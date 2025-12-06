@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>傷害計算機</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --accent-gold: #e67e22;
+            --accent-silver: #7f8c8d;
+            --accent-bronze: #a0522d;
+            --accent-blue: #3498db;
+            --accent-red: #e74c3c;
+            --accent-green: #27ae60;
+            --accent-purple: #9b59b6;
+            --accent-orange: #f39c12;
+            --accent-cyan: #1abc9c;
+            --accent-pink: #e91e63;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #dce4ec;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(ellipse at top left, rgba(52, 152, 219, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(230, 126, 34, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        h1 {
+            text-align: center;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .input-group { margin-bottom: 12px; }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .input-group input[type="number"],
+        .input-group select,
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        }
+
+        .skill-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .skill-input-row input[type="range"] { 
+            flex: 1; 
+            margin: 0;
+            height: 30px;
+        }
+
+        .skill-input-row input[type="number"] {
+            width: 75px;
+            padding: 10px 8px;
+            text-align: center;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-blue);
+            border-radius: 8px;
+            color: var(--accent-blue);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .skill-input-row .percent-sign {
+            color: var(--accent-blue);
+            font-weight: 700;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccd5de;
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #fff;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+            background-color: #fff;
+        }
+
+        .toggle-label { color: var(--text-secondary); font-size: 0.95rem; }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent-gold), #ff8f00);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(249, 168, 37, 0.4);
+        }
+
+        .btn-add-compare {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-purple), #7b1fa2);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-add-compare:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(171, 71, 188, 0.4);
+        }
+
+        .btn-clear-list {
+            padding: 6px 14px;
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            border-radius: 5px;
+            color: var(--accent-red);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear-list:hover {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        /* 結果區域 */
+        .results-section {
+            grid-column: 1 / -1;
+            margin-top: 15px;
+        }
+
+        .results-card {
+            background: linear-gradient(135deg, #fff, #fef9f3);
+            border: 2px solid var(--accent-gold);
+        }
+
+        /* 基礎數值區 */
+        .base-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .base-result-item {
+            background: #f8f9fa;
+            padding: 12px 8px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .base-result-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .base-result-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .base-result-value.gold { color: var(--accent-gold); }
+        .base-result-value.orange { color: var(--accent-orange); }
+
+        /* 修正值顯示 */
+        .modifier-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .modifier-item {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modifier-label { color: var(--text-secondary); font-size: 0.85rem; }
+        .modifier-value { font-weight: 700; font-size: 0.95rem; }
+        .modifier-positive { color: var(--accent-green); }
+        .modifier-negative { color: var(--accent-red); }
+        .modifier-neutral { color: var(--text-secondary); }
+
+        /* 改造倍率表 */
+        .reform-table-section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .reform-table-title {
+            font-size: 0.9rem;
+            color: var(--accent-orange);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .reform-table {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+
+        .reform-table-cell {
+            background: #f0f3f7;
+            padding: 8px 4px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .reform-table-cell.header {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .reform-table-cell.active {
+            background: var(--accent-orange);
+            color: #000;
+            font-weight: 700;
+        }
+
+        /* 傷害結果區 */
+        .damage-results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .damage-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .damage-box-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .damage-box.normal-atk { border-color: var(--accent-cyan); }
+        .damage-box.normal-atk .damage-box-title { color: var(--accent-cyan); }
+        .damage-box.no-crit .damage-box-title { color: var(--accent-silver); }
+        .damage-box.with-crit .damage-box-title { color: var(--accent-orange); }
+        .damage-box.with-boss .damage-box-title { color: var(--accent-red); }
+
+        .damage-box.highlight {
+            border-color: var(--accent-gold);
+            background: linear-gradient(135deg, #fffbf5, #fff3e0);
+        }
+        .damage-box.highlight .damage-box-title { color: var(--accent-gold); }
+
+        .tag {
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .tag-normal { background: var(--accent-cyan); color: #fff; }
+        .tag-skill { background: var(--accent-purple); color: #fff; }
+        .tag-crit { background: var(--accent-orange); color: #fff; }
+        .tag-no-crit { background: #bdc3c7; color: #555; }
+        .tag-boss { background: var(--accent-red); color: #fff; }
+        .tag-no-boss { background: #dce4ec; color: #777; }
+
+        .damage-category {
+            margin-bottom: 20px;
+        }
+
+        .damage-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .damage-category-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: #f0f3f7;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .damage-category:last-child .damage-category-title {
+            border-left-color: var(--accent-red);
+        }
+
+        .damage-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .damage-stat { text-align: center; }
+        .damage-stat-label { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 3px; }
+        .damage-stat-value { font-size: 1.1rem; font-weight: 700; }
+        .damage-stat.min .damage-stat-value { color: var(--accent-green); }
+        .damage-stat.avg .damage-stat-value { color: var(--accent-blue); }
+        .damage-stat.max .damage-stat-value { color: var(--accent-red); }
+
+        /* 改造等級標籤 */
+        .reform-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .reform-0 { background: #bdc3c7; color: #555; }
+        .reform-1 { background: #2e7d32; color: #fff; }
+        .reform-2 { background: #1976d2; color: #fff; }
+        .reform-3 { background: #7b1fa2; color: #fff; }
+        .reform-4 { background: #c62828; color: #fff; }
+        .reform-5 { background: linear-gradient(135deg, #f9a825, #ff6f00); color: #000; }
+
+        .grade-normal { color: var(--accent-bronze); }
+        .grade-silver { color: var(--accent-silver); }
+        .grade-gold { color: var(--accent-gold); }
+
+        /* 比較清單 */
+        .compare-list-card {
+            background: linear-gradient(135deg, #fff, #f8f5ff);
+            border: 2px solid var(--accent-purple);
+        }
+
+        .compare-list-card .card-title {
+            border-bottom-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .compare-list-empty {
+            text-align: center;
+            padding: 30px 15px;
+            color: var(--text-secondary);
+        }
+
+        .compare-list-empty .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .compare-list-scroll {
+            max-height: 500px;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+
+        .compare-list-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .compare-list-scroll::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 4px; }
+        .compare-list-scroll::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .compare-list-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+
+        .compare-list-table {
+            width: 100%;
+            min-width: 1400px;
+            border-collapse: collapse;
+            font-size: 15px;
+        }
+
+        .compare-list-table th {
+            background: #f0f3f7;
+            padding: 12px 8px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+            font-size: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .compare-list-table thead tr:first-child th {
+            top: 0;
+        }
+
+        .compare-list-table thead tr:nth-child(2) th {
+            top: 42px;
+            background: #e8ecf0;
+            font-size: 14px;
+        }
+
+        .compare-list-table th:first-child { text-align: left; padding-left: 12px; }
+
+        .compare-list-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .compare-list-table td:first-child { text-align: left; padding-left: 12px; }
+
+        .compare-list-table tbody tr:hover { background: rgba(171, 71, 188, 0.1); }
+
+        .compare-list-table .item-name {
+            font-weight: 600;
+            color: var(--accent-purple);
+            max-width: 110px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .compare-list-table .dmg-cell {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .btn-delete-item {
+            background: transparent;
+            border: none;
+            color: var(--accent-red);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .btn-delete-item:hover { opacity: 1; }
+
+        .btn-set-base {
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            cursor: pointer;
+            font-size: 13px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-set-base:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .btn-set-base.active {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+            color: #000;
+            font-weight: 600;
+        }
+
+        .base-row {
+            background: rgba(230, 126, 34, 0.12) !important;
+        }
+
+        .base-row td:first-child::before {
+            content: '⭐';
+            font-size: 14px;
+        }
+
+        .base-indicator {
+            display: inline-block;
+            background: var(--accent-gold);
+            color: #000;
+            font-size: 12px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            font-weight: 600;
+        }
+
+        .highlight-row { animation: highlightFade 2s ease-out; }
+
+        @keyframes highlightFade {
+            0% { background: rgba(155, 89, 182, 0.2); }
+            100% { background: transparent; }
+        }
+
+        .list-diff-positive { color: var(--accent-green); font-weight: 600; font-size: 13px; }
+        .list-diff-negative { color: var(--accent-red); font-weight: 600; font-size: 13px; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-yes { background: var(--accent-green); color: #fff; }
+        .status-no { background: #bdc3c7; color: #555; }
+
+        /* 手機版優化 */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            
+            .calculator-grid { 
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .card { padding: 12px; }
+            
+            .input-row { grid-template-columns: 1fr; gap: 10px; }
+            
+            .damage-results-grid { grid-template-columns: 1fr; gap: 12px; }
+            
+            .base-results { grid-template-columns: repeat(2, 1fr); }
+            
+            .modifier-section { grid-template-columns: 1fr 1fr; }
+            
+            .reform-table { 
+                grid-template-columns: repeat(3, 1fr); 
+                font-size: 0.75rem;
+            }
+            
+            .damage-stat-value { font-size: 1rem; }
+            
+            .compare-list-table { font-size: 0.9rem; min-width: 800px; }
+            .compare-list-table th { padding: 10px 6px; font-size: 0.85rem; }
+            .compare-list-table td { padding: 10px 6px; }
+            .compare-list-table .dmg-cell { font-size: 0.95rem; }
+        }
+
+        @media (max-width: 400px) {
+            h1 { font-size: 1.3rem; margin-bottom: 15px; }
+            .card-title { font-size: 1rem; }
+            .base-result-value { font-size: 1rem; }
+            .modifier-section { grid-template-columns: 1fr; }
+        }
+
+        /* 公式說明區 */
+        .formula-toggle {
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .formula-toggle:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .formula-section {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .formula-section.show {
+            display: block;
+        }
+
+        .formula-section h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .formula-item {
+            background: #fff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--accent-blue);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .formula-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .formula-item.main {
+            border-left-color: var(--accent-gold);
+            background: linear-gradient(90deg, rgba(230, 126, 34, 0.1), #fff);
+        }
+
+        .formula-label {
+            color: var(--accent-blue);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .formula-item.main .formula-label {
+            color: var(--accent-gold);
+        }
+
+        .formula-code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .formula-note {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .formula-var {
+            color: var(--accent-green);
+        }
+
+        .formula-op {
+            color: var(--accent-orange);
+        }
+
+        @media (max-width: 600px) {
+            .formula-section { font-size: 0.8rem; padding: 12px; }
+            .formula-item { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ 傷害計算機 ⚔️</h1>
+        
+        <div class="calculator-grid">
+            <!-- 基本數值 -->
+            <div class="card">
+                <div class="card-title">📊 基本數值</div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>攻擊力</label>
+                        <input type="number" id="attack" value="500" min="0" inputmode="numeric">
+                    </div>
+                    <div class="input-group">
+                        <label>防禦力 (被打方)</label>
+                        <input type="number" id="defense" value="300" min="0" inputmode="numeric">
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>攻擊方等級</label>
+                        <input type="number" id="attackerLevel" value="100" min="1" inputmode="numeric">
+                    </div>
+                    <div class="input-group">
+                        <label>防禦方等級</label>
+                        <input type="number" id="defenderLevel" value="100" min="1" inputmode="numeric">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 武器與屬性 -->
+            <div class="card">
+                <div class="card-title">🗡️ 武器與屬性</div>
+                <div class="input-group">
+                    <label>武器銳利度</label>
+                    <select id="weaponSharpness">
+                        <option value="0">空手 (+0%)</option>
+                        <option value="0.15" selected>有武器 (+15%)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>水晶屬性影響</label>
+                    <select id="crystalElement">
+                        <option value="0.30" data-label="全剋">全剋 (+30%)</option>
+                        <option value="0.15" data-label="半剋">半剋 (+15%)</option>
+                        <option value="0" data-label="不相剋" selected>不相剋 (+0%)</option>
+                        <option value="-0.15" data-label="被半剋">被半剋 (-15%)</option>
+                        <option value="-0.30" data-label="被全剋">被全剋 (-30%)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>種族影響</label>
+                    <select id="raceEffect">
+                        <option value="0.20" data-label="全剋">全剋 (+20%)</option>
+                        <option value="0.10" data-label="半剋">半剋 (+10%)</option>
+                        <option value="0" data-label="不相剋" selected>不相剋 (+0%)</option>
+                        <option value="-0.10" data-label="被半剋">被半剋 (-10%)</option>
+                        <option value="-0.20" data-label="被全剋">被全剋 (-20%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 技能倍率 -->
+            <div class="card">
+                <div class="card-title">✨ 技能傷害倍率</div>
+                <div class="input-group">
+                    <label>技能倍率 (45% ~ 220%)</label>
+                    <div class="skill-input-row">
+                        <input type="range" id="skillMultiplierRange" min="45" max="220" value="100">
+                        <input type="number" id="skillMultiplierInput" min="45" max="220" value="100" inputmode="numeric">
+                        <span class="percent-sign">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 寵物加乘 -->
+            <div class="card">
+                <div class="card-title">🐾 寵物加乘設定</div>
+
+                <div class="input-group">
+                    <label>寵物卡片等級</label>
+                    <select id="petGrade">
+                        <option value="normal">普卡寵</option>
+                        <option value="silver">銀卡寵</option>
+                        <option value="gold" selected>金卡寵</option>
+                    </select>
+                </div>
+
+                <div class="toggle-group">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="maxStats" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">滿檔狀態</span>
+                </div>
+
+                <div class="toggle-group">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="beastPassive">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">野獸系被動</span>
+                </div>
+
+                <div class="input-group">
+                    <label>寵物改造等級 (BOSS戰用)</label>
+                    <select id="petReform">
+                        <option value="0">未改造</option>
+                        <option value="1">一改</option>
+                        <option value="2">二改</option>
+                        <option value="3">三改</option>
+                        <option value="4">四改</option>
+                        <option value="5">五改</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 計算按鈕 -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: center;">
+                <div class="input-group">
+                    <label>記錄名稱 (加入清單用)</label>
+                    <input type="text" id="recordName" placeholder="例如：金寵五改滿檔">
+                </div>
+                <button class="btn-calculate" onclick="calculate()">🔥 計算傷害 🔥</button>
+                <button class="btn-add-compare" onclick="addToCompareList()">📋 加入比較清單</button>
+            </div>
+
+            <!-- 結果顯示 -->
+            <div class="results-section">
+                <div class="card results-card">
+                    <div class="card-title">
+                        <span>📈 計算結果</span>
+                        <button class="formula-toggle" onclick="toggleFormula()">📐 查看公式</button>
+                    </div>
+
+                    <!-- 公式說明區 -->
+                    <div class="formula-section" id="formulaSection">
+                        <h4>📐 傷害計算公式說明</h4>
+                        
+                        <div class="formula-item">
+                            <span class="formula-label">① 攻擊實際效應值</span>
+                            <span class="formula-code">
+                                <span class="formula-var">攻擊效應</span> <span class="formula-op">=</span> <span class="formula-var">攻擊力</span>（若 ≤ 240）<span class="formula-op">或</span> 240 <span class="formula-op">+</span> 0.3 <span class="formula-op">×</span> (<span class="formula-var">攻擊力</span> <span class="formula-op">-</span> 240)（若 > 240）
+                            </span>
+                        </div>
+
+                        <div class="formula-item">
+                            <span class="formula-label">② 防禦實際效應值</span>
+                            <span class="formula-code">
+                                <span class="formula-var">防禦效應</span> <span class="formula-op">=</span> <span class="formula-var">防禦力</span>（若 ≤ 240）<span class="formula-op">或</span> 240 <span class="formula-op">+</span> 0.3 <span class="formula-op">×</span> (<span class="formula-var">防禦力</span> <span class="formula-op">-</span> 240)（若 > 240）
+                            </span>
+                        </div>
+
+                        <div class="formula-item">
+                            <span class="formula-label">③ 基本傷害值</span>
+                            <span class="formula-code">
+                                <span class="formula-var">基本傷害</span> <span class="formula-op">=</span> <span class="formula-var">攻擊效應</span>² <span class="formula-op">×</span> 3 <span class="formula-op">÷</span> (<span class="formula-var">攻擊效應</span> <span class="formula-op">+</span> <span class="formula-var">防禦效應</span> <span class="formula-op">×</span> 3)
+                            </span>
+                        </div>
+
+                        <div class="formula-item">
+                            <span class="formula-label">④ 必殺修正值</span>
+                            <span class="formula-code">
+                                <span class="formula-var">必殺修正</span> <span class="formula-op">=</span> <span class="formula-var">被打防禦力</span> <span class="formula-op">×</span> <span class="formula-var">攻擊方等級</span> <span class="formula-op">÷</span> (<span class="formula-var">防禦方等級</span> <span class="formula-op">×</span> 2)
+                            </span>
+                            <div class="formula-note">※ 無必殺時此值為 0</div>
+                        </div>
+
+                        <div class="formula-item main">
+                            <span class="formula-label">⑤ 實際傷害值（完整公式）</span>
+                            <span class="formula-code">
+                                <span class="formula-var">實際傷害</span> <span class="formula-op">=</span> [<span class="formula-var">基本傷害</span> <span class="formula-op">×</span> <span class="formula-var">武器修正</span> <span class="formula-op">×</span> <span class="formula-var">水晶屬性</span> <span class="formula-op">×</span> <span class="formula-var">隨機值(90%~110%)</span> <span class="formula-op">+</span> <span class="formula-var">必殺修正</span>] <span class="formula-op">×</span> <span class="formula-var">種族影響</span> <span class="formula-op">×</span> <span class="formula-var">技能倍率</span> <span class="formula-op">×</span> <span class="formula-var">滿檔加乘</span> <span class="formula-op">×</span> <span class="formula-var">改造BOSS增傷</span> <span class="formula-op">×</span> <span class="formula-var">野獸被動</span>
+                            </span>
+                            <div class="formula-note">
+                                ※ 武器修正：空手=1.0，有武器=1.15<br>
+                                ※ 水晶屬性：全剋=1.3，半剋=1.15，不相剋=1.0，被半剋=0.85，被全剋=0.7<br>
+                                ※ 種族影響：全剋=1.2，半剋=1.1，不相剋=1.0，被半剋=0.9，被全剋=0.8<br>
+                                ※ 改造BOSS增傷：僅在BOSS戰時生效
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 基礎計算數值 -->
+                    <div class="base-results">
+                        <div class="base-result-item">
+                            <div class="base-result-label">攻擊實際效應值</div>
+                            <div class="base-result-value" id="resultAttackEffect">-</div>
+                        </div>
+                        <div class="base-result-item">
+                            <div class="base-result-label">防禦實際效應值</div>
+                            <div class="base-result-value" id="resultDefenseEffect">-</div>
+                        </div>
+                        <div class="base-result-item">
+                            <div class="base-result-label">基本傷害值</div>
+                            <div class="base-result-value gold" id="resultBaseDamage">-</div>
+                        </div>
+                        <div class="base-result-item">
+                            <div class="base-result-label">必殺修正值</div>
+                            <div class="base-result-value orange" id="resultCritCorrection">-</div>
+                        </div>
+                    </div>
+
+                    <!-- 各項修正值 -->
+                    <div class="modifier-section">
+                        <div class="modifier-item">
+                            <span class="modifier-label">💎 水晶屬性</span>
+                            <span class="modifier-value" id="modCrystal">-</span>
+                        </div>
+                        <div class="modifier-item">
+                            <span class="modifier-label">👾 種族影響</span>
+                            <span class="modifier-value" id="modRace">-</span>
+                        </div>
+                        <div class="modifier-item">
+                            <span class="modifier-label">⚔️ 武器銳利度</span>
+                            <span class="modifier-value" id="modWeapon">-</span>
+                        </div>
+                        <div class="modifier-item">
+                            <span class="modifier-label">✨ 技能倍率</span>
+                            <span class="modifier-value" id="modSkill">-</span>
+                        </div>
+                        <div class="modifier-item">
+                            <span class="modifier-label">📊 滿檔加乘</span>
+                            <span class="modifier-value" id="modMaxStats">-</span>
+                        </div>
+                        <div class="modifier-item">
+                            <span class="modifier-label">🐺 野獸被動</span>
+                            <span class="modifier-value" id="modBeast">-</span>
+                        </div>
+                    </div>
+
+                    <!-- 改造倍率表 -->
+                    <div class="reform-table-section">
+                        <div class="reform-table-title">🔧 改造BOSS增傷倍率 (當前卡別: <span id="currentGrade">金卡</span>)</div>
+                        <div class="reform-table" id="reformTable">
+                            <!-- 動態生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 傷害結果分類 -->
+                    <div class="damage-category">
+                        <h4 class="damage-category-title">🗡️ 一般傷害（無BOSS增傷）</h4>
+                        <div class="damage-results-grid">
+                            <!-- 普攻傷害 (100%, 無必殺) -->
+                            <div class="damage-box normal-atk">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-normal">普攻100%</span>
+                                    <span class="tag tag-no-crit">無必殺</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="dmgNA_NoCrit_Min">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="dmgNA_NoCrit_Avg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="dmgNA_NoCrit_Max">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 技能傷害 (技能%, 無必殺) -->
+                            <div class="damage-box no-crit">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-skill" id="tagSkill1">技能%</span>
+                                    <span class="tag tag-no-crit">無必殺</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="dmgSkill_NoCrit_Min">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="dmgSkill_NoCrit_Avg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="dmgSkill_NoCrit_Max">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 普攻必殺 (100%, 有必殺) -->
+                            <div class="damage-box with-crit">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-normal">普攻100%</span>
+                                    <span class="tag tag-crit">有必殺</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="dmgNA_Crit_Min">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="dmgNA_Crit_Avg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="dmgNA_Crit_Max">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 技能必殺 (技能%, 有必殺) -->
+                            <div class="damage-box with-crit">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-skill" id="tagSkill2">技能%</span>
+                                    <span class="tag tag-crit">有必殺</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="dmgSkill_Crit_Min">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="dmgSkill_Crit_Avg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="dmgSkill_Crit_Max">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="damage-category">
+                        <h4 class="damage-category-title">👹 BOSS戰傷害（含改造增傷）</h4>
+                        <div class="damage-results-grid">
+                            <!-- 普攻BOSS (100%, 無必殺) -->
+                            <div class="damage-box with-boss">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-normal">普攻100%</span>
+                                    <span class="tag tag-no-crit">無必殺</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="dmgNA_Boss_Min">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="dmgNA_Boss_Avg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="dmgNA_Boss_Max">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 技能BOSS (技能%, 無必殺) -->
+                            <div class="damage-box with-boss">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-skill" id="tagSkill3">技能%</span>
+                                    <span class="tag tag-no-crit">無必殺</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="dmgSkill_Boss_Min">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="dmgSkill_Boss_Avg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="dmgSkill_Boss_Max">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 普攻BOSS必殺 (100%, 有必殺) -->
+                            <div class="damage-box highlight">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-normal">普攻100%</span>
+                                    <span class="tag tag-crit">有必殺</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="dmgNA_BossCrit_Min">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="dmgNA_BossCrit_Avg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="dmgNA_BossCrit_Max">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 技能BOSS必殺 (技能%, 有必殺) - 最大輸出 -->
+                            <div class="damage-box highlight">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-skill" id="tagSkill4">技能%</span>
+                                    <span class="tag tag-crit">有必殺</span>
+                                    🔥
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="dmgSkill_BossCrit_Min">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="dmgSkill_BossCrit_Avg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="dmgSkill_BossCrit_Max">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 比較清單 -->
+            <div class="results-section">
+                <div class="card compare-list-card">
+                    <div class="card-title">
+                        <span>📋 比較清單</span>
+                        <button class="btn-clear-list" onclick="clearCompareList()">清空清單</button>
+                    </div>
+                    
+                    <div id="compareListContent">
+                        <div class="compare-list-empty" id="compareListEmpty">
+                            <div class="icon">📝</div>
+                            <p>尚無比較記錄</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">計算後點擊「加入比較清單」來新增記錄</p>
+                        </div>
+                        
+                        <div class="compare-list-scroll" id="compareListScroll" style="display: none;">
+                            <table class="compare-list-table">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">名稱</th>
+                                        <th rowspan="2">攻/防</th>
+                                        <th rowspan="2">武器</th>
+                                        <th rowspan="2">屬性</th>
+                                        <th rowspan="2">種族</th>
+                                        <th rowspan="2">卡別</th>
+                                        <th rowspan="2">滿檔</th>
+                                        <th rowspan="2">野獸</th>
+                                        <th rowspan="2">改造</th>
+                                        <th colspan="2">一般傷害</th>
+                                        <th colspan="2">必殺傷害</th>
+                                        <th colspan="2">BOSS傷</th>
+                                        <th colspan="2">BOSS必殺</th>
+                                        <th rowspan="2">操作</th>
+                                    </tr>
+                                    <tr>
+                                        <th>普攻</th>
+                                        <th>技能</th>
+                                        <th>普攻</th>
+                                        <th>技能</th>
+                                        <th>普攻</th>
+                                        <th>技能</th>
+                                        <th>普攻</th>
+                                        <th>技能</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="compareListBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 資料表
+        const maxStatsBonusTable = { normal: 0.10, silver: 0.15, gold: 0.20 };
+        const petReformBonusTable = {
+            0: { normal: 0, silver: 0, gold: 0 },
+            1: { normal: 0.06, silver: 0.09, gold: 0.13 },
+            2: { normal: 0.09, silver: 0.13, gold: 0.18 },
+            3: { normal: 0.12, silver: 0.17, gold: 0.23 },
+            4: { normal: 0.16, silver: 0.22, gold: 0.29 },
+            5: { normal: 0.20, silver: 0.27, gold: 0.35 }
+        };
+        const beastPassiveBonusTable = { normal: 0.03, silver: 0.05, gold: 0.08 };
+        const gradeNames = { normal: '普卡', silver: '銀卡', gold: '金卡' };
+        const reformLabels = ['未改', '一改', '二改', '三改', '四改', '五改'];
+
+        let compareList = [];
+        let recordCounter = 1;
+        let baseItemId = null; // 基準項目 ID
+
+        // 公式區塊切換
+        function toggleFormula() {
+            const section = document.getElementById('formulaSection');
+            const btn = document.querySelector('.formula-toggle');
+            section.classList.toggle('show');
+            btn.textContent = section.classList.contains('show') ? '📐 隱藏公式' : '📐 查看公式';
+        }
+
+        // 技能倍率同步
+        const skillRange = document.getElementById('skillMultiplierRange');
+        const skillInput = document.getElementById('skillMultiplierInput');
+
+        skillRange.addEventListener('input', function() {
+            skillInput.value = this.value;
+            calculate();
+        });
+
+        skillInput.addEventListener('input', function() {
+            // 輸入時不強制限制，讓使用者可以自由輸入
+            const val = parseInt(this.value);
+            if (!isNaN(val) && val >= 45 && val <= 220) {
+                skillRange.value = val;
+                calculate();
+            }
+        });
+
+        skillInput.addEventListener('blur', function() {
+            // 失去焦點時才驗證並修正數值
+            let val = parseInt(this.value);
+            if (isNaN(val) || val < 45) val = 45;
+            if (val > 220) val = 220;
+            this.value = val;
+            skillRange.value = val;
+            calculate();
+        });
+
+        skillInput.addEventListener('keydown', function(e) {
+            // 按 Enter 時驗證並更新
+            if (e.key === 'Enter') {
+                this.blur();
+            }
+        });
+
+        function formatModifier(value, isPercent = true) {
+            if (value === 0) return '<span class="modifier-neutral">+0%</span>';
+            const sign = value > 0 ? '+' : '';
+            const cls = value > 0 ? 'modifier-positive' : 'modifier-negative';
+            const display = isPercent ? `${sign}${(value * 100).toFixed(0)}%` : `×${value.toFixed(2)}`;
+            return `<span class="${cls}">${display}</span>`;
+        }
+
+        function getSelectedLabel(selectId) {
+            const sel = document.getElementById(selectId);
+            return sel.options[sel.selectedIndex].getAttribute('data-label') || '';
+        }
+
+        function renderReformTable(petGrade, currentReform) {
+            const tableEl = document.getElementById('reformTable');
+            document.getElementById('currentGrade').textContent = gradeNames[petGrade];
+            document.getElementById('currentGrade').className = `grade-${petGrade}`;
+
+            let html = '';
+            // Header
+            for (let i = 0; i <= 5; i++) {
+                html += `<div class="reform-table-cell header">${reformLabels[i]}</div>`;
+            }
+            // Values
+            for (let i = 0; i <= 5; i++) {
+                const bonus = petReformBonusTable[i][petGrade];
+                const isActive = i === currentReform;
+                const displayVal = bonus === 0 ? '-' : `+${(bonus * 100).toFixed(0)}%`;
+                html += `<div class="reform-table-cell${isActive ? ' active' : ''}">${displayVal}</div>`;
+            }
+            tableEl.innerHTML = html;
+        }
+
+        function getCurrentParams() {
+            const attack = parseFloat(document.getElementById('attack').value) || 0;
+            const defense = parseFloat(document.getElementById('defense').value) || 0;
+            const attackerLevel = parseFloat(document.getElementById('attackerLevel').value) || 1;
+            const defenderLevel = parseFloat(document.getElementById('defenderLevel').value) || 1;
+            const weaponSharpness = parseFloat(document.getElementById('weaponSharpness').value);
+            const crystalElement = parseFloat(document.getElementById('crystalElement').value);
+            const raceEffect = parseFloat(document.getElementById('raceEffect').value);
+            const skillMultiplier = parseFloat(skillInput.value) / 100;
+            const isMaxStats = document.getElementById('maxStats').checked;
+            const petReformLevel = parseInt(document.getElementById('petReform').value);
+            const isBeast = document.getElementById('beastPassive').checked;
+            const petGrade = document.getElementById('petGrade').value;
+
+            const crystalLabel = getSelectedLabel('crystalElement');
+            const raceLabel = getSelectedLabel('raceEffect');
+
+            const attackEffect = attack <= 240 ? attack : 240 + 0.3 * (attack - 240);
+            const defenseEffect = defense <= 240 ? defense : 240 + 0.3 * (defense - 240);
+            const baseDamage = Math.pow(attackEffect, 2) * 3 / (attackEffect + defenseEffect * 3);
+            const critCorrection = defense * attackerLevel / (defenderLevel * 2);
+            const weaponModifier = 1 + weaponSharpness;
+            const crystalModifier = 1 + crystalElement;
+            const raceModifier = 1 + raceEffect;
+
+            const maxStatsBonus = isMaxStats ? maxStatsBonusTable[petGrade] : 0;
+            const petReformBonus = petReformBonusTable[petReformLevel][petGrade];
+            const beastBonus = isBeast ? beastPassiveBonusTable[petGrade] : 0;
+
+            return {
+                attack, defense, attackerLevel, defenderLevel,
+                weaponSharpness, crystalElement, raceEffect,
+                crystalLabel, raceLabel,
+                skillMultiplier, isMaxStats, petReformLevel, isBeast, petGrade,
+                attackEffect, defenseEffect, baseDamage, critCorrection,
+                weaponModifier, crystalModifier, raceModifier,
+                maxStatsBonus, petReformBonus, beastBonus
+            };
+        }
+
+        function calculateDamage(params, withCrit, withBoss, skillMult = null) {
+            const { baseDamage, critCorrection, weaponModifier, crystalModifier, raceModifier, 
+                    skillMultiplier, maxStatsBonus, petReformBonus, beastBonus } = params;
+
+            const actualSkillMult = skillMult !== null ? skillMult : skillMultiplier;
+            const maxStatsMult = 1 + maxStatsBonus;
+            const beastMult = 1 + beastBonus;
+            const reformMult = withBoss ? (1 + petReformBonus) : 1;
+            const crit = withCrit ? critCorrection : 0;
+
+            const baseCalc = baseDamage * weaponModifier * crystalModifier;
+            
+            const dmgMin = (baseCalc * 0.90 + crit) * raceModifier * actualSkillMult * maxStatsMult * reformMult * beastMult;
+            const dmgAvg = (baseCalc * 1.00 + crit) * raceModifier * actualSkillMult * maxStatsMult * reformMult * beastMult;
+            const dmgMax = (baseCalc * 1.10 + crit) * raceModifier * actualSkillMult * maxStatsMult * reformMult * beastMult;
+
+            return {
+                min: Math.floor(dmgMin),
+                avg: Math.floor(dmgAvg),
+                max: Math.floor(dmgMax)
+            };
+        }
+
+        function calculate() {
+            const params = getCurrentParams();
+
+            // 基礎數值
+            document.getElementById('resultAttackEffect').textContent = params.attackEffect.toFixed(2);
+            document.getElementById('resultDefenseEffect').textContent = params.defenseEffect.toFixed(2);
+            document.getElementById('resultBaseDamage').textContent = params.baseDamage.toFixed(2);
+            document.getElementById('resultCritCorrection').textContent = params.critCorrection.toFixed(2);
+
+            // 修正值
+            document.getElementById('modCrystal').innerHTML = 
+                `${params.crystalLabel} ${formatModifier(params.crystalElement)}`;
+            document.getElementById('modRace').innerHTML = 
+                `${params.raceLabel} ${formatModifier(params.raceEffect)}`;
+            document.getElementById('modWeapon').innerHTML = formatModifier(params.weaponSharpness);
+            document.getElementById('modSkill').innerHTML = 
+                `<span class="modifier-positive">×${params.skillMultiplier.toFixed(2)}</span>`;
+            document.getElementById('modMaxStats').innerHTML = 
+                params.isMaxStats ? formatModifier(params.maxStatsBonus) : '<span class="modifier-neutral">無</span>';
+            document.getElementById('modBeast').innerHTML = 
+                params.isBeast ? formatModifier(params.beastBonus) : '<span class="modifier-neutral">無</span>';
+
+            // 改造倍率表
+            renderReformTable(params.petGrade, params.petReformLevel);
+
+            // 更新技能%標籤
+            const skillPercent = Math.round(params.skillMultiplier * 100);
+            document.getElementById('tagSkill1').textContent = `技能${skillPercent}%`;
+            document.getElementById('tagSkill2').textContent = `技能${skillPercent}%`;
+            document.getElementById('tagSkill3').textContent = `技能${skillPercent}%`;
+            document.getElementById('tagSkill4').textContent = `技能${skillPercent}%`;
+
+            // 八種傷害情況
+            // 一般傷害（無BOSS增傷）
+            const dmgNA_NoCrit = calculateDamage(params, false, false, 1.0);    // 普攻100%, 無必殺
+            const dmgSkill_NoCrit = calculateDamage(params, false, false);      // 技能%, 無必殺
+            const dmgNA_Crit = calculateDamage(params, true, false, 1.0);       // 普攻100%, 有必殺
+            const dmgSkill_Crit = calculateDamage(params, true, false);         // 技能%, 有必殺
+
+            // BOSS戰傷害（含改造增傷）
+            const dmgNA_Boss = calculateDamage(params, false, true, 1.0);       // 普攻100%, 無必殺, BOSS
+            const dmgSkill_Boss = calculateDamage(params, false, true);         // 技能%, 無必殺, BOSS
+            const dmgNA_BossCrit = calculateDamage(params, true, true, 1.0);    // 普攻100%, 有必殺, BOSS
+            const dmgSkill_BossCrit = calculateDamage(params, true, true);      // 技能%, 有必殺, BOSS
+
+            // 更新一般傷害區
+            document.getElementById('dmgNA_NoCrit_Min').textContent = dmgNA_NoCrit.min.toLocaleString();
+            document.getElementById('dmgNA_NoCrit_Avg').textContent = dmgNA_NoCrit.avg.toLocaleString();
+            document.getElementById('dmgNA_NoCrit_Max').textContent = dmgNA_NoCrit.max.toLocaleString();
+
+            document.getElementById('dmgSkill_NoCrit_Min').textContent = dmgSkill_NoCrit.min.toLocaleString();
+            document.getElementById('dmgSkill_NoCrit_Avg').textContent = dmgSkill_NoCrit.avg.toLocaleString();
+            document.getElementById('dmgSkill_NoCrit_Max').textContent = dmgSkill_NoCrit.max.toLocaleString();
+
+            document.getElementById('dmgNA_Crit_Min').textContent = dmgNA_Crit.min.toLocaleString();
+            document.getElementById('dmgNA_Crit_Avg').textContent = dmgNA_Crit.avg.toLocaleString();
+            document.getElementById('dmgNA_Crit_Max').textContent = dmgNA_Crit.max.toLocaleString();
+
+            document.getElementById('dmgSkill_Crit_Min').textContent = dmgSkill_Crit.min.toLocaleString();
+            document.getElementById('dmgSkill_Crit_Avg').textContent = dmgSkill_Crit.avg.toLocaleString();
+            document.getElementById('dmgSkill_Crit_Max').textContent = dmgSkill_Crit.max.toLocaleString();
+
+            // 更新BOSS傷害區
+            document.getElementById('dmgNA_Boss_Min').textContent = dmgNA_Boss.min.toLocaleString();
+            document.getElementById('dmgNA_Boss_Avg').textContent = dmgNA_Boss.avg.toLocaleString();
+            document.getElementById('dmgNA_Boss_Max').textContent = dmgNA_Boss.max.toLocaleString();
+
+            document.getElementById('dmgSkill_Boss_Min').textContent = dmgSkill_Boss.min.toLocaleString();
+            document.getElementById('dmgSkill_Boss_Avg').textContent = dmgSkill_Boss.avg.toLocaleString();
+            document.getElementById('dmgSkill_Boss_Max').textContent = dmgSkill_Boss.max.toLocaleString();
+
+            document.getElementById('dmgNA_BossCrit_Min').textContent = dmgNA_BossCrit.min.toLocaleString();
+            document.getElementById('dmgNA_BossCrit_Avg').textContent = dmgNA_BossCrit.avg.toLocaleString();
+            document.getElementById('dmgNA_BossCrit_Max').textContent = dmgNA_BossCrit.max.toLocaleString();
+
+            document.getElementById('dmgSkill_BossCrit_Min').textContent = dmgSkill_BossCrit.min.toLocaleString();
+            document.getElementById('dmgSkill_BossCrit_Avg').textContent = dmgSkill_BossCrit.avg.toLocaleString();
+            document.getElementById('dmgSkill_BossCrit_Max').textContent = dmgSkill_BossCrit.max.toLocaleString();
+        }
+
+        function addToCompareList() {
+            const params = getCurrentParams();
+            let recordName = document.getElementById('recordName').value.trim();
+            
+            if (!recordName) {
+                recordName = `記錄 ${recordCounter++}`;
+            }
+
+            // 普攻版本 (100%)
+            const dmgNA_NoCrit = calculateDamage(params, false, false, 1.0);
+            const dmgNA_Crit = calculateDamage(params, true, false, 1.0);
+            const dmgNA_Boss = calculateDamage(params, false, true, 1.0);
+            const dmgNA_BossCrit = calculateDamage(params, true, true, 1.0);
+            
+            // 技能版本
+            const dmgSkill_NoCrit = calculateDamage(params, false, false);
+            const dmgSkill_Crit = calculateDamage(params, true, false);
+            const dmgSkill_Boss = calculateDamage(params, false, true);
+            const dmgSkill_BossCrit = calculateDamage(params, true, true);
+
+            compareList.push({
+                id: Date.now(),
+                name: recordName,
+                attack: params.attack,
+                defense: params.defense,
+                hasWeapon: params.weaponSharpness > 0,
+                petGrade: params.petGrade,
+                isMaxStats: params.isMaxStats,
+                isBeast: params.isBeast,
+                petReformLevel: params.petReformLevel,
+                crystalLabel: params.crystalLabel,
+                raceLabel: params.raceLabel,
+                skillPercent: Math.round(params.skillMultiplier * 100),
+                maxStatsPercent: params.isMaxStats ? Math.round(params.maxStatsBonus * 100) : 0,
+                reformPercent: Math.round(params.petReformBonus * 100),
+                beastPercent: params.isBeast ? Math.round(params.beastBonus * 100) : 0,
+                // 普攻版本
+                dmgNA_NoCrit: dmgNA_NoCrit.avg,
+                dmgNA_Crit: dmgNA_Crit.avg,
+                dmgNA_Boss: dmgNA_Boss.avg,
+                dmgNA_BossCrit: dmgNA_BossCrit.avg,
+                // 技能版本
+                dmgSkill_NoCrit: dmgSkill_NoCrit.avg,
+                dmgSkill_Crit: dmgSkill_Crit.avg,
+                dmgSkill_Boss: dmgSkill_Boss.avg,
+                dmgSkill_BossCrit: dmgSkill_BossCrit.avg
+            });
+
+            document.getElementById('recordName').value = '';
+            renderCompareList();
+        }
+
+        function renderCompareList() {
+            const emptyEl = document.getElementById('compareListEmpty');
+            const scrollEl = document.getElementById('compareListScroll');
+            const bodyEl = document.getElementById('compareListBody');
+
+            if (compareList.length === 0) {
+                emptyEl.style.display = 'block';
+                scrollEl.style.display = 'none';
+                baseItemId = null;
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            scrollEl.style.display = 'block';
+
+            // 如果沒有設定基準，或基準項目已被刪除，則使用第一筆
+            let baseItem = compareList.find(item => item.id === baseItemId);
+            if (!baseItem) {
+                baseItemId = compareList[0].id;
+                baseItem = compareList[0];
+            }
+
+            let html = '';
+            compareList.forEach((item, index) => {
+                const isBase = item.id === baseItemId;
+                const isNew = index === compareList.length - 1;
+
+                const getDiff = (current, base) => {
+                    if (isBase || base === 0) return '';
+                    const diff = ((current - base) / base * 100).toFixed(1);
+                    if (diff > 0) return `<br><span class="list-diff-positive">+${diff}%</span>`;
+                    if (diff < 0) return `<br><span class="list-diff-negative">${diff}%</span>`;
+                    return '';
+                };
+
+                const rowClass = isBase ? 'base-row' : (isNew ? 'highlight-row' : '');
+                const baseLabel = isBase ? '<span class="base-indicator">基準</span>' : '';
+                const btnClass = isBase ? 'btn-set-base active' : 'btn-set-base';
+                const btnText = isBase ? '✓ 基準' : '設為基準';
+
+                const maxStatsDisplay = item.isMaxStats ? `+${item.maxStatsPercent}%` : '-';
+                const beastDisplay = item.isBeast ? `+${item.beastPercent}%` : '-';
+                const reformDisplay = item.petReformLevel > 0 ? `${reformLabels[item.petReformLevel]} +${item.reformPercent}%` : '未改';
+                const weaponDisplay = item.hasWeapon ? '有' : '無';
+
+                const shortReform = item.petReformLevel > 0 ? `${item.petReformLevel}改` : '-';
+
+                html += `
+                    <tr class="${rowClass}">
+                        <td class="item-name" title="${item.name}">${item.name}${baseLabel}</td>
+                        <td>${item.attack}/${item.defense}</td>
+                        <td><span class="status-badge ${item.hasWeapon ? 'status-yes' : 'status-no'}">${weaponDisplay}</span></td>
+                        <td>${item.crystalLabel}</td>
+                        <td>${item.raceLabel}</td>
+                        <td class="grade-${item.petGrade}">${gradeNames[item.petGrade]}</td>
+                        <td><span class="status-badge ${item.isMaxStats ? 'status-yes' : 'status-no'}">${maxStatsDisplay}</span></td>
+                        <td><span class="status-badge ${item.isBeast ? 'status-yes' : 'status-no'}">${beastDisplay}</span></td>
+                        <td><span class="reform-badge reform-${item.petReformLevel}">${shortReform}</span></td>
+                        <td class="dmg-cell">${item.dmgNA_NoCrit.toLocaleString()}${getDiff(item.dmgNA_NoCrit, baseItem.dmgNA_NoCrit)}</td>
+                        <td class="dmg-cell">${item.dmgSkill_NoCrit.toLocaleString()}${getDiff(item.dmgSkill_NoCrit, baseItem.dmgSkill_NoCrit)}</td>
+                        <td class="dmg-cell">${item.dmgNA_Crit.toLocaleString()}${getDiff(item.dmgNA_Crit, baseItem.dmgNA_Crit)}</td>
+                        <td class="dmg-cell">${item.dmgSkill_Crit.toLocaleString()}${getDiff(item.dmgSkill_Crit, baseItem.dmgSkill_Crit)}</td>
+                        <td class="dmg-cell">${item.dmgNA_Boss.toLocaleString()}${getDiff(item.dmgNA_Boss, baseItem.dmgNA_Boss)}</td>
+                        <td class="dmg-cell">${item.dmgSkill_Boss.toLocaleString()}${getDiff(item.dmgSkill_Boss, baseItem.dmgSkill_Boss)}</td>
+                        <td class="dmg-cell">${item.dmgNA_BossCrit.toLocaleString()}${getDiff(item.dmgNA_BossCrit, baseItem.dmgNA_BossCrit)}</td>
+                        <td class="dmg-cell">${item.dmgSkill_BossCrit.toLocaleString()}${getDiff(item.dmgSkill_BossCrit, baseItem.dmgSkill_BossCrit)}</td>
+                        <td>
+                            <button class="${btnClass}" onclick="setAsBase(${item.id})">${btnText}</button>
+                            <button class="btn-delete-item" onclick="removeFromList(${item.id})">✕</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            bodyEl.innerHTML = html;
+        }
+
+        function setAsBase(id) {
+            baseItemId = id;
+            renderCompareList();
+        }
+
+        function removeFromList(id) {
+            compareList = compareList.filter(item => item.id !== id);
+            renderCompareList();
+        }
+
+        function clearCompareList() {
+            if (compareList.length === 0) return;
+            if (confirm('確定要清空所有比較記錄嗎？')) {
+                compareList = [];
+                recordCounter = 1;
+                renderCompareList();
+            }
+        }
+
+        window.onload = function() { calculate(); };
+
+        document.querySelectorAll('input:not(#recordName):not(#skillMultiplierInput):not(#skillMultiplierRange), select').forEach(el => {
+            el.addEventListener('change', calculate);
+            el.addEventListener('input', calculate);
+        });
+    </script>
+</body>
+</html>
