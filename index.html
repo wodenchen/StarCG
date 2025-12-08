@@ -509,7 +509,7 @@
         }
 
         .compare-list-scroll {
-            max-height: 500px;
+            max-height: 1280px;
             overflow-x: auto;
             overflow-y: auto;
         }
@@ -565,9 +565,9 @@
         .compare-list-table .item-name {
             font-weight: 600;
             color: var(--accent-purple);
-            max-width: 110px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            max-width: 130px;
+            word-break: break-all;
+            white-space: normal;
         }
 
         .compare-list-table .dmg-cell {
@@ -587,6 +587,33 @@
         }
 
         .btn-delete-item:hover { opacity: 1; }
+
+        .btn-move {
+            background: transparent;
+            border: 1px solid var(--accent-purple);
+            color: var(--accent-purple);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin-right: 3px;
+        }
+
+        .btn-move:hover {
+            background: var(--accent-purple);
+            color: #fff;
+        }
+
+        .btn-move:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-move:disabled:hover {
+            background: transparent;
+            color: var(--accent-purple);
+        }
 
         .btn-set-base {
             background: transparent;
@@ -1630,6 +1657,8 @@
                         <td class="dmg-cell">${item.dmgNA_BossCrit.toLocaleString()}${getDiff(item.dmgNA_BossCrit, baseItem.dmgNA_BossCrit)}</td>
                         <td class="dmg-cell">${item.dmgSkill_BossCrit.toLocaleString()}${getDiff(item.dmgSkill_BossCrit, baseItem.dmgSkill_BossCrit)}</td>
                         <td>
+                            <button class="btn-move" onclick="moveUp(${index})" ${index === 0 ? 'disabled' : ''} title="上移">▲</button>
+                            <button class="btn-move" onclick="moveDown(${index})" ${index === compareList.length - 1 ? 'disabled' : ''} title="下移">▼</button>
                             <button class="${btnClass}" onclick="setAsBase(${item.id})">${btnText}</button>
                             <button class="btn-delete-item" onclick="removeFromList(${item.id})">✕</button>
                         </td>
@@ -1647,6 +1676,22 @@
 
         function removeFromList(id) {
             compareList = compareList.filter(item => item.id !== id);
+            renderCompareList();
+        }
+
+        function moveUp(index) {
+            if (index <= 0) return;
+            const temp = compareList[index];
+            compareList[index] = compareList[index - 1];
+            compareList[index - 1] = temp;
+            renderCompareList();
+        }
+
+        function moveDown(index) {
+            if (index >= compareList.length - 1) return;
+            const temp = compareList[index];
+            compareList[index] = compareList[index + 1];
+            compareList[index + 1] = temp;
             renderCompareList();
         }
 
