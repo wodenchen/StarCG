@@ -641,6 +641,43 @@
             max-width: 130px;
             word-break: break-all;
             white-space: normal;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .compare-list-table .item-name:hover {
+            background: rgba(171, 71, 188, 0.1);
+            border-radius: 4px;
+        }
+
+        .compare-list-table .item-name input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 2px solid var(--accent-purple);
+            border-radius: 4px;
+            background: #fff;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        .compare-list-table .item-name input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.2);
+        }
+
+        .compare-list-table tbody tr {
+            cursor: move;
+        }
+
+        .compare-list-table tbody tr.dragging {
+            opacity: 0.5;
+            background: rgba(171, 71, 188, 0.2);
+        }
+
+        .compare-list-table tbody tr.drag-over {
+            border-top: 3px solid var(--accent-purple);
         }
 
         .compare-list-table .dmg-cell {
@@ -1895,8 +1932,15 @@
                 const shortReform = item.petReformLevel > 0 ? `${item.petReformLevel}改 +${item.reformPercent}%` : '-';
 
                 html += `
-                    <tr class="${rowClass}">
-                        <td class="item-name" title="${item.name}">${item.name}${baseLabel}</td>
+                    <tr class="${rowClass}" draggable="true" data-id="${item.id}" data-index="${index}">
+                        <td class="item-name" title="${item.name}">
+                            <span class="name-display" id="name-${item.id}" onclick="editItemName(${item.id}, event)">${item.name}</span>
+                            <input type="text" class="name-input" id="name-input-${item.id}" value="${item.name}" 
+                                   style="display: none;" 
+                                   onblur="saveItemName(${item.id})" 
+                                   onkeydown="handleNameKeydown(${item.id}, event)">
+                            ${baseLabel}
+                        </td>
                         <td>${item.attack}/${item.defense}</td>
                         <td><span class="status-badge ${item.hasWeapon ? 'status-yes' : 'status-no'}">${weaponDisplay}</span></td>
                         <td>${item.crystalLabel}</td>
@@ -1925,6 +1969,171 @@
             });
 
             bodyEl.innerHTML = html;
+            
+            // 添加拖曳事件監聽器
+            const rows = bodyEl.querySelectorAll('tr[draggable="true"]');
+            rows.forEach(row => {
+                row.addEventListener('dragstart', handleDragStart);
+                row.addEventListener('dragover', handleDragOver);
+                row.addEventListener('drop', handleDrop);
+                row.addEventListener('dragend', handleDragEnd);
+            });
+        }
+
+        // 名稱編輯相關函數
+        let isDragging = false;
+        
+        function editItemName(id, event) {
+            if (isDragging) return;
+            event.stopPropagation();
+            const displayEl = document.getElementById(`name-${id}`);
+            const inputEl = document.getElementById(`name-input-${id}`);
+            if (displayEl && inputEl) {
+                displayEl.style.display = 'none';
+                inputEl.style.display = 'block';
+                inputEl.focus();
+                inputEl.select();
+            }
+        }
+
+        function saveItemName(id) {
+            const displayEl = document.getElementById(`name-${id}`);
+            const inputEl = document.getElementById(`name-input-${id}`);
+            if (displayEl && inputEl) {
+                const newName = inputEl.value.trim();
+                if (newName) {
+                    const item = compareList.find(item => item.id === id);
+                    if (item) {
+                        item.name = newName;
+                        displayEl.textContent = newName;
+                        inputEl.setAttribute('value', newName);
+                    }
+                } else {
+                    inputEl.value = displayEl.textContent;
+                }
+                displayEl.style.display = '';
+                inputEl.style.display = 'none';
+            }
+        }
+
+        function handleNameKeydown(id, event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveItemName(id);
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                const displayEl = document.getElementById(`name-${id}`);
+                const inputEl = document.getElementById(`name-input-${id}`);
+                if (displayEl && inputEl) {
+                    inputEl.value = displayEl.textContent;
+                    displayEl.style.display = '';
+                    inputEl.style.display = 'none';
+                }
+            }
+        }
+
+        // 拖曳排序相關函數
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            isDragging = true;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            
+            const rows = document.querySelectorAll('#compareListBody tr');
+            rows.forEach(row => {
+                if (row !== draggedElement) {
+                    row.classList.remove('drag-over');
+                }
+            });
+            
+            const afterElement = getDragAfterElement(e.clientY);
+            if (afterElement && afterElement !== draggedElement) {
+                afterElement.classList.add('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            e.preventDefault();
+            
+            const rows = document.querySelectorAll('#compareListBody tr');
+            rows.forEach(row => {
+                row.classList.remove('drag-over');
+            });
+            
+            if (draggedElement) {
+                const draggedId = parseInt(draggedElement.getAttribute('data-id'));
+                const draggedIndex = compareList.findIndex(item => item.id === draggedId);
+                
+                if (draggedIndex === -1) {
+                    draggedElement.classList.remove('dragging');
+                    return false;
+                }
+                
+                const afterElement = getDragAfterElement(e.clientY);
+                let targetIndex;
+                
+                if (afterElement == null) {
+                    // 拖到最後
+                    targetIndex = compareList.length;
+                } else {
+                    const targetId = parseInt(afterElement.getAttribute('data-id'));
+                    targetIndex = compareList.findIndex(item => item.id === targetId);
+                }
+                
+                // 重新排序 compareList
+                if (targetIndex !== draggedIndex) {
+                    const draggedItem = compareList[draggedIndex];
+                    compareList.splice(draggedIndex, 1);
+                    
+                    // 如果目標索引在拖曳元素之後，需要減1
+                    if (targetIndex > draggedIndex) {
+                        targetIndex--;
+                    }
+                    
+                    compareList.splice(targetIndex, 0, draggedItem);
+                    renderCompareList();
+                }
+            }
+            
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            const rows = document.querySelectorAll('#compareListBody tr');
+            rows.forEach(row => {
+                row.classList.remove('dragging', 'drag-over');
+            });
+            draggedElement = null;
+            isDragging = false;
+        }
+
+        function getDragAfterElement(y) {
+            const draggableElements = [...document.querySelectorAll('#compareListBody tr:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
         }
 
         function setAsBase(id) {
