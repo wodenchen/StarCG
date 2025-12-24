@@ -919,6 +919,68 @@
             color: var(--accent-orange);
         }
 
+        .formula-table-toggle {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .formula-table-toggle:hover {
+            background: var(--accent-blue);
+            color: #fff;
+        }
+
+        .formula-table {
+            display: none;
+            margin-top: 10px;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .formula-table.show {
+            display: block;
+        }
+
+        .formula-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .formula-table th {
+            background: var(--accent-blue);
+            color: #fff;
+            padding: 8px 6px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .formula-table td {
+            padding: 6px 4px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .formula-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .formula-table tbody tr:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
         @media (max-width: 600px) {
             .formula-section { font-size: 0.8rem; padding: 12px; }
             .formula-item { padding: 8px 10px; }
@@ -970,9 +1032,13 @@
                     <select id="crystalElement">
                         <option value="0.30" data-label="全剋">全剋 (+30%)</option>
                         <option value="0.15" data-label="半剋">半剋 (+15%)</option>
+                        <option value="0.06" data-label="防守方全屬性2">防守方全屬性2 (+6%)</option>
                         <option value="0" data-label="不相剋" selected>不相剋 (+0%)</option>
+                        <option value="-0.06" data-label="防守方全屬性3">防守方全屬性3 (-6%)</option>
                         <option value="-0.15" data-label="被半剋">被半剋 (-15%)</option>
+                        <option value="-0.18" data-label="防守方全屬性4">防守方全屬性4 (-18%)</option>
                         <option value="-0.30" data-label="被全剋">被全剋 (-30%)</option>
+                        <option value="-0.30" data-label="防守方全屬性5">防守方全屬性5 (-30%)</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -1160,6 +1226,158 @@
                         <option value="5">五改</option>
                     </select>
                 </div>
+            </div>
+
+            <!-- 魔法傷害計算 -->
+            <div class="card">
+                <div class="card-title">🔮 魔法傷害計算</div>
+                
+                <div class="input-group">
+                    <label>施法者類型</label>
+                    <select id="magicCasterType" onchange="updateMagicOptions()">
+                        <option value="character">人物</option>
+                        <option value="pet">寵物</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>魔法類型</label>
+                    <select id="magicType" onchange="updateMagicLevelOptions()">
+                        <option value="single">單體魔法</option>
+                        <option value="strong">強力魔法</option>
+                        <option value="super" id="magicTypeSuper">超強魔法</option>
+                        <option value="drain" id="magicTypeDrain">吸血魔法</option>
+                    </select>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>魔法等級</label>
+                        <select id="magicLevel">
+                            <option value="1">1等</option>
+                            <option value="2">2等</option>
+                            <option value="3">3等</option>
+                            <option value="4">4等</option>
+                            <option value="5">5等</option>
+                            <option value="6">6等</option>
+                            <option value="7">7等</option>
+                            <option value="8">8等</option>
+                            <option value="9">9等</option>
+                            <option value="10">10等</option>
+                            <option value="11" id="magicLevel11">11等</option>
+                            <option value="ex" id="magicLevelEx" style="display: none;">EX</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>施法者精神</label>
+                        <input type="number" id="magicCasterSpirit" value="300" min="0" inputmode="numeric">
+                    </div>
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>受法者精神</label>
+                        <input type="number" id="magicTargetSpirit" value="200" min="0" inputmode="numeric">
+                    </div>
+                    <div class="input-group">
+                        <label>魔攻 (僅人物)</label>
+                        <input type="number" id="magicAttack" value="0" min="0" inputmode="numeric">
+                    </div>
+                </div>
+                
+                <div class="toggle-group" id="magicPVEGroup" style="display: none;">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="magicPVE">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">PVE增傷 (+20%)</span>
+                </div>
+                
+                <!-- 寵物相關選項 -->
+                <div id="magicPetOptions" style="display: none;">
+                    <div class="input-group">
+                        <label>寵物卡別</label>
+                        <select id="magicPetGrade">
+                            <option value="normal">普卡寵</option>
+                            <option value="silver">銀卡寵</option>
+                            <option value="gold" selected>金卡寵</option>
+                        </select>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="magicMaxStats" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">滿檔狀態</span>
+                    </div>
+                    
+                    <div class="toggle-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="magicBeastPassive">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">野獸系被動</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>寵物改造等級 (BOSS戰用)</label>
+                        <select id="magicPetReform">
+                            <option value="0">未改造</option>
+                            <option value="1">一改</option>
+                            <option value="2">二改</option>
+                            <option value="3">三改</option>
+                            <option value="4">四改</option>
+                            <option value="5">五改</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>水晶屬性影響</label>
+                    <select id="magicCrystalElement">
+                        <option value="0.30" data-label="全剋">全剋 (+30%)</option>
+                        <option value="0.15" data-label="半剋">半剋 (+15%)</option>
+                        <option value="0.06" data-label="防守方全屬性2">防守方全屬性2 (+6%)</option>
+                        <option value="0" data-label="不相剋" selected>不相剋 (+0%)</option>
+                        <option value="-0.06" data-label="防守方全屬性3">防守方全屬性3 (-6%)</option>
+                        <option value="-0.15" data-label="被半剋">被半剋 (-15%)</option>
+                        <option value="-0.18" data-label="防守方全屬性4">防守方全屬性4 (-18%)</option>
+                        <option value="-0.30" data-label="被全剋">被全剋 (-30%)</option>
+                        <option value="-0.30" data-label="防守方全屬性5">防守方全屬性5 (-30%)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>種族影響</label>
+                    <select id="magicRaceEffect">
+                        <option value="0.20" data-label="全剋">全剋 (+20%)</option>
+                        <option value="0.10" data-label="半剋">半剋 (+10%)</option>
+                        <option value="0" data-label="不相剋" selected>不相剋 (+0%)</option>
+                        <option value="-0.10" data-label="被半剋">被半剋 (-10%)</option>
+                        <option value="-0.20" data-label="被全剋">被全剋 (-20%)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>防守方洞悉技能等級</label>
+                    <select id="magicInsightLevel">
+                        <option value="0" selected>無</option>
+                        <option value="1">1等 (-1%)</option>
+                        <option value="2">2等 (-2%)</option>
+                        <option value="3">3等 (-3%)</option>
+                        <option value="4">4等 (-4%)</option>
+                        <option value="5">5等 (-5%)</option>
+                        <option value="6">6等 (-6%)</option>
+                        <option value="7">7等 (-7%)</option>
+                        <option value="8">8等 (-8%)</option>
+                        <option value="9">9等 (-9%)</option>
+                        <option value="10">10等 (-10%)</option>
+                        <option value="11">11等 (-11%)</option>
+                    </select>
+                </div>
+                
+                <button class="btn-calculate" onclick="calculateMagic()" style="margin-top: 10px;">🔮 計算魔法傷害</button>
             </div>
 
             <!-- 計算按鈕 -->
@@ -1473,6 +1691,268 @@
                 </div>
             </div>
 
+            <!-- 魔法傷害結果 -->
+            <div class="results-section" id="magicResultsSection" style="display: none;">
+                <div class="card results-card">
+                    <div class="card-title">
+                        <span>🔮 魔法傷害計算結果</span>
+                        <button class="formula-toggle" onclick="toggleMagicFormula()">📐 查看公式</button>
+                    </div>
+
+                    <!-- 公式說明區 -->
+                    <div class="formula-section" id="magicFormulaSection">
+                        <h4>📐 魔法傷害計算公式說明</h4>
+                        
+                        <div class="formula-item">
+                            <span class="formula-label">① 基礎傷害值</span>
+                            <span class="formula-code">
+                                根據<span class="formula-var">施法者類型</span>（人物/寵物）、<span class="formula-var">魔法類型</span>（單體/強力/超強/吸血）、<span class="formula-var">魔法等級</span>查表取得
+                            </span>
+                            <div class="formula-note">※ EX法：10等傷害 × 1.13（僅寵物）<br>※ 資料來源：魔力百科</div>
+                            <button class="formula-table-toggle" onclick="toggleMagicBaseDamageTable()">📊 查看基礎傷害值表</button>
+                            <div class="formula-table" id="magicBaseDamageTable">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>等級</th>
+                                            <th>人物單體</th>
+                                            <th>人物強力</th>
+                                            <th>人物超強</th>
+                                            <th>人物吸血</th>
+                                            <th>寵物單體</th>
+                                            <th>寵物強力</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>1等</td><td>95</td><td>57</td><td>38</td><td>63</td><td>86</td><td>51</td></tr>
+                                        <tr><td>2等</td><td>171</td><td>103</td><td>68</td><td>114</td><td>154</td><td>93</td></tr>
+                                        <tr><td>3等</td><td>239</td><td>143</td><td>96</td><td>159</td><td>215</td><td>129</td></tr>
+                                        <tr><td>4等</td><td>303</td><td>182</td><td>121</td><td>202</td><td>273</td><td>164</td></tr>
+                                        <tr><td>5等</td><td>368</td><td>221</td><td>147</td><td>245</td><td>331</td><td>199</td></tr>
+                                        <tr><td>6等</td><td>432</td><td>259</td><td>173</td><td>288</td><td>389</td><td>233</td></tr>
+                                        <tr><td>7等</td><td>497</td><td>298</td><td>199</td><td>331</td><td>447</td><td>268</td></tr>
+                                        <tr><td>8等</td><td>570</td><td>342</td><td>228</td><td>380</td><td>513</td><td>307</td></tr>
+                                        <tr><td>9等</td><td>646</td><td>388</td><td>258</td><td>430</td><td>581</td><td>349</td></tr>
+                                        <tr><td>10等</td><td>722</td><td>433</td><td>289</td><td>481</td><td>650</td><td>390</td></tr>
+                                        <tr><td>11等</td><td>791</td><td>475</td><td>316</td><td>522</td><td>-</td><td>-</td></tr>
+                                        <tr><td>EX</td><td>-</td><td>-</td><td>-</td><td>-</td><td>735</td><td>441</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="formula-item">
+                            <span class="formula-label">② 需求精神倍率</span>
+                            <span class="formula-code">
+                                <span class="formula-var">需求精神</span> <span class="formula-op">=</span> 103 <span class="formula-op">+</span> <span class="formula-var">魔法等級</span> <span class="formula-op">×</span> 20<br>
+                                若 <span class="formula-var">施法者精神</span> <span class="formula-op">≥</span> <span class="formula-var">需求精神</span>，則 <span class="formula-var">精神倍率</span> <span class="formula-op">=</span> 100%<br>
+                                否則 <span class="formula-var">精神倍率</span> <span class="formula-op">=</span> (<span class="formula-var">施法者精神</span> <span class="formula-op">÷</span> <span class="formula-var">需求精神</span>) <span class="formula-op">×</span> 100%
+                            </span>
+                        </div>
+
+                        <div class="formula-item">
+                            <span class="formula-label">③ 精神差距倍率</span>
+                            <span class="formula-code">
+                                根據<span class="formula-var">施法者精神</span>與<span class="formula-var">受法者精神</span>的差距百分比查表：<br>
+                                20%以上: 100% | 14%~20%: 90% | 5%~14%: 82% | 2~5%: 63%<br>
+                                -2%~-10%: 55% | -10%~-20%: 36% | -20%~-30%: 27% | -30%以下: 9%
+                            </span>
+                            <div class="formula-note">※ 寵物魔法：正常倍率 > 36%維持原值，正常倍率 ≤ 36%限制為36%</div>
+                        </div>
+
+                        <div class="formula-item">
+                            <span class="formula-label">④ 魔攻倍率（僅人物）</span>
+                            <span class="formula-code">
+                                根據<span class="formula-var">魔攻值</span>和<span class="formula-var">魔法等級</span>在係數表中查找對應的<span class="formula-var">係數</span>（1.0 ~ 1.5）<br>
+                                <span class="formula-var">頂魔攻需求</span> <span class="formula-op">=</span> <span class="formula-var">魔法等級</span> <span class="formula-op">×</span> 34 <span class="formula-op">-</span> 20<br>
+                                達到頂魔攻時係數為 1.5（150%），未達到時根據係數表查找
+                            </span>
+                            <div class="formula-note">※ 寵物固定為 100%（無魔攻加成）</div>
+                            <button class="formula-table-toggle" onclick="toggleMagicCoeffTable()">📊 查看魔攻係數表</button>
+                            <div class="formula-table" id="magicCoeffTable">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">
+                                    係數表：行=係數(1.0~1.5, 步長0.0125)，列=等級(1~11)，每個單元格是該等級在該係數下的魔攻值
+                                </div>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>係數</th>
+                                            <th>1等</th>
+                                            <th>2等</th>
+                                            <th>3等</th>
+                                            <th>4等</th>
+                                            <th>5等</th>
+                                            <th>6等</th>
+                                            <th>7等</th>
+                                            <th>8等</th>
+                                            <th>9等</th>
+                                            <th>10等</th>
+                                            <th>11等</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="magicCoeffTableBody">
+                                        <!-- 動態生成 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="formula-item">
+                            <span class="formula-label">⑤ PVE增傷（僅寵物）</span>
+                            <span class="formula-code">
+                                若開啟PVE增傷，則 <span class="formula-var">PVE倍率</span> <span class="formula-op">=</span> 1.2（120%）<br>
+                                否則 <span class="formula-var">PVE倍率</span> <span class="formula-op">=</span> 1.0（100%）
+                            </span>
+                        </div>
+
+                        <div class="formula-item main">
+                            <span class="formula-label">⑥ 實際魔法傷害值（完整公式）</span>
+                            <span class="formula-code">
+                                <span class="formula-var">實際傷害</span> <span class="formula-op">=</span> [<span class="formula-var">基礎傷害</span> <span class="formula-op">×</span> <span class="formula-var">水晶屬性</span> <span class="formula-op">×</span> <span class="formula-var">隨機值(85%~115%)</span>] <span class="formula-op">×</span> <span class="formula-var">需求精神倍率</span> <span class="formula-op">×</span> <span class="formula-var">精神差距倍率</span> <span class="formula-op">×</span> <span class="formula-var">人物魔攻係數</span> <span class="formula-op">×</span> <span class="formula-var">寵物PVE增傷</span> <span class="formula-op">×</span> <span class="formula-var">種族影響</span> <span class="formula-op">×</span> <span class="formula-var">寵物滿檔加成</span> <span class="formula-op">×</span> <span class="formula-var">寵物改造BOSS增傷</span> <span class="formula-op">×</span> <span class="formula-var">野獸被動</span> <span class="formula-op">×</span> <span class="formula-var">洞悉技能</span>
+                            </span>
+                            <div class="formula-note">
+                                ※ 水晶屬性：全剋=1.3，半剋=1.15，不相剋=1.0，被半剋=0.85，被全剋=0.7<br>
+                                ※ 防守方全屬性2=1.06，防守方全屬性3=0.94，防守方全屬性4=0.82，防守方全屬性5=0.7<br>
+                                ※ 種族影響：全剋=1.2，半剋=1.1，不相剋=1.0，被半剋=0.9，被全剋=0.8<br>
+                                ※ 寵物滿檔加成：普卡+10%，銀卡+15%，金卡+20%<br>
+                                ※ 寵物改造BOSS增傷：根據改造等級和卡別，僅在BOSS戰時生效<br>
+                                ※ 野獸被動：普卡+3%，銀卡+5%，金卡+8%<br>
+                                ※ 洞悉技能：降低所受魔法傷害，每等級-1%（1等-1%，11等-11%）<br>
+                                <br>
+                                <strong>三種情況區分：</strong><br>
+                                • <strong>一般野外打怪</strong>：寵物PVE加成生效，種族影響正常，無改造加成<br>
+                                • <strong>PK</strong>：無寵物PVE加成，種族影響減半，無改造加成<br>
+                                • <strong>BOSS戰</strong>：寵物PVE加成生效，種族影響正常，有改造加成
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 基礎數值 -->
+                    <div class="base-results">
+                        <div class="base-result-item">
+                            <div class="base-result-label">基礎傷害</div>
+                            <div class="base-result-value" id="magicBaseDamage">-</div>
+                        </div>
+                        <div class="base-result-item">
+                            <div class="base-result-label">需求精神倍率</div>
+                            <div class="base-result-value" id="magicSpiritMultiplier">-</div>
+                        </div>
+                        <div class="base-result-item">
+                            <div class="base-result-label">精神差距倍率</div>
+                            <div class="base-result-value" id="magicSpiritDiffMultiplier">-</div>
+                        </div>
+                        <div class="base-result-item">
+                            <div class="base-result-label">魔攻倍率</div>
+                            <div class="base-result-value" id="magicAttackMultiplier">-</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 修正值 -->
+                    <div class="modifier-section">
+                        <div class="modifier-item">
+                            <span class="modifier-label">💎 水晶屬性</span>
+                            <span class="modifier-value" id="magicModCrystal">-</span>
+                        </div>
+                        <div class="modifier-item">
+                            <span class="modifier-label">👾 種族影響</span>
+                            <span class="modifier-value" id="magicModRace">-</span>
+                        </div>
+                        <div class="modifier-item" id="magicModMaxStats" style="display: none;">
+                            <span class="modifier-label">📊 滿檔加乘</span>
+                            <span class="modifier-value">-</span>
+                        </div>
+                        <div class="modifier-item" id="magicModReform" style="display: none;">
+                            <span class="modifier-label">🔧 改造BOSS增傷</span>
+                            <span class="modifier-value">-</span>
+                        </div>
+                        <div class="modifier-item" id="magicModBeast" style="display: none;">
+                            <span class="modifier-label">🐺 野獸被動</span>
+                            <span class="modifier-value">-</span>
+                        </div>
+                        <div class="modifier-item" id="magicModInsight">
+                            <span class="modifier-label">🛡️ 洞悉技能</span>
+                            <span class="modifier-value">-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 傷害結果 -->
+                    <div class="damage-category">
+                        <h4 class="damage-category-title">🌲 一般野外打怪（寵物PVE加成）</h4>
+                        <div class="damage-results-grid">
+                            <div class="damage-box highlight">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-skill" id="magicTagTypeNormal">單體魔法</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="magicDmgNormalMin">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="magicDmgNormalAvg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="magicDmgNormalMax">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="damage-category">
+                        <h4 class="damage-category-title">⚔️ PK（種族克制效果減半）</h4>
+                        <div class="damage-results-grid">
+                            <div class="damage-box highlight">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-skill" id="magicTagTypePK">單體魔法</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="magicDmgPKMin">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="magicDmgPKAvg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="magicDmgPKMax">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="damage-category">
+                        <h4 class="damage-category-title">👹 BOSS戰（寵物PVE及改造加成）</h4>
+                        <div class="damage-results-grid">
+                            <div class="damage-box highlight">
+                                <div class="damage-box-title">
+                                    <span class="tag tag-skill" id="magicTagTypeBoss">單體魔法</span>
+                                </div>
+                                <div class="damage-values">
+                                    <div class="damage-stat min">
+                                        <div class="damage-stat-label">最小</div>
+                                        <div class="damage-stat-value" id="magicDmgBossMin">-</div>
+                                    </div>
+                                    <div class="damage-stat avg">
+                                        <div class="damage-stat-label">平均</div>
+                                        <div class="damage-stat-value" id="magicDmgBossAvg">-</div>
+                                    </div>
+                                    <div class="damage-stat max">
+                                        <div class="damage-stat-label">最大</div>
+                                        <div class="damage-stat-value" id="magicDmgBossMax">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 比較清單 -->
             <div class="results-section">
                 <div class="card compare-list-card">
@@ -1544,6 +2024,377 @@
         const gradeNames = { normal: '普卡', silver: '銀卡', gold: '金卡' };
         const reformLabels = ['未改', '一改', '二改', '三改', '四改', '五改'];
 
+        // 魔法傷害數據表
+        const magicBaseDamageTable = {
+            character: {
+                single: { 1: 95, 2: 171, 3: 239, 4: 303, 5: 368, 6: 432, 7: 497, 8: 570, 9: 646, 10: 722, 11: 791 },
+                strong: { 1: 57, 2: 103, 3: 143, 4: 182, 5: 221, 6: 259, 7: 298, 8: 342, 9: 388, 10: 433, 11: 475 },
+                super: { 1: 38, 2: 68, 3: 96, 4: 121, 5: 147, 6: 173, 7: 199, 8: 228, 9: 258, 10: 289, 11: 316 },
+                drain: { 1: 63, 2: 114, 3: 159, 4: 202, 5: 245, 6: 288, 7: 331, 8: 380, 9: 430, 10: 481, 11: 522 }
+            },
+            pet: {
+                single: { 1: 86, 2: 154, 3: 215, 4: 273, 5: 331, 6: 389, 7: 447, 8: 513, 9: 581, 10: 650 },
+                strong: { 1: 51, 2: 93, 3: 129, 4: 164, 5: 199, 6: 233, 7: 268, 8: 307, 9: 349, 10: 390 }
+            }
+        };
+
+        const magicTypeNames = {
+            single: '單體魔法',
+            strong: '強力魔法',
+            super: '超強魔法',
+            drain: '吸血魔法'
+        };
+
+        // 魔攻加成係數查找表（根據Excel表格 coeff_1_11.xlsx）
+        // 表格結構：行=係數(1.0~1.5, 步長0.0125)，列=等級(1~11)
+        // 每個單元格是該等級在該係數下的魔攻值
+        const magicAttackLookupTable = {
+            1: { 1.0: 10, 1.0125: 10, 1.025: 10, 1.0375: 10, 1.05: 10, 1.0625: 10, 1.075: 10, 1.0875: 10, 1.1: 10, 1.1125: 11, 1.125: 11, 1.1375: 11, 1.15: 11, 1.1625: 11, 1.175: 11, 1.1875: 11, 1.2: 11, 1.2125: 11, 1.225: 11, 1.2375: 11, 1.25: 12, 1.2625: 12, 1.275: 12, 1.2875: 12, 1.3: 12, 1.3125: 12, 1.325: 12, 1.3375: 12, 1.35: 12, 1.3625: 12, 1.375: 13, 1.3875: 13, 1.4: 13, 1.4125: 13, 1.425: 13, 1.4375: 13, 1.45: 13, 1.4625: 13, 1.475: 13, 1.4875: 13, 1.5: 14 },
+            2: { 1.0: 40, 1.0125: 40, 1.025: 40, 1.0375: 40, 1.05: 40, 1.0625: 41, 1.075: 41, 1.0875: 41, 1.1: 41, 1.1125: 41, 1.125: 42, 1.1375: 42, 1.15: 42, 1.1625: 42, 1.175: 42, 1.1875: 43, 1.2: 43, 1.2125: 43, 1.225: 43, 1.2375: 43, 1.25: 44, 1.2625: 44, 1.275: 44, 1.2875: 44, 1.3: 44, 1.3125: 45, 1.325: 45, 1.3375: 45, 1.35: 45, 1.3625: 45, 1.375: 46, 1.3875: 46, 1.4: 46, 1.4125: 46, 1.425: 46, 1.4375: 47, 1.45: 47, 1.4625: 47, 1.475: 47, 1.4875: 47, 1.5: 48 },
+            3: { 1.0: 70, 1.0125: 70, 1.025: 70, 1.0375: 71, 1.05: 71, 1.0625: 71, 1.075: 71, 1.0875: 72, 1.1: 72, 1.1125: 72, 1.125: 73, 1.1375: 73, 1.15: 73, 1.1625: 74, 1.175: 74, 1.1875: 74, 1.2: 74, 1.2125: 75, 1.225: 75, 1.2375: 75, 1.25: 76, 1.2625: 76, 1.275: 76, 1.2875: 77, 1.3: 77, 1.3125: 77, 1.325: 77, 1.3375: 78, 1.35: 78, 1.3625: 78, 1.375: 79, 1.3875: 79, 1.4: 79, 1.4125: 80, 1.425: 80, 1.4375: 80, 1.45: 80, 1.4625: 81, 1.475: 81, 1.4875: 81, 1.5: 82 },
+            4: { 1.0: 100, 1.0125: 100, 1.025: 101, 1.0375: 101, 1.05: 101, 1.0625: 102, 1.075: 102, 1.0875: 103, 1.1: 103, 1.1125: 103, 1.125: 104, 1.1375: 104, 1.15: 105, 1.1625: 105, 1.175: 105, 1.1875: 106, 1.2: 106, 1.2125: 107, 1.225: 107, 1.2375: 107, 1.25: 108, 1.2625: 108, 1.275: 109, 1.2875: 109, 1.3: 109, 1.3125: 110, 1.325: 110, 1.3375: 111, 1.35: 111, 1.3625: 111, 1.375: 112, 1.3875: 112, 1.4: 113, 1.4125: 113, 1.425: 113, 1.4375: 114, 1.45: 114, 1.4625: 115, 1.475: 115, 1.4875: 115, 1.5: 116 },
+            5: { 1.0: 130, 1.0125: 130, 1.025: 131, 1.0375: 131, 1.05: 132, 1.0625: 132, 1.075: 133, 1.0875: 133, 1.1: 134, 1.1125: 134, 1.125: 135, 1.1375: 135, 1.15: 136, 1.1625: 136, 1.175: 137, 1.1875: 137, 1.2: 138, 1.2125: 138, 1.225: 139, 1.2375: 139, 1.25: 140, 1.2625: 140, 1.275: 141, 1.2875: 141, 1.3: 142, 1.3125: 142, 1.325: 143, 1.3375: 143, 1.35: 144, 1.3625: 144, 1.375: 145, 1.3875: 145, 1.4: 146, 1.4125: 146, 1.425: 147, 1.4375: 147, 1.45: 148, 1.4625: 148, 1.475: 149, 1.4875: 149, 1.5: 150 },
+            6: { 1.0: 160, 1.0125: 160, 1.025: 161, 1.0375: 162, 1.05: 162, 1.0625: 163, 1.075: 163, 1.0875: 164, 1.1: 165, 1.1125: 165, 1.125: 166, 1.1375: 166, 1.15: 167, 1.1625: 168, 1.175: 168, 1.1875: 169, 1.2: 169, 1.2125: 170, 1.225: 171, 1.2375: 171, 1.25: 172, 1.2625: 172, 1.275: 173, 1.2875: 174, 1.3: 174, 1.3125: 175, 1.325: 175, 1.3375: 176, 1.35: 177, 1.3625: 177, 1.375: 178, 1.3875: 178, 1.4: 179, 1.4125: 180, 1.425: 180, 1.4375: 181, 1.45: 181, 1.4625: 182, 1.475: 183, 1.4875: 183, 1.5: 184 },
+            7: { 1.0: 190, 1.0125: 191, 1.025: 191, 1.0375: 192, 1.05: 193, 1.0625: 193, 1.075: 194, 1.0875: 195, 1.1: 195, 1.1125: 196, 1.125: 197, 1.1375: 198, 1.15: 198, 1.1625: 199, 1.175: 200, 1.1875: 200, 1.2: 201, 1.2125: 202, 1.225: 202, 1.2375: 203, 1.25: 204, 1.2625: 205, 1.275: 205, 1.2875: 206, 1.3: 207, 1.3125: 207, 1.325: 208, 1.3375: 209, 1.35: 209, 1.3625: 210, 1.375: 211, 1.3875: 212, 1.4: 212, 1.4125: 213, 1.425: 214, 1.4375: 214, 1.45: 215, 1.4625: 216, 1.475: 216, 1.4875: 217, 1.5: 218 },
+            8: { 1.0: 220, 1.0125: 221, 1.025: 222, 1.0375: 222, 1.05: 223, 1.0625: 224, 1.075: 225, 1.0875: 226, 1.1: 226, 1.1125: 227, 1.125: 228, 1.1375: 229, 1.15: 230, 1.1625: 230, 1.175: 231, 1.1875: 232, 1.2: 233, 1.2125: 234, 1.225: 234, 1.2375: 235, 1.25: 236, 1.2625: 237, 1.275: 238, 1.2875: 238, 1.3: 239, 1.3125: 240, 1.325: 241, 1.3375: 242, 1.35: 242, 1.3625: 243, 1.375: 244, 1.3875: 245, 1.4: 246, 1.4125: 246, 1.425: 247, 1.4375: 248, 1.45: 249, 1.4625: 250, 1.475: 250, 1.4875: 251, 1.5: 252 },
+            9: { 1.0: 250, 1.0125: 251, 1.025: 252, 1.0375: 253, 1.05: 254, 1.0625: 254, 1.075: 255, 1.0875: 256, 1.1: 257, 1.1125: 258, 1.125: 259, 1.1375: 260, 1.15: 261, 1.1625: 262, 1.175: 263, 1.1875: 263, 1.2: 264, 1.2125: 265, 1.225: 266, 1.2375: 267, 1.25: 268, 1.2625: 269, 1.275: 270, 1.2875: 271, 1.3: 272, 1.3125: 272, 1.325: 273, 1.3375: 274, 1.35: 275, 1.3625: 276, 1.375: 277, 1.3875: 278, 1.4: 279, 1.4125: 280, 1.425: 281, 1.4375: 281, 1.45: 282, 1.4625: 283, 1.475: 284, 1.4875: 285, 1.5: 286 },
+            10: { 1.0: 280, 1.0125: 281, 1.025: 282, 1.0375: 283, 1.05: 284, 1.0625: 285, 1.075: 286, 1.0875: 287, 1.1: 288, 1.1125: 289, 1.125: 290, 1.1375: 291, 1.15: 292, 1.1625: 293, 1.175: 294, 1.1875: 295, 1.2: 296, 1.2125: 297, 1.225: 298, 1.2375: 299, 1.25: 300, 1.2625: 301, 1.275: 302, 1.2875: 303, 1.3: 304, 1.3125: 305, 1.325: 306, 1.3375: 307, 1.35: 308, 1.3625: 309, 1.375: 310, 1.3875: 311, 1.4: 312, 1.4125: 313, 1.425: 314, 1.4375: 315, 1.45: 316, 1.4625: 317, 1.475: 318, 1.4875: 319, 1.5: 320 },
+            11: { 1.0: 310, 1.0125: 311, 1.025: 312, 1.0375: 313, 1.05: 314, 1.0625: 316, 1.075: 317, 1.0875: 318, 1.1: 319, 1.1125: 320, 1.125: 321, 1.1375: 322, 1.15: 323, 1.1625: 324, 1.175: 325, 1.1875: 326, 1.2: 328, 1.2125: 329, 1.225: 330, 1.2375: 331, 1.25: 332, 1.2625: 333, 1.275: 334, 1.2875: 335, 1.3: 336, 1.3125: 338, 1.325: 339, 1.3375: 340, 1.35: 341, 1.3625: 342, 1.375: 343, 1.3875: 344, 1.4: 345, 1.4125: 346, 1.425: 347, 1.4375: 348, 1.45: 350, 1.4625: 351, 1.475: 352, 1.4875: 353, 1.5: 354 }
+        };
+
+        // 根據魔攻值和等級查找對應的係數
+        function getMagicAttackCoefficient(magicAttack, level) {
+            const requiredAttack = level * 34 - 20; // 頂魔攻需求
+            
+            // 如果達到或超過頂魔攻，係數為1.5（150%）
+            if (magicAttack >= requiredAttack) {
+                return 1.5;
+            }
+            
+            // 如果沒有魔攻，係數為1.0（100%）
+            if (magicAttack <= 0) {
+                return 1.0;
+            }
+            
+            // 如果有該等級的查找表，使用查找表
+            if (magicAttackLookupTable[level]) {
+                const levelTable = magicAttackLookupTable[level];
+                
+                // 將查找表轉換為數組並按魔攻值排序
+                const sortedEntries = Object.entries(levelTable)
+                    .map(([coeff, val]) => [parseFloat(coeff), parseInt(val)])
+                    .sort((a, b) => a[1] - b[1]);
+                
+                // 如果魔攻值小於最小值，返回最小係數
+                if (magicAttack < sortedEntries[0][1]) {
+                    return sortedEntries[0][0];
+                }
+                
+                // 如果魔攻值大於最大值，返回最大係數
+                if (magicAttack >= sortedEntries[sortedEntries.length - 1][1]) {
+                    return sortedEntries[sortedEntries.length - 1][0];
+                }
+                
+                // 查找包含該魔攻值的區間並進行線性插值
+                for (let i = 0; i < sortedEntries.length - 1; i++) {
+                    const [coeff1, val1] = sortedEntries[i];
+                    const [coeff2, val2] = sortedEntries[i + 1];
+                    
+                    if (magicAttack >= val1 && magicAttack < val2) {
+                        if (val2 === val1) {
+                            return coeff1; // 如果區間為0，直接返回係數
+                        }
+                        const ratio = (magicAttack - val1) / (val2 - val1);
+                        return coeff1 + (coeff2 - coeff1) * ratio;
+                    }
+                }
+                
+                // 如果正好等於最後一個值
+                return sortedEntries[sortedEntries.length - 1][0];
+            }
+            
+            // 如果沒有查找表數據，使用線性插值（備用方案）
+            const ratio = magicAttack / requiredAttack;
+            return 1.0 + ratio * 0.5; // 從100%線性插值到150%
+        }
+
+        // 更新魔法選項
+        function updateMagicOptions() {
+            const casterType = document.getElementById('magicCasterType').value;
+            const magicTypeSelect = document.getElementById('magicType');
+            const magicLevelSelect = document.getElementById('magicLevel');
+            const pveGroup = document.getElementById('magicPVEGroup');
+            const magicAttackInput = document.getElementById('magicAttack').parentElement;
+            const petOptions = document.getElementById('magicPetOptions');
+            
+            // 顯示/隱藏PVE開關和寵物選項
+            if (casterType === 'pet') {
+                pveGroup.style.display = 'flex';
+                petOptions.style.display = 'block';
+            } else {
+                pveGroup.style.display = 'none';
+                petOptions.style.display = 'none';
+                document.getElementById('magicPVE').checked = false;
+            }
+            
+            // 更新魔法類型選項
+            const superOption = document.getElementById('magicTypeSuper');
+            const drainOption = document.getElementById('magicTypeDrain');
+            
+            if (casterType === 'pet') {
+                superOption.style.display = 'none';
+                drainOption.style.display = 'none';
+                // 如果當前選中不存在的選項，切換到單體
+                if (magicTypeSelect.value === 'super' || magicTypeSelect.value === 'drain') {
+                    magicTypeSelect.value = 'single';
+                }
+            } else {
+                superOption.style.display = 'block';
+                drainOption.style.display = 'block';
+            }
+            
+            updateMagicLevelOptions();
+        }
+
+        // 更新魔法等級選項
+        function updateMagicLevelOptions() {
+            const casterType = document.getElementById('magicCasterType').value;
+            const magicType = document.getElementById('magicType').value;
+            const magicLevelSelect = document.getElementById('magicLevel');
+            const level11Option = document.getElementById('magicLevel11');
+            const levelExOption = document.getElementById('magicLevelEx');
+            
+            if (casterType === 'pet') {
+                level11Option.style.display = 'none';
+                levelExOption.style.display = 'block';
+                // 如果當前選中11等，切換到10等
+                if (magicLevelSelect.value === '11') {
+                    magicLevelSelect.value = '10';
+                }
+            } else {
+                level11Option.style.display = 'block';
+                levelExOption.style.display = 'none';
+                // 如果當前選中EX，切換到10等
+                if (magicLevelSelect.value === 'ex') {
+                    magicLevelSelect.value = '10';
+                }
+            }
+        }
+
+        // 精神差距倍率表
+        function getSpiritDiffMultiplier(casterSpirit, targetSpirit) {
+            if (targetSpirit === 0) return 1.0;
+            const diff = ((casterSpirit - targetSpirit) / targetSpirit) * 100;
+            
+            // 施法者精神高受法者精神
+            if (diff >= 20) return 1.0;        // 20%以上: 100%
+            if (diff >= 14) return 0.9;        // 14%~20%: 90% (14 <= diff < 20)
+            if (diff >= 5) return 0.82;        // 5%~14%: 82% (5 <= diff < 14)
+            if (diff >= 2) return 0.63;        // 2~5%: 63% (2 <= diff < 5)
+            if (diff >= -10) return 0.55;      // -10%~2%: 55% (-10 <= diff < 2，包含-2%~-10%和-2%~2%)
+            if (diff >= -20) return 0.36;      // -20%~-10%: 36% (-20 <= diff < -10)
+            if (diff >= -30) return 0.27;      // -30%~-20%: 27% (-30 <= diff < -20)
+            return 0.09;                       // -30%以下: 9% (diff < -30)
+        }
+
+        // 寵物精神差距倍率（最低36%，即精神差影響最低能發動36%）
+        function getPetSpiritDiffMultiplier(casterSpirit, targetSpirit) {
+            // 先計算正常的精神差距倍率
+            const normalMultiplier = getSpiritDiffMultiplier(casterSpirit, targetSpirit);
+            // 正常倍率 > 36%（如 100%、90%、82%、63%、55%）→ 維持原值
+            // 正常倍率 ≤ 36%（如 36%、27%、9%）→ 限制為 36%
+            return Math.max(normalMultiplier, 0.36);
+        }
+
+        // 魔法傷害計算
+        function calculateMagic() {
+            const casterType = document.getElementById('magicCasterType').value;
+            const magicType = document.getElementById('magicType').value;
+            const levelValue = document.getElementById('magicLevel').value;
+            const isEx = levelValue === 'ex';
+            const level = isEx ? 10 : parseInt(levelValue); // EX法使用10等的精神需求
+            const casterSpirit = parseFloat(document.getElementById('magicCasterSpirit').value) || 0;
+            const targetSpirit = parseFloat(document.getElementById('magicTargetSpirit').value) || 0;
+            const magicAttack = parseFloat(document.getElementById('magicAttack').value) || 0;
+            const crystalElement = parseFloat(document.getElementById('magicCrystalElement').value);
+            const raceEffect = parseFloat(document.getElementById('magicRaceEffect').value);
+            const isPVE = document.getElementById('magicPVE').checked;
+            const insightLevel = parseInt(document.getElementById('magicInsightLevel').value) || 0;
+            
+            // 寵物相關參數
+            const petGrade = document.getElementById('magicPetGrade').value;
+            const isMaxStats = document.getElementById('magicMaxStats').checked;
+            const isBeast = document.getElementById('magicBeastPassive').checked;
+            const petReformLevel = parseInt(document.getElementById('magicPetReform').value) || 0;
+
+            // 基礎傷害
+            let baseDamage;
+            if (isEx && casterType === 'pet') {
+                // EX法：10等傷害 × 1.13
+                const base10 = magicBaseDamageTable[casterType][magicType][10];
+                baseDamage = Math.round(base10 * 1.13);
+            } else {
+                baseDamage = magicBaseDamageTable[casterType][magicType][level];
+            }
+            
+            if (!baseDamage) {
+                alert('無效的魔法等級或類型');
+                return;
+            }
+
+            // 需求精神倍率（EX法使用10等的精神需求）
+            const requiredSpirit = 103 + level * 20;
+            const spiritMultiplier = casterSpirit >= requiredSpirit ? 1.0 : (casterSpirit / requiredSpirit);
+
+            // 精神差距倍率
+            const spiritDiffMultiplier = casterType === 'pet' 
+                ? getPetSpiritDiffMultiplier(casterSpirit, targetSpirit)
+                : getSpiritDiffMultiplier(casterSpirit, targetSpirit);
+
+            // 魔攻倍率（使用係數查找表）
+            let attackMultiplier = 1.0;
+            if (casterType === 'character') {
+                // 根據魔攻值和等級查找對應的係數
+                const coeff = getMagicAttackCoefficient(magicAttack, level);
+                attackMultiplier = coeff; // 係數直接作為倍率（1.0 = 100%, 1.5 = 150%）
+            } else {
+                attackMultiplier = 1.0; // 寵物固定100%
+            }
+
+            // PVE增傷（僅寵物）
+            const pveMultiplier = (casterType === 'pet' && isPVE) ? 1.2 : 1.0;
+
+            // 水晶屬性修正
+            const crystalModifier = 1 + crystalElement;
+            
+            // 種族影響修正
+            const raceModifier = 1 + raceEffect;
+
+            // 寵物滿檔加成
+            const petMaxStatsMultiplier = (casterType === 'pet' && isMaxStats) 
+                ? (1 + maxStatsBonusTable[petGrade]) 
+                : 1.0;
+            
+            // 寵物改造BOSS增傷
+            const petReformBossMultiplier = (casterType === 'pet') 
+                ? (1 + petReformBonusTable[petReformLevel][petGrade]) 
+                : 1.0;
+            
+            // 野獸被動
+            const beastPassiveMultiplier = (casterType === 'pet' && isBeast) 
+                ? (1 + beastPassiveBonusTable[petGrade]) 
+                : 1.0;
+
+            // 洞悉技能效果（降低所受魔法傷害）
+            const insightMultiplier = 1 - (insightLevel / 100);
+            
+            // 計算基礎值：[基礎傷害*水晶屬性*隨機值(85%~115%)]
+            const baseWithCrystalMin = baseDamage * crystalModifier * 0.85;
+            const baseWithCrystalAvg = baseDamage * crystalModifier * 1.0;
+            const baseWithCrystalMax = baseDamage * crystalModifier * 1.15;
+            
+            // 計算三種情況的傷害
+            // 1. 一般野外打怪：寵物PVE加成，種族影響正常，無改造加成
+            const pveMultiplierNormal = (casterType === 'pet' && isPVE) ? 1.2 : 1.0;
+            const raceModifierNormal = 1 + raceEffect;
+            const reformMultiplierNormal = 1.0; // 一般野外無改造加成
+            
+            const dmgNormalMin = Math.floor(baseWithCrystalMin * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierNormal * raceModifierNormal * petMaxStatsMultiplier * reformMultiplierNormal * beastPassiveMultiplier * insightMultiplier);
+            const dmgNormalAvg = Math.floor(baseWithCrystalAvg * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierNormal * raceModifierNormal * petMaxStatsMultiplier * reformMultiplierNormal * beastPassiveMultiplier * insightMultiplier);
+            const dmgNormalMax = Math.floor(baseWithCrystalMax * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierNormal * raceModifierNormal * petMaxStatsMultiplier * reformMultiplierNormal * beastPassiveMultiplier * insightMultiplier);
+            
+            // 2. PK：無寵物PVE加成，種族影響減半，無改造加成
+            const pveMultiplierPK = 1.0; // PK無PVE加成
+            const raceModifierPK = 1 + (raceEffect / 2); // 種族影響減半
+            const reformMultiplierPK = 1.0; // PK無改造加成
+            
+            const dmgPKMin = Math.floor(baseWithCrystalMin * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierPK * raceModifierPK * petMaxStatsMultiplier * reformMultiplierPK * beastPassiveMultiplier * insightMultiplier);
+            const dmgPKAvg = Math.floor(baseWithCrystalAvg * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierPK * raceModifierPK * petMaxStatsMultiplier * reformMultiplierPK * beastPassiveMultiplier * insightMultiplier);
+            const dmgPKMax = Math.floor(baseWithCrystalMax * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierPK * raceModifierPK * petMaxStatsMultiplier * reformMultiplierPK * beastPassiveMultiplier * insightMultiplier);
+            
+            // 3. BOSS戰：寵物PVE加成，種族影響正常，有改造加成
+            const pveMultiplierBoss = (casterType === 'pet' && isPVE) ? 1.2 : 1.0;
+            const raceModifierBoss = 1 + raceEffect;
+            const reformMultiplierBoss = petReformBossMultiplier; // BOSS戰有改造加成
+            
+            const dmgBossMin = Math.floor(baseWithCrystalMin * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierBoss * raceModifierBoss * petMaxStatsMultiplier * reformMultiplierBoss * beastPassiveMultiplier * insightMultiplier);
+            const dmgBossAvg = Math.floor(baseWithCrystalAvg * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierBoss * raceModifierBoss * petMaxStatsMultiplier * reformMultiplierBoss * beastPassiveMultiplier * insightMultiplier);
+            const dmgBossMax = Math.floor(baseWithCrystalMax * spiritMultiplier * spiritDiffMultiplier * attackMultiplier * pveMultiplierBoss * raceModifierBoss * petMaxStatsMultiplier * reformMultiplierBoss * beastPassiveMultiplier * insightMultiplier);
+
+            // 顯示結果
+            document.getElementById('magicResultsSection').style.display = 'block';
+            document.getElementById('magicBaseDamage').textContent = baseDamage;
+            document.getElementById('magicSpiritMultiplier').textContent = (spiritMultiplier * 100).toFixed(1) + '%';
+            document.getElementById('magicSpiritDiffMultiplier').textContent = (spiritDiffMultiplier * 100).toFixed(0) + '%';
+            document.getElementById('magicAttackMultiplier').textContent = (attackMultiplier * 100).toFixed(0) + '%';
+            
+            const crystalLabel = document.getElementById('magicCrystalElement').options[document.getElementById('magicCrystalElement').selectedIndex].getAttribute('data-label');
+            const raceLabel = document.getElementById('magicRaceEffect').options[document.getElementById('magicRaceEffect').selectedIndex].getAttribute('data-label');
+            
+            document.getElementById('magicModCrystal').innerHTML = `${crystalLabel} ${formatModifier(crystalElement)}`;
+            document.getElementById('magicModRace').innerHTML = `${raceLabel} ${formatModifier(raceEffect)}`;
+            
+            // 顯示寵物相關倍率
+            const maxStatsItem = document.getElementById('magicModMaxStats');
+            const reformItem = document.getElementById('magicModReform');
+            const beastItem = document.getElementById('magicModBeast');
+            
+            if (casterType === 'pet') {
+                maxStatsItem.style.display = 'flex';
+                maxStatsItem.querySelector('.modifier-value').innerHTML = isMaxStats 
+                    ? formatModifier(maxStatsBonusTable[petGrade]) 
+                    : '無';
+                
+                reformItem.style.display = 'flex';
+                const reformBonus = petReformBonusTable[petReformLevel][petGrade];
+                reformItem.querySelector('.modifier-value').innerHTML = reformBonus > 0 
+                    ? formatModifier(reformBonus) 
+                    : '無';
+                
+                beastItem.style.display = 'flex';
+                beastItem.querySelector('.modifier-value').innerHTML = isBeast 
+                    ? formatModifier(beastPassiveBonusTable[petGrade]) 
+                    : '無';
+            } else {
+                maxStatsItem.style.display = 'none';
+                reformItem.style.display = 'none';
+                beastItem.style.display = 'none';
+            }
+            
+            // 顯示洞悉技能效果
+            const insightItem = document.getElementById('magicModInsight');
+            if (insightLevel > 0) {
+                insightItem.style.display = 'flex';
+                insightItem.querySelector('.modifier-value').textContent = `-${insightLevel}%`;
+            } else {
+                insightItem.style.display = 'flex';
+                insightItem.querySelector('.modifier-value').textContent = '無';
+            }
+            
+            // 顯示三種情況的傷害
+            const typeName = isEx ? magicTypeNames[magicType] + ' EX' : magicTypeNames[magicType];
+            
+            // 一般野外打怪
+            document.getElementById('magicTagTypeNormal').textContent = typeName;
+            document.getElementById('magicDmgNormalMin').textContent = dmgNormalMin.toLocaleString();
+            document.getElementById('magicDmgNormalAvg').textContent = dmgNormalAvg.toLocaleString();
+            document.getElementById('magicDmgNormalMax').textContent = dmgNormalMax.toLocaleString();
+            
+            // PK
+            document.getElementById('magicTagTypePK').textContent = typeName;
+            document.getElementById('magicDmgPKMin').textContent = dmgPKMin.toLocaleString();
+            document.getElementById('magicDmgPKAvg').textContent = dmgPKAvg.toLocaleString();
+            document.getElementById('magicDmgPKMax').textContent = dmgPKMax.toLocaleString();
+            
+            // BOSS戰
+            document.getElementById('magicTagTypeBoss').textContent = typeName;
+            document.getElementById('magicDmgBossMin').textContent = dmgBossMin.toLocaleString();
+            document.getElementById('magicDmgBossAvg').textContent = dmgBossAvg.toLocaleString();
+            document.getElementById('magicDmgBossMax').textContent = dmgBossMax.toLocaleString();
+
+            // 移除自動滾動，讓用戶可以繼續輸入
+        }
+
         let compareList = [];
         let recordCounter = 1;
         let baseItemId = null; // 基準項目 ID
@@ -1554,6 +2405,105 @@
             const btn = document.querySelector('.formula-toggle');
             section.classList.toggle('show');
             btn.textContent = section.classList.contains('show') ? '📐 隱藏公式' : '📐 查看公式';
+        }
+
+        function toggleMagicFormula() {
+            const section = document.getElementById('magicFormulaSection');
+            const btn = event.target;
+            section.classList.toggle('show');
+            btn.textContent = section.classList.contains('show') ? '📐 隱藏公式' : '📐 查看公式';
+        }
+
+        function toggleMagicBaseDamageTable() {
+            const table = document.getElementById('magicBaseDamageTable');
+            const btn = event.target;
+            table.classList.toggle('show');
+            btn.textContent = table.classList.contains('show') ? '📊 隱藏基礎傷害值表' : '📊 查看基礎傷害值表';
+        }
+
+        function toggleMagicCoeffTable() {
+            const table = document.getElementById('magicCoeffTable');
+            const btn = event.target;
+            const isShowing = table.classList.contains('show');
+            table.classList.toggle('show');
+            btn.textContent = !isShowing ? '📊 隱藏魔攻係數表' : '📊 查看魔攻係數表';
+            
+            // 首次展開時生成表格
+            if (!isShowing) {
+                // 使用setTimeout確保DOM更新後再生成
+                setTimeout(() => {
+                    generateMagicCoeffTable();
+                }, 10);
+            }
+        }
+
+        function generateMagicCoeffTable() {
+            const tbody = document.getElementById('magicCoeffTableBody');
+            if (!tbody) {
+                console.error('找不到 magicCoeffTableBody 元素');
+                return;
+            }
+            
+            // 每次重新生成，確保使用最新的查找表數據
+            
+            // 從查找表中獲取所有係數值（使用等級1的係數作為基準）
+            if (!magicAttackLookupTable || !magicAttackLookupTable[1]) {
+                tbody.innerHTML = '<tr><td colspan="12">數據載入中...</td></tr>';
+                return;
+            }
+            
+            const level1Table = magicAttackLookupTable[1];
+            
+            // 獲取所有係數鍵並排序
+            // 注意：在JavaScript對象字面量中，1.0會變成"1"，1.0125會保持為"1.0125"
+            const coeffKeys = Object.keys(level1Table).sort((a, b) => {
+                return parseFloat(a) - parseFloat(b);
+            });
+            
+            if (coeffKeys.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="12">無數據</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            coeffKeys.forEach(coeffKey => {
+                const coeff = parseFloat(coeffKey);
+                html += '<tr>';
+                // 格式化係數顯示
+                let coeffDisplay;
+                if (coeff % 1 === 0) {
+                    coeffDisplay = coeff.toString();
+                } else {
+                    // 顯示4位小數
+                    coeffDisplay = coeff.toFixed(4);
+                }
+                html += `<td>${coeffDisplay}</td>`;
+                
+                for (let level = 1; level <= 11; level++) {
+                    const levelTable = magicAttackLookupTable[level];
+                    let attackValue = '-';
+                    
+                    if (levelTable) {
+                        // 直接使用原始鍵查找
+                        if (coeffKey in levelTable) {
+                            attackValue = levelTable[coeffKey];
+                        } else {
+                            // 如果找不到，可能是因為1.0變成了"1"，嘗試用數字查找
+                            const numValue = coeff % 1 === 0 ? Math.floor(coeff) : coeff;
+                            if (numValue in levelTable) {
+                                attackValue = levelTable[numValue];
+                            } else if (String(numValue) in levelTable) {
+                                attackValue = levelTable[String(numValue)];
+                            }
+                        }
+                    }
+                    
+                    html += `<td>${attackValue}</td>`;
+                }
+                html += '</tr>';
+            });
+            
+            tbody.innerHTML = html;
         }
 
         // 技能倍率同步
@@ -2171,11 +3121,21 @@
             }
         }
 
-        window.onload = function() { calculate(); };
+        window.onload = function() { 
+            calculate(); 
+            updateMagicOptions(); // 初始化魔法選項
+        };
 
-        document.querySelectorAll('input:not(#recordName):not(#skillMultiplierInput):not(#skillMultiplierRange), select').forEach(el => {
+        document.querySelectorAll('input:not(#recordName):not(#skillMultiplierInput):not(#skillMultiplierRange):not(#magicCasterSpirit):not(#magicTargetSpirit):not(#magicAttack), select:not(#magicCasterType):not(#magicType):not(#magicLevel):not(#magicCrystalElement):not(#magicRaceEffect)').forEach(el => {
             el.addEventListener('change', calculate);
             el.addEventListener('input', calculate);
+        });
+
+        // 魔法傷害計算的事件監聽器（僅更新選項，不自動計算）
+        document.getElementById('magicCasterType').addEventListener('change', updateMagicOptions);
+        document.getElementById('magicType').addEventListener('change', updateMagicLevelOptions);
+        document.getElementById('magicPVE').addEventListener('change', function() {
+            // PVE開關變化時不自動計算，只更新顯示
         });
     </script>
 </body>
