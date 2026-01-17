@@ -395,6 +395,37 @@
             vertical-align: middle;
         }
 
+        /* 寵物標籤 */
+        .pet-lv {
+            background: #3498db;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        
+        .pet-trans {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        
+        .pet-slot {
+            background: #27ae60;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
         /* Price Display */
         .price {
             display: flex;
@@ -1065,16 +1096,27 @@ async function fetchMarketData(keyword) {
             // 寵物
             (petsMap[cdkey] || []).forEach(pet => {
                 if (pet.Name.includes(keyword)) {
+                    // 寵物標籤：等級、改造、技能欄數
+                    const petLv = pet.Lv || 1;
+                    const trans = pet.Trans || 0;
+                    const slot = pet.Slot || 6;
+                    
+                    let petTags = `<span class="pet-lv">Lv${petLv}</span>`;
+                    petTags += `<span class="pet-trans">${trans}改</span>`;
+                    petTags += `<span class="pet-slot">${slot}技</span>`;
+                    
                     items.push({
-                        item: `${pet.Name} (寵物)`,
+                        item: pet.Name,
+                        transTag: petTags,
+                        gradeTag: '',
                         price: pet.price,
                         pricetype: pet.pricetype,
                         durability: '-',
                         durCurrent: 0,
                         durMax: 0,
-                        attack: 0,
-                        defence: 0,
-                        agility: 0,
+                        attack: '-',
+                        defence: '-',
+                        agility: '-',
                         location: stall.coords,
                         server: stall.server,
                         shopName: stall.name,
@@ -1289,7 +1331,7 @@ function renderMarketTable(items) {
         
         return `
         <tr>
-            <td><strong>${escapeHtml(item.item)}</strong> ${item.gradeTag || ''}</td>
+            <td><strong>${escapeHtml(item.item)}</strong> ${item.gradeTag || ''}${item.transTag || ''}</td>
             <td>
                 <span class="price ${item.pricetype === 0 ? 'coin' : 'crystal'}">
                     ${item.pricetype === 0 ? '💰' : '💎'} ${item.price.toLocaleString()}
