@@ -751,8 +751,8 @@
             <div class="form-group">
                 <label>💰 幣種</label>
                 <select id="currencyFilter">
-                    <option value="all">全部</option>
-                    <option value="0" selected>魔幣 💰</option>
+                    <option value="all" selected>全部</option>
+                    <option value="0">魔幣 💰</option>
                     <option value="1">魔晶 💎</option>
                 </select>
             </div>
@@ -774,13 +774,13 @@
             </div>
             <div class="form-group exchange-rate-group">
                 <label>💱 匯率 (魔幣:魔晶)</label>
-                <input type="number" id="exchangeRate" value="300" min="1">
+                <input type="number" id="exchangeRate" value="275" min="1">
             </div>
             <div class="form-group">
                 <button id="searchBtn">🔍 搜尋市場</button>
             </div>
             <div class="form-group">
-                <button id="historyBtn" class="secondary">📈 24H歷史成交</button>
+                <button id="historyBtn" class="secondary">📈 72H歷史成交</button>
             </div>
         </div>
 
@@ -1124,7 +1124,7 @@ async function searchHistory() {
 
 async function fetchHistoryData(keyword) {
     const logs = [];
-    const TIME_RANGE = 24 * 60 * 60 * 1000; // 24小時
+    const TIME_RANGE = 72 * 60 * 60 * 1000; // 72小時
     const now = Date.now();
     let page = 1;
     let keepFetching = true;
