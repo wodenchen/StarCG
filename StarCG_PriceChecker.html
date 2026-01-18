@@ -757,6 +757,11 @@
             0% { background: rgba(180, 138, 97, 0.3); }
             100% { background: transparent; }
         }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            50% { transform: scale(1.02); box-shadow: 0 0 15px 5px rgba(231, 76, 60, 0.4); }
+        }
     </style>
 </head>
 <body>
@@ -766,8 +771,12 @@
     <div class="header">
         <h1>⭐ 星詠魔力 市場查價器</h1>
         <span class="badge">v2.0</span>
+        <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" 
+           style="margin-left:auto; background:#e74c3c; color:#fff; padding:10px 18px; border-radius:8px; font-size:1.1rem; font-weight:700; text-decoration:none; animation: pulse 2s infinite;">
+            ⚠️ 首次使用請先點此開通權限
+        </a>
         <a href="https://member.starcg.net/market.php" target="_blank" 
-           style="margin-left:auto; color:var(--text-secondary); font-size:0.9rem; text-decoration:none;">
+           style="color:var(--text-secondary); font-size:0.9rem; text-decoration:none; margin-left:12px;">
             📋 官方市場
         </a>
     </div>
@@ -912,7 +921,7 @@
 /* ========================================
    全域變數
 ======================================== */
-const CORS_PROXY = 'https://corsproxy.io/?';
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
 const API_MARKET_BASE = 'https://member.starcg.net/market.php';
 const API_HISTORY_BASE = 'https://member.starcg.net/marketrecord.php';
 const MAX_PAGES = 20;
@@ -1036,7 +1045,7 @@ async function fetchMarketData(keyword) {
     
     while (hasMore && page <= MAX_PAGES) {
         const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=0&page=${page}&search=${encodeURIComponent(keyword)}`;
-        const url = CORS_PROXY + encodeURIComponent(targetUrl);
+        const url = CORS_PROXY + targetUrl;
         const resp = await fetch(url);
         const data = await resp.json();
         
@@ -1056,11 +1065,6 @@ async function fetchMarketData(keyword) {
             // 道具
             (itemsMap[cdkey] || []).forEach(item => {
                 if (item.ITEM_TRUENAME.includes(keyword)) {
-                    // Debug: 顯示改造圖的完整資料結構
-                    if (item.ITEM_TRUENAME.includes('改造圖')) {
-                        console.log('【改造圖原始資料】', JSON.stringify(item, null, 2));
-                    }
-                    
                     // 處理改造圖等級區分（嘗試多種可能的欄位名）
                     let displayName = item.ITEM_TRUENAME;
                     let gradeTag = '';
@@ -1173,7 +1177,7 @@ async function fetchHistoryData(keyword) {
     
     while (keepFetching && page <= 100) {
         const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=all&page=${page}&search=${encodeURIComponent(keyword)}`;
-        const url = CORS_PROXY + encodeURIComponent(targetUrl);
+        const url = CORS_PROXY + targetUrl;
         const resp = await fetch(url);
         const data = await resp.json();
         
@@ -1184,11 +1188,6 @@ async function fetchHistoryData(keyword) {
             if (now - logTime > TIME_RANGE) {
                 keepFetching = false;
                 break;
-            }
-            
-            // Debug: 顯示改造圖的歷史成交原始資料
-            if (log.buff && log.buff.includes('改造圖')) {
-                console.log('【改造圖歷史成交原始資料】', JSON.stringify(log, null, 2));
             }
             
             // 解析物品名稱
