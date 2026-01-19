@@ -775,6 +775,10 @@
     <div class="header">
         <h1>⭐ 星詠魔力 市場查價器</h1>
         <span class="badge">v2.0</span>
+        <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" 
+           style="margin-left:auto; background:linear-gradient(135deg, #e74c3c, #c0392b); color:#fff; padding:12px 20px; border-radius:8px; font-size:1.1rem; font-weight:700; text-decoration:none; box-shadow: 0 4px 15px rgba(231,76,60,0.4); animation: pulse 2s infinite;">
+            ⚠️ 首次使用請先點此開通權限
+        </a>
         <a href="https://member.starcg.net/market.php" target="_blank" 
            style="color:var(--text-secondary); font-size:0.9rem; text-decoration:none; margin-left:12px;">
             📋 官方市場
@@ -921,15 +925,8 @@
 /* ========================================
    全域變數
 ======================================== */
-// Cloudflare Worker CORS 代理
-// 部署步驟（詳細說明請見 README_CORS_WORKER.md）：
-// 1. 前往 https://dash.cloudflare.com/ 登入（免費註冊）
-// 2. 點擊左側 "Workers & Pages" → "Create application" → "Create Worker"
-// 3. 刪除預設代碼，貼上 cors-proxy-worker.js 的完整內容
-// 4. 點擊 "Save and deploy"
-// 5. 複製部署後的 Worker URL（例如：https://cors-proxy.你的帳號.workers.dev）
-// 6. 將下面的 URL 替換成你的 Worker URL（記得保留結尾的 /）
-const CORS_PROXY = 'https://starcg-proxy.raywode13.workers.dev/';
+// CORS 代理（使用 cors-anywhere，首次使用需開通權限）
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
 const API_MARKET_BASE = 'https://member.starcg.net/market.php';
 const API_HISTORY_BASE = 'https://member.starcg.net/marketrecord.php';
 const MAX_PAGES = 20;
@@ -1055,13 +1052,18 @@ async function fetchMarketData(keyword) {
         const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=0&page=${page}&search=${encodeURIComponent(keyword)}`;
         const url = CORS_PROXY + targetUrl;
         const resp = await fetch(url);
+        const text = await resp.text();
         
-        if (!resp.ok) {
-            const errorText = await resp.text();
-            throw new Error(`HTTP ${resp.status}: ${errorText.substring(0, 100)}`);
+        // 檢查是否為 HTML 錯誤頁（520 等）
+        if (text.startsWith('<!') || text.startsWith('<html') || text.includes('error code:')) {
+            throw new Error('伺服器暫時無法連線，請稍後再試');
         }
         
-        const data = await resp.json();
+        if (!resp.ok) {
+            throw new Error(`HTTP ${resp.status}: ${text.substring(0, 100)}`);
+        }
+        
+        const data = JSON.parse(text);
         
         if (data.totalFiltered === 0) break;
         if (data.totalFiltered > 300) {
@@ -1193,13 +1195,18 @@ async function fetchHistoryData(keyword) {
         const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=all&page=${page}&search=${encodeURIComponent(keyword)}`;
         const url = CORS_PROXY + targetUrl;
         const resp = await fetch(url);
+        const text = await resp.text();
         
-        if (!resp.ok) {
-            const errorText = await resp.text();
-            throw new Error(`HTTP ${resp.status}: ${errorText.substring(0, 100)}`);
+        // 檢查是否為 HTML 錯誤頁（520 等）
+        if (text.startsWith('<!') || text.startsWith('<html') || text.includes('error code:')) {
+            throw new Error('伺服器暫時無法連線，請稍後再試');
         }
         
-        const data = await resp.json();
+        if (!resp.ok) {
+            throw new Error(`HTTP ${resp.status}: ${text.substring(0, 100)}`);
+        }
+        
+        const data = JSON.parse(text);
         
         if (!data.logs || data.logs.length === 0) break;
         
