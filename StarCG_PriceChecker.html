@@ -223,14 +223,16 @@
         }
 
         .stat-card .label {
-            font-size: 0.95rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             color: var(--text-secondary);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .stat-card .value {
-            font-size: 1.6rem;
+            font-size: 1.2rem;
             font-weight: 700;
+            line-height: 1.4;
         }
 
         .stat-card .value.gold { color: var(--accent-gold); }
@@ -662,11 +664,13 @@
             }
 
             .stat-card .label {
-                font-size: 0.8rem;
+                font-size: 0.95rem;
+                font-weight: 600;
             }
 
             .stat-card .value {
-                font-size: 1.3rem;
+                font-size: 1.0rem;
+                line-height: 1.3;
             }
 
             .tabs {
@@ -1545,18 +1549,71 @@ function simplifyData(data) {
 
 function updateStats(items) {
     const currency = document.getElementById('currencyFilter').value;
-    const priceType = currency === '1' ? 1 : 0;
+    const rate = parseInt(document.getElementById('exchangeRate').value) || 275;
     
-    const prices = items
-        .filter(i => currency === 'all' || i.pricetype === priceType)
-        .map(i => i.price);
+    if (currency === 'all') {
+        // 分別計算兩種幣種的數量
+        const coinCount = items.filter(i => i.pricetype === 0).reduce((sum, i) => sum + i.count, 0);
+        const crystalCount = items.filter(i => i.pricetype === 1).reduce((sum, i) => sum + i.count, 0);
+        
+        // 在售數量：一行魔幣、一行魔晶
+        const countLines = [];
+        if (coinCount > 0) countLines.push(`💰 ${coinCount.toLocaleString()}`);
+        if (crystalCount > 0) countLines.push(`💎 ${crystalCount.toLocaleString()}`);
+        document.getElementById('statCount').innerHTML = countLines.length > 0 ? countLines.join('<br>') : '-';
+    } else {
+        // 單一幣種模式
+        const totalCount = items.reduce((sum, i) => sum + i.count, 0);
+        document.getElementById('statCount').textContent = totalCount.toLocaleString();
+    }
     
-    const totalCount = items.reduce((sum, i) => sum + i.count, 0);
-    
-    document.getElementById('statCount').textContent = totalCount.toLocaleString();
-    document.getElementById('statMinPrice').textContent = prices.length ? Math.min(...prices).toLocaleString() : '-';
-    document.getElementById('statMaxPrice').textContent = prices.length ? Math.max(...prices).toLocaleString() : '-';
-    document.getElementById('statAvgPrice').textContent = prices.length ? calcTrimmedAvg(prices).toLocaleString() : '-';
+    if (currency === 'all') {
+        // 分別計算兩種幣種的價格
+        const coinPrices = items.filter(i => i.pricetype === 0).map(i => i.price);
+        const crystalPrices = items.filter(i => i.pricetype === 1).map(i => i.price);
+        
+        // 計算星幣統計
+        const coinMin = coinPrices.length ? Math.min(...coinPrices) : 0;
+        const coinMax = coinPrices.length ? Math.max(...coinPrices) : 0;
+        const coinAvg = coinPrices.length ? calcTrimmedAvg(coinPrices) : 0;
+        
+        // 計算魔晶統計
+        const crystalMin = crystalPrices.length ? Math.min(...crystalPrices) : 0;
+        const crystalMax = crystalPrices.length ? Math.max(...crystalPrices) : 0;
+        const crystalAvg = crystalPrices.length ? calcTrimmedAvg(crystalPrices) : 0;
+        
+        // 格式化顯示：主要價格 (~換算價格)
+        const formatPrice = (mainPrice, convertedPrice, convertedIcon) => {
+            if (mainPrice === 0) return '-';
+            const converted = convertedPrice > 0 ? ` (~${convertedPrice.toLocaleString()}${convertedIcon})` : '';
+            return `${mainPrice.toLocaleString()}${converted}`;
+        };
+        
+        // 最低價：星幣最低 (~魔晶換算) / 魔晶最低 (~星幣換算)
+        const minCoinText = coinMin > 0 ? `💰 ${formatPrice(coinMin, Math.round(coinMin / rate), '💎')}` : '';
+        const minCrystalText = crystalMin > 0 ? `💎 ${formatPrice(crystalMin, Math.round(crystalMin * rate), '💰')}` : '';
+        document.getElementById('statMinPrice').innerHTML = [minCoinText, minCrystalText].filter(Boolean).join('<br>') || '-';
+        
+        // 中位價：星幣中位 (~魔晶換算) / 魔晶中位 (~星幣換算)
+        const avgCoinText = coinAvg > 0 ? `💰 ${formatPrice(coinAvg, Math.round(coinAvg / rate), '💎')}` : '';
+        const avgCrystalText = crystalAvg > 0 ? `💎 ${formatPrice(crystalAvg, Math.round(crystalAvg * rate), '💰')}` : '';
+        document.getElementById('statAvgPrice').innerHTML = [avgCoinText, avgCrystalText].filter(Boolean).join('<br>') || '-';
+        
+        // 最高價：星幣最高 (~魔晶換算) / 魔晶最高 (~星幣換算)
+        const maxCoinText = coinMax > 0 ? `💰 ${formatPrice(coinMax, Math.round(coinMax / rate), '💎')}` : '';
+        const maxCrystalText = crystalMax > 0 ? `💎 ${formatPrice(crystalMax, Math.round(crystalMax * rate), '💰')}` : '';
+        document.getElementById('statMaxPrice').innerHTML = [maxCoinText, maxCrystalText].filter(Boolean).join('<br>') || '-';
+    } else {
+        // 單一幣種模式（原有邏輯）
+        const priceType = currency === '1' ? 1 : 0;
+        const prices = items
+            .filter(i => i.pricetype === priceType)
+            .map(i => i.price);
+        
+        document.getElementById('statMinPrice').textContent = prices.length ? Math.min(...prices).toLocaleString() : '-';
+        document.getElementById('statMaxPrice').textContent = prices.length ? Math.max(...prices).toLocaleString() : '-';
+        document.getElementById('statAvgPrice').textContent = prices.length ? calcTrimmedAvg(prices).toLocaleString() : '-';
+    }
     
     document.getElementById('statsGrid').style.display = 'grid';
 }
