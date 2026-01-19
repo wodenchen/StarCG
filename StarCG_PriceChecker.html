@@ -921,7 +921,15 @@
 /* ========================================
    全域變數
 ======================================== */
-const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+// Cloudflare Worker CORS 代理
+// 部署步驟（詳細說明請見 README_CORS_WORKER.md）：
+// 1. 前往 https://dash.cloudflare.com/ 登入（免費註冊）
+// 2. 點擊左側 "Workers & Pages" → "Create application" → "Create Worker"
+// 3. 刪除預設代碼，貼上 cors-proxy-worker.js 的完整內容
+// 4. 點擊 "Save and deploy"
+// 5. 複製部署後的 Worker URL（例如：https://cors-proxy.你的帳號.workers.dev）
+// 6. 將下面的 URL 替換成你的 Worker URL（記得保留結尾的 /）
+const CORS_PROXY = 'https://starcg-proxy.raywode13.workers.dev/';
 const API_MARKET_BASE = 'https://member.starcg.net/market.php';
 const API_HISTORY_BASE = 'https://member.starcg.net/marketrecord.php';
 const MAX_PAGES = 20;
@@ -1047,6 +1055,12 @@ async function fetchMarketData(keyword) {
         const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=0&page=${page}&search=${encodeURIComponent(keyword)}`;
         const url = CORS_PROXY + targetUrl;
         const resp = await fetch(url);
+        
+        if (!resp.ok) {
+            const errorText = await resp.text();
+            throw new Error(`HTTP ${resp.status}: ${errorText.substring(0, 100)}`);
+        }
+        
         const data = await resp.json();
         
         if (data.totalFiltered === 0) break;
@@ -1179,6 +1193,12 @@ async function fetchHistoryData(keyword) {
         const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=all&page=${page}&search=${encodeURIComponent(keyword)}`;
         const url = CORS_PROXY + targetUrl;
         const resp = await fetch(url);
+        
+        if (!resp.ok) {
+            const errorText = await resp.text();
+            throw new Error(`HTTP ${resp.status}: ${errorText.substring(0, 100)}`);
+        }
+        
         const data = await resp.json();
         
         if (!data.logs || data.logs.length === 0) break;
