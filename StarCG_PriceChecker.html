@@ -968,13 +968,17 @@ const MAX_PAGES = 20;
 // 嘗試 fetch，失敗則換下一個 proxy
 async function fetchWithProxy(targetUrl) {
     let lastError;
+    // 加上時間戳繞過快取
+    const cacheBuster = `_t=${Date.now()}`;
+    const urlWithCache = targetUrl + (targetUrl.includes('?') ? '&' : '?') + cacheBuster;
+    
     for (let i = 0; i < CORS_PROXIES.length; i++) {
         const proxyIndex = (currentProxyIndex + i) % CORS_PROXIES.length;
         const proxy = CORS_PROXIES[proxyIndex];
-        const url = proxy.prefix + (proxy.encode ? encodeURIComponent(targetUrl) : targetUrl);
+        const url = proxy.prefix + (proxy.encode ? encodeURIComponent(urlWithCache) : urlWithCache);
         
         try {
-            const resp = await fetch(url);
+            const resp = await fetch(url, { cache: 'no-store' });
             const text = await resp.text();
             
             // 檢查是否為錯誤回應
