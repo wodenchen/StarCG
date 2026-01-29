@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骰寶趨勢分析器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            color: #ffd700;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card h2 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 10px;
+        }
+
+        /* 輸入區域 */
+        .input-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dice-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dice-input label {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .dice-input input {
+            width: 70px;
+            height: 55px;
+            font-size: 1.7rem;
+            text-align: center;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        .dice-input input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
+        }
+
+        /* 當前結果顯示 */
+        .current-result {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dice-display {
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1a1a2e;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-type {
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 10px 30px;
+            border-radius: 10px;
+        }
+
+        .result-big {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+        }
+
+        .result-small {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+        }
+
+        .result-triple {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #1a1a2e;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* 歷史記錄表格 */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.05rem;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-table th {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+
+        .history-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .history-container {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .badge-big { background: #e74c3c; }
+        .badge-small { background: #3498db; }
+        .badge-triple { background: #ffd700; color: #1a1a2e; }
+
+        /* 統計區域 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #aaa;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .stat-card .percentage {
+            font-size: 1rem;
+            color: #888;
+        }
+
+        /* 趨勢分析 */
+        .trend-section {
+            margin-bottom: 20px;
+        }
+
+        .trend-title {
+            font-size: 1.15rem;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .trend-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .trend-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px 5px;
+            text-align: center;
+        }
+
+        .trend-item .number {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .trend-item .count {
+            font-size: 0.95rem;
+            color: #888;
+        }
+
+        .trend-item .status {
+            font-size: 0.85rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .hot { background: #e74c3c; }
+        .warm { background: #f39c12; }
+        .cold { background: #3498db; }
+
+        /* 投注建議 */
+        .strategy-section {
+            margin-top: 20px;
+        }
+
+        .strategy-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .strategy-btn {
+            flex: 1;
+            padding: 18px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .strategy-btn.conservative {
+            background: rgba(52, 152, 219, 0.3);
+            color: #3498db;
+        }
+
+        .strategy-btn.aggressive {
+            background: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        .strategy-btn.active {
+            border-color: currentColor;
+            transform: scale(1.02);
+        }
+
+        .bet-suggestion {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 1.05rem;
+        }
+
+        .bet-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bet-item:last-child {
+            border-bottom: none;
+        }
+
+        .bet-item .bet-type {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .bet-item .bet-amount {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.15rem;
+        }
+
+        .bet-item .bet-odds {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .total-bet {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255, 215, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .total-bet .amount {
+            color: #ffd700;
+        }
+
+        .confidence-meter {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .confidence-meter label {
+            display: block;
+            margin-bottom: 8px;
+            color: #888;
+        }
+
+        .meter-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        .meter-low { background: linear-gradient(90deg, #3498db, #2ecc71); }
+        .meter-medium { background: linear-gradient(90deg, #f39c12, #e74c3c); }
+        .meter-high { background: linear-gradient(90deg, #e74c3c, #8e44ad); }
+
+        /* 路單顯示 */
+        .roadmap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .roadmap-cell {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .roadmap-big { background: #e74c3c; }
+        .roadmap-small { background: #3498db; }
+        .roadmap-triple { background: #ffd700; color: #1a1a2e; }
+
+        /* 賠率說明 */
+        .odds-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .odds-item {
+            text-align: center;
+        }
+
+        .odds-item .type {
+            font-size: 1.05rem;
+            color: #888;
+        }
+
+        .odds-item .odds {
+            font-size: 1.35rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .warning-text {
+            color: #f39c12;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(243, 156, 18, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #f39c12;
+        }
+
+        .strategy-desc {
+            font-size: 0.75rem;
+            font-weight: normal;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .strategy-explain {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            line-height: 1.7;
+            display: none;
+        }
+
+        .strategy-explain.show {
+            display: block;
+        }
+
+        .strategy-explain .title {
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .strategy-explain ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #ccc;
+        }
+
+        .strategy-explain li {
+            margin-bottom: 4px;
+        }
+
+        .confidence-detail {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .confidence-detail .detail-title {
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        .confidence-detail .detail-content {
+            font-size: 1rem;
+            color: #ccc;
+        }
+
+        .confidence-detail .detail-table {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .confidence-detail .detail-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .confidence-detail .detail-table .val {
+            text-align: right;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .confidence-levels {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .confidence-levels .level {
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+        }
+
+        .confidence-levels .low {
+            background: rgba(52, 152, 219, 0.3);
+            color: #3498db;
+        }
+
+        .confidence-levels .medium {
+            background: rgba(243, 156, 18, 0.3);
+            color: #f39c12;
+        }
+
+        .confidence-levels .high {
+            background: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 骰寶趨勢分析器 🎲</h1>
+
+        <div class="main-grid">
+            <!-- 左側：輸入與記錄 -->
+            <div>
+                <div class="card">
+                    <h2>📝 輸入開獎結果</h2>
+                    <div class="input-section">
+                        <div class="dice-input">
+                            <label>期數:</label>
+                            <input type="text" id="roundNum" placeholder="如:001" style="width: 80px;">
+                        </div>
+                        <div class="dice-input">
+                            <label>骰1:</label>
+                            <input type="number" id="dice1" min="1" max="6" placeholder="1-6">
+                        </div>
+                        <div class="dice-input">
+                            <label>骰2:</label>
+                            <input type="number" id="dice2" min="1" max="6" placeholder="1-6">
+                        </div>
+                        <div class="dice-input">
+                            <label>骰3:</label>
+                            <input type="number" id="dice3" min="1" max="6" placeholder="1-6">
+                        </div>
+                        <button class="btn btn-primary" onclick="addRecord()">新增記錄</button>
+                        <button class="btn btn-danger" onclick="clearRecords()">清除全部</button>
+                    </div>
+
+                    <div class="current-result" id="currentResult" style="display: none;">
+                        <div style="text-align: center; margin-right: 15px;">
+                            <div style="color: #888; font-size: 0.8rem;">最新期數</div>
+                            <div style="color: #ffd700; font-size: 1.5rem; font-weight: bold;" id="displayRound">-</div>
+                        </div>
+                        <div class="dice-display" id="display1">-</div>
+                        <div class="dice-display" id="display2">-</div>
+                        <div class="dice-display" id="display3">-</div>
+                        <span>=</span>
+                        <div class="dice-display" id="displaySum">-</div>
+                        <div class="result-type" id="resultType">-</div>
+                    </div>
+
+                    <div class="odds-info">
+                        <div class="odds-item">
+                            <div class="type">大/小</div>
+                            <div class="odds">1 賠 2</div>
+                        </div>
+                        <div class="odds-item">
+                            <div class="type">豹子</div>
+                            <div class="odds">1 賠 30</div>
+                        </div>
+                        <div class="odds-item">
+                            <div class="type">指定豹子</div>
+                            <div class="odds">1 賠 150</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>🛤️ 路單 (大小走勢)</h2>
+                    <div class="roadmap" id="roadmap"></div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>📜 歷史記錄 (最多100筆)</h2>
+                    <div class="history-container">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>期數</th>
+                                    <th>骰1</th>
+                                    <th>骰2</th>
+                                    <th>骰3</th>
+                                    <th>總和</th>
+                                    <th>結果</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <p style="text-align: center; color: #888; margin-top: 10px;" id="recordCount">目前 0 筆記錄</p>
+                </div>
+            </div>
+
+            <!-- 右側：統計與策略 -->
+            <div>
+                <div class="card">
+                    <h2>📊 統計分析 (近10期) <span id="analysisRange" style="font-size: 0.8rem; color: #888; font-weight: normal;"></span></h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>大</h3>
+                            <div class="value" style="color: #e74c3c;" id="bigCount">0</div>
+                            <div class="percentage" id="bigPercent">0%</div>
+                            <div class="percentage" id="bigCountAll" style="font-size: 0.75rem; margin-top: 5px;">全0期: 0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>小</h3>
+                            <div class="value" style="color: #3498db;" id="smallCount">0</div>
+                            <div class="percentage" id="smallPercent">0%</div>
+                            <div class="percentage" id="smallCountAll" style="font-size: 0.75rem; margin-top: 5px;">全0期: 0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>豹子</h3>
+                            <div class="value" style="color: #ffd700;" id="tripleCount">0</div>
+                            <div class="percentage" id="triplePercent">0%</div>
+                            <div class="percentage" id="tripleCountAll" style="font-size: 0.75rem; margin-top: 5px;">全0期: 0</div>
+                        </div>
+                    </div>
+
+                    <div class="trend-section">
+                        <div class="trend-title">🔢 各點數出現次數 - 近10期 (冷/溫/熱)</div>
+                        <div class="trend-grid" id="numberTrend"></div>
+                    </div>
+
+                    <div class="trend-section">
+                        <div class="trend-title">🎯 總和分布 - 近10期 (4-17)</div>
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;" id="sumTrend"></div>
+                    </div>
+
+                    <div class="trend-section">
+                        <div class="trend-title">📈 連續趨勢</div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3>當前連續</h3>
+                                <div class="value" id="currentStreak">-</div>
+                                <div class="percentage" id="streakType">-</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>最長連大</h3>
+                                <div class="value" style="color: #e74c3c;" id="maxBigStreak">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>最長連小</h3>
+                                <div class="value" style="color: #3498db;" id="maxSmallStreak">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>💰 投注建議 <span id="nextRoundHint" style="font-size: 0.9rem; color: #ffd700;"></span></h2>
+                    <p style="color: #888; margin-bottom: 15px;">1注 = $5,000 | 單期最高60注 ($300,000)</p>
+                    
+                    <div class="strategy-toggle">
+                        <button class="strategy-btn conservative active" onclick="setStrategy('conservative')">
+                            🛡️ 保守策略
+                            <div class="strategy-desc">穩健為主・只押大小・高門檻觸發</div>
+                        </button>
+                        <button class="strategy-btn aggressive" onclick="setStrategy('aggressive')">
+                            ⚔️ 激進策略
+                            <div class="strategy-desc">追求高賠・押豹子・低門檻觸發</div>
+                        </button>
+                    </div>
+
+                    <div class="strategy-explain" id="strategyExplain"></div>
+
+                    <div class="bet-suggestion" id="betSuggestion">
+                        <p style="text-align: center; color: #888;">請先輸入至少3筆開獎記錄</p>
+                    </div>
+
+                    <div class="confidence-meter" onclick="toggleConfidenceDetail()" style="cursor: pointer;">
+                        <label>策略信心指數 <span style="font-size: 0.8rem; color: #ffd700;">ⓘ 點擊查看詳情</span></label>
+                        <div class="meter-bar">
+                            <div class="meter-fill meter-low" id="confidenceFill" style="width: 0%"></div>
+                        </div>
+                        <p style="text-align: right; color: #888; margin-top: 5px;" id="confidenceText">0%</p>
+                    </div>
+
+                    <div class="confidence-detail" id="confidenceDetail" style="display: none;">
+                        <div class="detail-title">📊 信心指數計算方式</div>
+                        <div class="detail-content">
+                            <p><strong>基礎值：30%</strong></p>
+                            <table class="detail-table">
+                                <tr><td>連續6+期同結果</td><td class="val">+30%</td></tr>
+                                <tr><td>連續4-5期同結果</td><td class="val">+20%</td></tr>
+                                <tr><td>連續3期同結果</td><td class="val">+12%</td></tr>
+                                <tr><td>近10期大小比例偏離>20%</td><td class="val">+18%</td></tr>
+                                <tr><td>近10期大小比例偏離>10%</td><td class="val">+8%</td></tr>
+                                <tr><td>近5期出現4次以上同結果</td><td class="val">+10%</td></tr>
+                                <tr><td>超過20期未出豹子</td><td class="val">+12%</td></tr>
+                                <tr><td>超過12期未出豹子</td><td class="val">+6%</td></tr>
+                            </table>
+                            <p style="margin-top: 10px; color: #888;">上限 90%（骰子為隨機遊戲，不存在100%確定性）</p>
+                            <div class="confidence-levels">
+                                <span class="level low">< 40% 觀望</span>
+                                <span class="level medium">40-70% 可投注</span>
+                                <span class="level high">> 70% 訊號明確</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-text">
+                        ⚠️ 投注建議僅供參考，骰寶為隨機遊戲，過往結果不代表未來。請理性投注，量力而為。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 常量
+        const MAX_RECORDS = 100;
+        const ANALYSIS_WINDOW = 10; // 分析視窗：前10期
+        const BET_UNIT = 5000;
+        const MAX_BETS = 60;
+
+        // 狀態
+        let records = [];
+        let currentStrategy = 'conservative';
+
+        // 從 localStorage 載入
+        function loadRecords() {
+            const saved = localStorage.getItem('sicBoRecords');
+            if (saved) {
+                records = JSON.parse(saved);
+                updateDisplay();
+            }
+        }
+
+        // 儲存到 localStorage
+        function saveRecords() {
+            localStorage.setItem('sicBoRecords', JSON.stringify(records));
+        }
+
+        // 判斷結果類型
+        function getResultType(d1, d2, d3) {
+            const sum = d1 + d2 + d3;
+            if (d1 === d2 && d2 === d3) {
+                return { type: 'triple', sum, tripleNumber: d1 };
+            }
+            return { type: sum >= 12 ? 'big' : 'small', sum };
+        }
+
+        // 新增記錄
+        function addRecord() {
+            const roundNum = document.getElementById('roundNum').value.trim();
+            const d1 = parseInt(document.getElementById('dice1').value);
+            const d2 = parseInt(document.getElementById('dice2').value);
+            const d3 = parseInt(document.getElementById('dice3').value);
+
+            // 驗證
+            if (!roundNum) {
+                alert('請輸入期數');
+                return;
+            }
+
+            if (isNaN(d1) || isNaN(d2) || isNaN(d3) ||
+                d1 < 1 || d1 > 6 || d2 < 1 || d2 > 6 || d3 < 1 || d3 > 6) {
+                alert('請輸入有效的骰子點數 (1-6)');
+                return;
+            }
+
+            const result = getResultType(d1, d2, d3);
+            records.unshift({
+                round: roundNum,
+                dice: [d1, d2, d3],
+                ...result,
+                timestamp: Date.now()
+            });
+
+            // 限制記錄數量
+            if (records.length > MAX_RECORDS) {
+                records = records.slice(0, MAX_RECORDS);
+            }
+
+            saveRecords();
+            updateDisplay();
+
+            // 清空輸入（期數自動遞增或保留）
+            const nextRound = autoIncrementRound(roundNum);
+            document.getElementById('roundNum').value = nextRound;
+            document.getElementById('dice1').value = '';
+            document.getElementById('dice2').value = '';
+            document.getElementById('dice3').value = '';
+            document.getElementById('dice1').focus();
+        }
+
+        // 自動遞增期數
+        function autoIncrementRound(currentRound) {
+            // 嘗試解析數字部分並遞增
+            const match = currentRound.match(/^(.*?)(\d+)$/);
+            if (match) {
+                const prefix = match[1];
+                const num = parseInt(match[2]);
+                const padLength = match[2].length;
+                return prefix + String(num + 1).padStart(padLength, '0');
+            }
+            return currentRound;
+        }
+
+        // 刪除單筆記錄
+        function deleteRecord(index) {
+            records.splice(index, 1);
+            saveRecords();
+            updateDisplay();
+        }
+
+        // 清除所有記錄
+        function clearRecords() {
+            if (confirm('確定要清除所有記錄嗎？')) {
+                records = [];
+                saveRecords();
+                updateDisplay();
+            }
+        }
+
+        // 更新顯示
+        function updateDisplay() {
+            updateCurrentResult();
+            updateHistory();
+            updateStats();
+            updateTrends();
+            updateRoadmap();
+            updateBetSuggestion();
+        }
+
+        // 更新當前結果顯示
+        function updateCurrentResult() {
+            const container = document.getElementById('currentResult');
+            if (records.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'flex';
+            const latest = records[0];
+
+            document.getElementById('displayRound').textContent = latest.round || '-';
+            document.getElementById('display1').textContent = latest.dice[0];
+            document.getElementById('display2').textContent = latest.dice[1];
+            document.getElementById('display3').textContent = latest.dice[2];
+            document.getElementById('displaySum').textContent = latest.sum;
+
+            const typeEl = document.getElementById('resultType');
+            typeEl.className = 'result-type';
+
+            if (latest.type === 'triple') {
+                typeEl.textContent = `豹子 ${latest.tripleNumber}`;
+                typeEl.classList.add('result-triple');
+            } else if (latest.type === 'big') {
+                typeEl.textContent = '大';
+                typeEl.classList.add('result-big');
+            } else {
+                typeEl.textContent = '小';
+                typeEl.classList.add('result-small');
+            }
+        }
+
+        // 更新歷史記錄表格
+        function updateHistory() {
+            const tbody = document.getElementById('historyBody');
+            tbody.innerHTML = records.map((r, i) => {
+                let badge = '';
+                if (r.type === 'triple') {
+                    badge = `<span class="badge badge-triple">豹${r.tripleNumber}</span>`;
+                } else if (r.type === 'big') {
+                    badge = '<span class="badge badge-big">大</span>';
+                } else {
+                    badge = '<span class="badge badge-small">小</span>';
+                }
+
+                return `
+                    <tr${i === 0 ? ' style="background: rgba(255, 215, 0, 0.1);"' : ''}>
+                        <td style="color: #ffd700; font-weight: bold;">${r.round || '-'}</td>
+                        <td>${r.dice[0]}</td>
+                        <td>${r.dice[1]}</td>
+                        <td>${r.dice[2]}</td>
+                        <td>${r.sum}</td>
+                        <td>${badge}</td>
+                        <td><button onclick="deleteRecord(${i})" style="background:none;border:none;color:#ff4757;cursor:pointer;">✕</button></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('recordCount').textContent = `目前 ${records.length} 筆記錄`;
+        }
+
+        // 更新統計
+        function updateStats() {
+            // 取前10期作為主要分析範圍
+            const recent10 = records.slice(0, ANALYSIS_WINDOW);
+            const r10Total = recent10.length;
+            const r10Big = recent10.filter(r => r.type === 'big').length;
+            const r10Small = recent10.filter(r => r.type === 'small').length;
+            const r10Triple = recent10.filter(r => r.type === 'triple').length;
+
+            // 全部記錄統計
+            const total = records.length;
+            const bigCount = records.filter(r => r.type === 'big').length;
+            const smallCount = records.filter(r => r.type === 'small').length;
+            const tripleCount = records.filter(r => r.type === 'triple').length;
+
+            // 顯示近10期統計（主要）
+            document.getElementById('bigCount').textContent = r10Big;
+            document.getElementById('smallCount').textContent = r10Small;
+            document.getElementById('tripleCount').textContent = r10Triple;
+
+            document.getElementById('bigPercent').textContent = r10Total ? `${(r10Big / r10Total * 100).toFixed(0)}%` : '0%';
+            document.getElementById('smallPercent').textContent = r10Total ? `${(r10Small / r10Total * 100).toFixed(0)}%` : '0%';
+            document.getElementById('triplePercent').textContent = r10Total ? `${(r10Triple / r10Total * 100).toFixed(0)}%` : '0%';
+
+            // 顯示全部統計（次要）
+            document.getElementById('bigCountAll').textContent = `全${total}期: ${bigCount}`;
+            document.getElementById('smallCountAll').textContent = `全${total}期: ${smallCount}`;
+            document.getElementById('tripleCountAll').textContent = `全${total}期: ${tripleCount}`;
+
+            // 更新分析範圍顯示
+            if (records.length > 0) {
+                const newest = records[0].round || '?';
+                const analysisEnd = records[Math.min(ANALYSIS_WINDOW - 1, records.length - 1)].round || '?';
+                document.getElementById('analysisRange').textContent = 
+                    `(分析: 第${analysisEnd}期 ~ 第${newest}期，共${r10Total}期)`;
+            } else {
+                document.getElementById('analysisRange').textContent = '';
+            }
+
+            // 連續趨勢
+            updateStreaks();
+        }
+
+        // 更新連續趨勢
+        function updateStreaks() {
+            if (records.length === 0) {
+                document.getElementById('currentStreak').textContent = '-';
+                document.getElementById('streakType').textContent = '-';
+                document.getElementById('maxBigStreak').textContent = '0';
+                document.getElementById('maxSmallStreak').textContent = '0';
+                return;
+            }
+
+            let currentStreak = 1;
+            let currentType = records[0].type === 'triple' ? 'triple' : records[0].type;
+            let maxBig = 0, maxSmall = 0;
+            let tempBig = 0, tempSmall = 0;
+
+            for (let i = 0; i < records.length; i++) {
+                const type = records[i].type === 'triple' ? 'triple' : records[i].type;
+                
+                if (type === 'big') {
+                    tempBig++;
+                    tempSmall = 0;
+                } else if (type === 'small') {
+                    tempSmall++;
+                    tempBig = 0;
+                } else {
+                    tempBig = 0;
+                    tempSmall = 0;
+                }
+
+                maxBig = Math.max(maxBig, tempBig);
+                maxSmall = Math.max(maxSmall, tempSmall);
+
+                if (i > 0) {
+                    const prevType = records[i - 1].type === 'triple' ? 'triple' : records[i - 1].type;
+                    if (type === currentType && i < 5) {
+                        currentStreak++;
+                    }
+                }
+            }
+
+            // 計算當前連續（從最新開始）
+            currentStreak = 1;
+            currentType = records[0].type === 'triple' ? 'triple' : records[0].type;
+            for (let i = 1; i < records.length; i++) {
+                const type = records[i].type === 'triple' ? 'triple' : records[i].type;
+                if (type === currentType) {
+                    currentStreak++;
+                } else {
+                    break;
+                }
+            }
+
+            document.getElementById('currentStreak').textContent = currentStreak;
+            document.getElementById('streakType').textContent = 
+                currentType === 'big' ? '連大' : 
+                currentType === 'small' ? '連小' : '豹子';
+            document.getElementById('maxBigStreak').textContent = maxBig;
+            document.getElementById('maxSmallStreak').textContent = maxSmall;
+        }
+
+        // 更新趨勢分析（基於近10期）
+        function updateTrends() {
+            const recent10 = records.slice(0, ANALYSIS_WINDOW);
+            
+            // 各點數統計 (1-6) - 基於近10期
+            const numberCounts = [0, 0, 0, 0, 0, 0];
+            recent10.forEach(r => {
+                r.dice.forEach(d => numberCounts[d - 1]++);
+            });
+
+            const totalDice = recent10.length * 3;
+            const avgCount = totalDice / 6;
+
+            const numberTrendEl = document.getElementById('numberTrend');
+            numberTrendEl.innerHTML = numberCounts.map((count, i) => {
+                let status = 'warm';
+                let statusText = '溫';
+                if (totalDice > 0) {
+                    const ratio = count / avgCount;
+                    if (ratio >= 1.4) { status = 'hot'; statusText = '熱'; }
+                    else if (ratio <= 0.6) { status = 'cold'; statusText = '冷'; }
+                }
+                return `
+                    <div class="trend-item">
+                        <div class="number">${i + 1}</div>
+                        <div class="count">${count}次</div>
+                        <span class="status ${status}">${statusText}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // 總和分布 (4-17，排除豹子3和18) - 基於近10期
+            const sumCounts = {};
+            for (let i = 4; i <= 17; i++) sumCounts[i] = 0;
+            recent10.forEach(r => {
+                if (r.type !== 'triple' && sumCounts[r.sum] !== undefined) {
+                    sumCounts[r.sum]++;
+                }
+            });
+
+            const nonTripleCount = recent10.filter(r => r.type !== 'triple').length;
+            const avgSum = nonTripleCount / 14;
+
+            const sumTrendEl = document.getElementById('sumTrend');
+            sumTrendEl.innerHTML = Object.entries(sumCounts).map(([sum, count]) => {
+                let status = 'warm';
+                let statusText = '溫';
+                if (nonTripleCount > 0) {
+                    const ratio = count / avgSum;
+                    if (ratio >= 1.8) { status = 'hot'; statusText = '熱'; }
+                    else if (ratio <= 0.3 || count === 0) { status = 'cold'; statusText = '冷'; }
+                }
+                const isBig = parseInt(sum) >= 12;
+                return `
+                    <div class="trend-item" style="border-left: 3px solid ${isBig ? '#e74c3c' : '#3498db'}">
+                        <div class="number" style="font-size: 1rem;">${sum}</div>
+                        <div class="count">${count}</div>
+                        <span class="status ${status}">${statusText}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新路單
+        function updateRoadmap() {
+            const roadmapEl = document.getElementById('roadmap');
+            roadmapEl.innerHTML = [...records].reverse().map(r => {
+                let cls = 'roadmap-';
+                let text = '';
+                if (r.type === 'triple') {
+                    cls += 'triple';
+                    text = r.tripleNumber;
+                } else if (r.type === 'big') {
+                    cls += 'big';
+                    text = '大';
+                } else {
+                    cls += 'small';
+                    text = '小';
+                }
+                const tooltip = `第${r.round || '?'}期: ${r.dice.join(',')}=${r.sum}`;
+                return `<div class="roadmap-cell ${cls}" title="${tooltip}">${text}</div>`;
+            }).join('');
+        }
+
+        // 設定策略
+        function setStrategy(strategy) {
+            currentStrategy = strategy;
+            document.querySelectorAll('.strategy-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.strategy-btn.${strategy}`).classList.add('active');
+            updateStrategyExplain();
+            updateBetSuggestion();
+        }
+
+        // 更新策略說明
+        function updateStrategyExplain() {
+            const explainEl = document.getElementById('strategyExplain');
+            
+            if (currentStrategy === 'conservative') {
+                explainEl.innerHTML = `
+                    <div class="title">🛡️ 保守策略原則</div>
+                    <ul>
+                        <li><strong>只押大小</strong>：不押豹子，避免低機率高風險</li>
+                        <li><strong>訊號積分制</strong>：需累積 2 分以上才出建議
+                            <ul style="font-size: 0.9em; margin-top: 5px;">
+                                <li>連續3期 +1分，4期 +2分，5期以上 +3分</li>
+                                <li>比例偏離25%~30% +1分，30%~35% +2分，35%以上 +3分</li>
+                                <li>近5期極端（4次以上同結果）+1分</li>
+                            </ul>
+                        </li>
+                        <li><strong>穩健下注</strong>：訊號越強，下注越多（3~10注）</li>
+                    </ul>
+                `;
+            } else {
+                explainEl.innerHTML = `
+                    <div class="title">⚔️ 激進策略原則</div>
+                    <ul>
+                        <li><strong>追求高賠率</strong>：會押豹子(1:30)、指定豹子(1:150)</li>
+                        <li><strong>低門檻觸發</strong>：連續3期即觸發反轉建議</li>
+                        <li><strong>多元投注</strong>：同時押大小 + 豹子，分散風險</li>
+                        <li><strong>追熱號</strong>：根據熱號押指定豹子</li>
+                        <li><strong>積極下注</strong>：單項建議 5~20 注</li>
+                    </ul>
+                `;
+            }
+            explainEl.classList.add('show');
+        }
+
+        // 切換信心指數詳情顯示
+        function toggleConfidenceDetail() {
+            const detailEl = document.getElementById('confidenceDetail');
+            if (detailEl.style.display === 'none') {
+                detailEl.style.display = 'block';
+            } else {
+                detailEl.style.display = 'none';
+            }
+        }
+
+        // 更新投注建議
+        function updateBetSuggestion() {
+            const container = document.getElementById('betSuggestion');
+            const nextRoundHint = document.getElementById('nextRoundHint');
+            
+            // 顯示下一期預測提示
+            if (records.length > 0) {
+                const latestRound = records[0].round || '?';
+                const nextRound = autoIncrementRound(latestRound);
+                nextRoundHint.textContent = `(基於第${latestRound}期，建議第${nextRound}期)`;
+            } else {
+                nextRoundHint.textContent = '';
+            }
+            
+            if (records.length < 3) {
+                container.innerHTML = '<p style="text-align: center; color: #888;">請先輸入至少3筆開獎記錄</p>';
+                document.getElementById('confidenceFill').style.width = '0%';
+                document.getElementById('confidenceText').textContent = '0%';
+                return;
+            }
+
+            const analysis = analyzeForBetting();
+            const suggestions = generateSuggestions(analysis);
+            
+            let html = '';
+            let totalBets = 0;
+
+            suggestions.forEach(s => {
+                totalBets += s.bets;
+                html += `
+                    <div class="bet-item">
+                        <div>
+                            <div class="bet-type">${s.type}</div>
+                            <div class="bet-odds">${s.reason || ''}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="bet-amount">${s.bets}注 ($${(s.bets * BET_UNIT).toLocaleString()})</div>
+                            <div class="bet-odds">賠率 1:${s.odds} → $${(s.bets * BET_UNIT * s.odds).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (suggestions.length === 0) {
+                html = '<p style="text-align: center; color: #888;">目前無明確投注建議，建議觀望</p>';
+            } else {
+                html += `
+                    <div class="total-bet">
+                        <span>總投注</span>
+                        <span class="amount">${totalBets}注 ($${(totalBets * BET_UNIT).toLocaleString()})</span>
+                    </div>
+                `;
+            }
+
+            html += `<div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                <strong>分析理由：</strong><br>
+                <span style="color: #888; font-size: 0.9rem;">${analysis.reason}</span>
+            </div>`;
+
+            container.innerHTML = html;
+
+            // 更新信心指數
+            const confidence = analysis.confidence;
+            const fillEl = document.getElementById('confidenceFill');
+            fillEl.style.width = `${confidence}%`;
+            fillEl.className = 'meter-fill ' + 
+                (confidence < 40 ? 'meter-low' : confidence < 70 ? 'meter-medium' : 'meter-high');
+            document.getElementById('confidenceText').textContent = `${confidence}%`;
+        }
+
+        // 分析數據用於投注（主要基於前10期）
+        function analyzeForBetting() {
+            // 取前10期作為主要分析數據
+            const recent10 = records.slice(0, ANALYSIS_WINDOW);
+            const total = recent10.length;
+            const bigCount = recent10.filter(r => r.type === 'big').length;
+            const smallCount = recent10.filter(r => r.type === 'small').length;
+            const tripleCount = recent10.filter(r => r.type === 'triple').length;
+
+            // 計算當前連續（從最新期開始）
+            let currentStreak = 1;
+            let currentType = records[0].type;
+            for (let i = 1; i < records.length; i++) {
+                if (records[i].type === currentType) {
+                    currentStreak++;
+                } else {
+                    break;
+                }
+            }
+
+            // 計算近10期各點數出現頻率
+            const numberCounts = [0, 0, 0, 0, 0, 0];
+            recent10.forEach(r => r.dice.forEach(d => numberCounts[d - 1]++));
+            const totalDice = total * 3;
+            const avgNumber = totalDice / 6;
+
+            // 找出冷號和熱號（基於近10期）
+            const coldNumbers = [];
+            const hotNumbers = [];
+            if (total >= 5) {
+                numberCounts.forEach((count, i) => {
+                    if (count < avgNumber * 0.5) coldNumbers.push(i + 1);
+                    if (count > avgNumber * 1.5) hotNumbers.push(i + 1);
+                });
+            }
+
+            // 大小比例偏離度（基於近10期）
+            const nonTriple = total - tripleCount;
+            const bigRatio = nonTriple > 0 ? bigCount / nonTriple : 0.5;
+            const deviation = Math.abs(bigRatio - 0.5);
+
+            // 計算近5期趨勢
+            const recent5 = records.slice(0, 5);
+            const recentBig = recent5.filter(r => r.type === 'big').length;
+            const recentSmall = recent5.filter(r => r.type === 'small').length;
+
+            // 豹子間隔（從最新期開始算）
+            let tripleGap = 0;
+            for (let i = 0; i < records.length; i++) {
+                if (records[i].type === 'triple') break;
+                tripleGap++;
+            }
+
+            let confidence = 30;
+            let reasons = [];
+
+            // 連續趨勢分析（權重最高）
+            if (currentStreak >= 6) {
+                confidence += 30;
+                reasons.push(`🔥 連續${currentStreak}次${currentType === 'big' ? '大' : currentType === 'small' ? '小' : '豹子'}，強烈反轉訊號`);
+            } else if (currentStreak >= 4) {
+                confidence += 20;
+                reasons.push(`連續${currentStreak}次${currentType === 'big' ? '大' : currentType === 'small' ? '小' : '豹子'}，反轉機率提高`);
+            } else if (currentStreak >= 3) {
+                confidence += 12;
+                reasons.push(`連續${currentStreak}次${currentType === 'big' ? '大' : currentType === 'small' ? '小' : '豹子'}`);
+            }
+
+            // 近10期比例偏離分析
+            if (total >= 5 && deviation > 0.2) {
+                confidence += 18;
+                reasons.push(`近${total}期大小比例失衡 (大${(bigRatio * 100).toFixed(0)}%)`);
+            } else if (total >= 5 && deviation > 0.1) {
+                confidence += 8;
+                reasons.push(`近${total}期大佔${(bigRatio * 100).toFixed(0)}%`);
+            }
+
+            // 近5期極端情況
+            if (recentBig >= 4) {
+                confidence += 10;
+                reasons.push(`近5期大出${recentBig}次`);
+            } else if (recentSmall >= 4) {
+                confidence += 10;
+                reasons.push(`近5期小出${recentSmall}次`);
+            }
+
+            // 豹子分析
+            if (tripleGap >= 20) {
+                confidence += 12;
+                reasons.push(`已${tripleGap}期未出豹子`);
+            } else if (tripleGap >= 12) {
+                confidence += 6;
+                reasons.push(`${tripleGap}期未見豹子`);
+            }
+
+            // 冷熱號分析
+            if (coldNumbers.length > 0) {
+                reasons.push(`近${total}期冷號: ${coldNumbers.join(', ')}`);
+            }
+            if (hotNumbers.length > 0) {
+                reasons.push(`近${total}期熱號: ${hotNumbers.join(', ')}`);
+            }
+
+            confidence = Math.min(confidence, 90);
+
+            return {
+                total,
+                bigCount,
+                smallCount,
+                tripleCount,
+                bigRatio,
+                currentStreak,
+                currentType,
+                tripleGap,
+                coldNumbers,
+                hotNumbers,
+                recentBig,
+                recentSmall,
+                confidence,
+                reason: reasons.join('；') || '數據樣本較小，建議觀望'
+            };
+        }
+
+        // 生成投注建議（保守 vs 激進策略本質不同）
+        function generateSuggestions(analysis) {
+            const suggestions = [];
+            const isConservative = currentStrategy === 'conservative';
+
+            if (isConservative) {
+                // ========== 保守策略 ==========
+                // 原則：只押大小、穩健獲利、多訊號驗證
+                
+                // 計算訊號強度
+                let signalScore = 0;
+                let targetBet = null; // 'big' or 'small'
+                
+                // 訊號1：連續趨勢
+                if (analysis.currentStreak >= 3 && analysis.currentType !== 'triple') {
+                    signalScore += analysis.currentStreak >= 5 ? 3 : analysis.currentStreak >= 4 ? 2 : 1;
+                    targetBet = analysis.currentType === 'big' ? 'small' : 'big';
+                }
+                
+                // 訊號2：比例失衡
+                const deviation = Math.abs(analysis.bigRatio - 0.5);
+                if (analysis.total >= 5 && deviation >= 0.25) {
+                    signalScore += deviation >= 0.35 ? 3 : deviation >= 0.3 ? 2 : 1;
+                    const underdogBet = analysis.bigRatio > 0.5 ? 'small' : 'big';
+                    if (!targetBet) targetBet = underdogBet;
+                }
+                
+                // 訊號3：近5期極端
+                if (analysis.recentBig >= 4 || analysis.recentSmall >= 4) {
+                    signalScore += 1;
+                    const extremeBet = analysis.recentBig >= 4 ? 'small' : 'big';
+                    if (!targetBet) targetBet = extremeBet;
+                }
+                
+                // 根據訊號強度決定下注
+                if (signalScore >= 2 && targetBet) {
+                    let bets;
+                    let reasons = [];
+                    
+                    if (analysis.currentStreak >= 3 && analysis.currentType !== 'triple') {
+                        reasons.push(`連${analysis.currentStreak}期${analysis.currentType === 'big' ? '大' : '小'}`);
+                    }
+                    if (deviation >= 0.25) {
+                        reasons.push(`大小比例${(analysis.bigRatio * 100).toFixed(0)}%:${((1-analysis.bigRatio) * 100).toFixed(0)}%`);
+                    }
+                    if (analysis.recentBig >= 4) {
+                        reasons.push(`近5期大${analysis.recentBig}次`);
+                    } else if (analysis.recentSmall >= 4) {
+                        reasons.push(`近5期小${analysis.recentSmall}次`);
+                    }
+                    
+                    // 訊號越強，下注越多
+                    if (signalScore >= 5) {
+                        bets = 10;
+                    } else if (signalScore >= 4) {
+                        bets = 8;
+                    } else if (signalScore >= 3) {
+                        bets = 5;
+                    } else {
+                        bets = 3;
+                    }
+                    
+                    suggestions.push({
+                        type: `押${targetBet === 'big' ? '大' : '小'}`,
+                        reason: reasons.join('，'),
+                        bets,
+                        odds: 2
+                    });
+                }
+
+                // 保守策略不押豹子（賠率高但機率太低）
+                
+            } else {
+                // ========== 激進策略 ==========
+                // 原則：追求高賠率、低門檻觸發、多元下注、可承受風險
+                
+                // 1. 連續趨勢反轉（門檻較低：連續3期即觸發）
+                if (analysis.currentStreak >= 3 && analysis.currentType !== 'triple') {
+                    const oppositeBet = analysis.currentType === 'big' ? '小' : '大';
+                    let bets;
+                    if (analysis.currentStreak >= 6) {
+                        bets = 20;
+                    } else if (analysis.currentStreak >= 5) {
+                        bets = 15;
+                    } else if (analysis.currentStreak >= 4) {
+                        bets = 10;
+                    } else {
+                        bets = 6;
+                    }
+                    suggestions.push({
+                        type: `押${oppositeBet}`,
+                        reason: `連${analysis.currentStreak}期${analysis.currentType === 'big' ? '大' : '小'}，反轉機會`,
+                        bets,
+                        odds: 2
+                    });
+                }
+
+                // 2. 比例失衡回歸（門檻較低：偏離>20%）
+                if (analysis.total >= 5 && Math.abs(analysis.bigRatio - 0.5) > 0.2 && analysis.currentStreak < 3) {
+                    const underdog = analysis.bigRatio > 0.5 ? '小' : '大';
+                    suggestions.push({
+                        type: `押${underdog}`,
+                        reason: `近${analysis.total}期大佔${(analysis.bigRatio * 100).toFixed(0)}%，追回歸`,
+                        bets: 8,
+                        odds: 2
+                    });
+                }
+
+                // 3. 近5期極端情況
+                if (analysis.recentBig >= 4 && analysis.currentStreak < 3) {
+                    const hasReverse = suggestions.some(s => s.type === '押小');
+                    if (!hasReverse) {
+                        suggestions.push({
+                            type: '押小',
+                            reason: `近5期大出${analysis.recentBig}次`,
+                            bets: 5,
+                            odds: 2
+                        });
+                    }
+                } else if (analysis.recentSmall >= 4 && analysis.currentStreak < 3) {
+                    const hasReverse = suggestions.some(s => s.type === '押大');
+                    if (!hasReverse) {
+                        suggestions.push({
+                            type: '押大',
+                            reason: `近5期小出${analysis.recentSmall}次`,
+                            bets: 5,
+                            odds: 2
+                        });
+                    }
+                }
+
+                // 4. 豹子投注（激進策略獨有）
+                if (analysis.tripleGap >= 12) {
+                    suggestions.push({
+                        type: '任意豹子',
+                        reason: `已${analysis.tripleGap}期未出豹子`,
+                        bets: analysis.tripleGap >= 20 ? 3 : 2,
+                        odds: 30
+                    });
+                }
+
+                // 5. 指定豹子（激進策略獨有，追熱號）
+                if (analysis.tripleGap >= 18 && analysis.hotNumbers.length > 0) {
+                    suggestions.push({
+                        type: `指定豹子 ${analysis.hotNumbers[0]}`,
+                        reason: `熱號${analysis.hotNumbers[0]}，搏高賠`,
+                        bets: 1,
+                        odds: 150
+                    });
+                }
+            }
+
+            // 限制總注數
+            let totalBets = suggestions.reduce((sum, s) => sum + s.bets, 0);
+            if (totalBets > MAX_BETS) {
+                const ratio = MAX_BETS / totalBets;
+                suggestions.forEach(s => {
+                    s.bets = Math.max(1, Math.floor(s.bets * ratio));
+                });
+            }
+
+            return suggestions;
+        }
+
+        // Enter 鍵快速輸入
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const active = document.activeElement;
+                if (active.id === 'roundNum') {
+                    document.getElementById('dice1').focus();
+                } else if (active.id === 'dice1') {
+                    document.getElementById('dice2').focus();
+                } else if (active.id === 'dice2') {
+                    document.getElementById('dice3').focus();
+                } else if (active.id === 'dice3') {
+                    addRecord();
+                }
+            }
+        });
+
+        // 骰子輸入自動跳下一格
+        function setupAutoJump() {
+            const dice1 = document.getElementById('dice1');
+            const dice2 = document.getElementById('dice2');
+            const dice3 = document.getElementById('dice3');
+
+            dice1.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (val >= 1 && val <= 6) {
+                    dice2.focus();
+                    dice2.select();
+                }
+            });
+
+            dice2.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (val >= 1 && val <= 6) {
+                    dice3.focus();
+                    dice3.select();
+                }
+            });
+
+            dice3.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (val >= 1 && val <= 6) {
+                    // 第三顆輸入完自動送出
+                    setTimeout(() => addRecord(), 100);
+                }
+            });
+        }
+
+        // 初始化
+        loadRecords();
+        updateDisplay();
+        setupAutoJump();
+        updateStrategyExplain();
+    </script>
+</body>
+</html>
