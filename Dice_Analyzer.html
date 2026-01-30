@@ -945,6 +945,31 @@
                     </div>
 
                     <div class="trend-section">
+                        <div class="trend-title">🎯 路型分析（核心策略依據）</div>
+                        <div class="stats-grid">
+                            <div class="stat-card" style="flex: 2;">
+                                <h3>當前路型</h3>
+                                <div class="value" id="patternType" style="font-size: 1.3rem;">-</div>
+                                <div class="percentage" id="patternDesc">等待更多數據</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>路型信心</h3>
+                                <div class="value" id="patternConfidence" style="color: #ffd700;">-</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>預測下期</h3>
+                                <div class="value" id="patternPredict">-</div>
+                            </div>
+                        </div>
+                        <div class="pattern-legend" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 0.85rem; color: #888;">
+                            <span style="color: #9b59b6;">🔀 單跳</span>：大小大小交替 ｜
+                            <span style="color: #3498db;">🔄 雙跳</span>：大大小小成對 ｜
+                            <span style="color: #2ecc71;">🐉 長龍</span>：連續同向 ｜
+                            <span style="color: #888;">📊 亂路</span>：無規律
+                        </div>
+                    </div>
+
+                    <div class="trend-section">
                         <div class="trend-title">🐉 龍勢分析（大/小，豹子視為中斷）</div>
                         <div class="stats-grid">
                             <div class="stat-card">
@@ -962,7 +987,7 @@
                                 <div class="value" style="color: #3498db;" id="maxSmallStreak">0</div>
                             </div>
                         </div>
-                        <div class="dragon-legend" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 0.9rem; color: #888;">
+                        <div class="dragon-legend" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 0.85rem; color: #888;">
                             <span style="color: #2ecc71;">🐉 長龍</span>：連3期以上 ｜
                             <span style="color: #e74c3c;">⚔️ 斷龍</span>：保守7期/激進6期 ｜
                             <span style="color: #f39c12;">🔄 回龍</span>：斷龍後常跳回
@@ -977,11 +1002,11 @@
                     <div class="strategy-toggle">
                         <button class="strategy-btn conservative active" onclick="setStrategy('conservative')">
                             🛡️ 保守策略
-                            <div class="strategy-desc">穩健為主・只押大小・高門檻觸發</div>
+                            <div class="strategy-desc">路型優先・謹慎確認・高門檻出手</div>
                         </button>
                         <button class="strategy-btn aggressive" onclick="setStrategy('aggressive')">
                             ⚔️ 激進策略
-                            <div class="strategy-desc">追求高賠・押豹子・低門檻觸發</div>
+                            <div class="strategy-desc">多重信號・積極追擊・搭配豹子</div>
                         </button>
                     </div>
 
@@ -1000,24 +1025,33 @@
                     </div>
 
                     <div class="confidence-detail" id="confidenceDetail" style="display: none;">
-                        <div class="detail-title">📊 信心指數計算方式</div>
+                        <div class="detail-title">📊 信心指數與策略說明</div>
                         <div class="detail-content">
-                            <p><strong>基礎值：30%</strong>（訊號旗標累加）</p>
+                            <p><strong>基礎值：25%</strong>（多維度訊號累加）</p>
                             <table class="detail-table">
-                                <tr><td>連續6+期大/小（豹子中斷）</td><td class="val">+30%</td></tr>
-                                <tr><td>連續4-5期大/小</td><td class="val">+20%</td></tr>
-                                <tr><td>連續3期大/小</td><td class="val">+12%</td></tr>
-                                <tr><td>大小比例偏離>20%（排除豹子）</td><td class="val">+18%</td></tr>
-                                <tr><td>大小比例偏離>10%</td><td class="val">+8%</td></tr>
-                                <tr><td>近5期出現4次以上大/小</td><td class="val">+10%</td></tr>
-                                <tr><td>超過20期未出豹子</td><td class="val">+12%</td></tr>
-                                <tr><td>超過12期未出豹子</td><td class="val">+6%</td></tr>
+                                <tr><th colspan="2" style="color: #9b59b6; text-align: left;">🎯 路型分析</th></tr>
+                                <tr><td>單跳路（≥60%交替）</td><td class="val">+15~30%</td></tr>
+                                <tr><td>雙跳路（≥55%成對）</td><td class="val">+10~25%</td></tr>
+                                <tr><td>長龍路（連續同向）</td><td class="val">+10~20%</td></tr>
+                                <tr><th colspan="2" style="color: #2ecc71; text-align: left; padding-top: 8px;">🐉 龍勢分析</th></tr>
+                                <tr><td>跟龍（3期起跟）</td><td class="val">+8~18%</td></tr>
+                                <tr><td>回龍時機</td><td class="val">+15%</td></tr>
+                                <tr><td>斷龍時機（7期+）</td><td class="val">+12~18%</td></tr>
+                                <tr><th colspan="2" style="color: #f39c12; text-align: left; padding-top: 8px;">📊 其他信號</th></tr>
+                                <tr><td>比例偏離（>25%）</td><td class="val">+10~15%</td></tr>
+                                <tr><td>近5期極端</td><td class="val">+8%</td></tr>
+                                <tr><td>趨勢延續（2期）</td><td class="val">+5%</td></tr>
+                                <tr><td>多重信號共振</td><td class="val">+5~10%</td></tr>
                             </table>
-                            <p style="margin-top: 10px; color: #888;">上限 90%（骰子為隨機遊戲，不存在100%確定性）</p>
+                            <div style="margin-top: 12px; padding: 10px; background: rgba(46, 204, 113, 0.1); border-radius: 8px; border-left: 3px solid #2ecc71;">
+                                <strong style="color: #2ecc71;">🛡️ 保守策略特點</strong>
+                                <p style="font-size: 0.85em; margin-top: 5px;">小注多出手（2-5注）・6層優先級保證有建議・追求穩定小贏</p>
+                            </div>
+                            <p style="margin-top: 10px; color: #888;">信心上限 85%（骰子為隨機遊戲）</p>
                             <div class="confidence-levels">
-                                <span class="level low">< 40% 觀望</span>
-                                <span class="level medium">40-70% 可投注</span>
-                                <span class="level high">> 70% 訊號明確</span>
+                                <span class="level low">< 40% 試探</span>
+                                <span class="level medium">40-65% 正常</span>
+                                <span class="level high">> 65% 加碼</span>
                             </div>
                         </div>
                     </div>
@@ -1060,12 +1094,13 @@
         }
 
         // 根據骰子計算結果（純函數）
+        // 規則：10點或以下為小，11點或以上為大，豹子通殺
         function getResultType(d1, d2, d3) {
             const sum = d1 + d2 + d3;
             if (d1 === d2 && d2 === d3) {
                 return { type: 'triple', sum, tripleNumber: d1 };
             }
-            return { type: sum >= 12 ? 'big' : 'small', sum };
+            return { type: sum >= 11 ? 'big' : 'small', sum };
         }
 
         // 從原始資料重新計算 type/sum（D8：避免舊資料問題）
@@ -1357,16 +1392,140 @@
         }
 
         // ============================================================
-        // 訊號旗標系統（C5-C6：統一信心指數與策略判斷）
+        // 路型分析（單跳、雙跳、長龍）
+        // ============================================================
+        
+        /**
+         * 分析路型模式
+         * - 單跳：大小大小大小（交替出現）
+         * - 雙跳：大大小小大大（成對交替）
+         * - 長龍：連續同結果
+         * - 亂路：無規律
+         */
+        function analyzePattern(records) {
+            if (records.length < 4) return { type: 'insufficient', confidence: 0 };
+            
+            // 只取大小結果（排除豹子）
+            const results = [];
+            for (let i = 0; i < Math.min(records.length, 20); i++) {
+                if (isBigSmall(records[i])) {
+                    results.push(records[i].type);
+                }
+            }
+            
+            if (results.length < 4) return { type: 'insufficient', confidence: 0 };
+            
+            // 檢測單跳：ABAB...
+            let singleJumpCount = 0;
+            for (let i = 0; i < results.length - 1; i++) {
+                if (results[i] !== results[i + 1]) singleJumpCount++;
+            }
+            const singleJumpRatio = singleJumpCount / (results.length - 1);
+            
+            // 檢測雙跳：AABB...
+            let doubleJumpCount = 0;
+            for (let i = 0; i < results.length - 2; i += 2) {
+                if (results[i] === results[i + 1] && 
+                    (i + 2 >= results.length || results[i + 1] !== results[i + 2])) {
+                    doubleJumpCount++;
+                }
+            }
+            const doubleJumpRatio = doubleJumpCount / Math.floor(results.length / 2);
+            
+            // 判斷路型
+            if (singleJumpRatio >= 0.75) {
+                return { 
+                    type: 'singleJump', 
+                    confidence: Math.min(singleJumpRatio * 100, 85),
+                    nextPredict: results[0] === 'big' ? 'small' : 'big',
+                    description: '單跳路（大小交替）'
+                };
+            }
+            
+            if (doubleJumpRatio >= 0.6 && results.length >= 6) {
+                // 判斷雙跳的下一期
+                const lastPair = results.slice(0, 2);
+                const isCompletePair = lastPair[0] === lastPair[1];
+                return {
+                    type: 'doubleJump',
+                    confidence: Math.min(doubleJumpRatio * 90, 75),
+                    nextPredict: isCompletePair ? (lastPair[0] === 'big' ? 'small' : 'big') : lastPair[0],
+                    description: '雙跳路（成對交替）'
+                };
+            }
+            
+            // 檢查是否為長龍
+            const currentStreak = calcCurrentStreak(records);
+            if (currentStreak.count >= 3 && currentStreak.type !== 'triple') {
+                return {
+                    type: 'dragon',
+                    confidence: Math.min(40 + currentStreak.count * 8, 80),
+                    currentType: currentStreak.type,
+                    length: currentStreak.count,
+                    description: `${currentStreak.type === 'big' ? '大' : '小'}龍（${currentStreak.count}期）`
+                };
+            }
+            
+            return { type: 'random', confidence: 30, description: '亂路（無明顯規律）' };
+        }
+        
+        /**
+         * 計算總和區間熱度
+         * 根據新規則：3-10小，11-18大
+         * 關注臨界區間 9-12 的出現頻率
+         */
+        function analyzeSumZones(records) {
+            if (records.length < 10) return null;
+            
+            const window = records.slice(0, 20).filter(r => isBigSmall(r));
+            if (window.length < 8) return null;
+            
+            // 區間定義
+            const zones = {
+                lowSmall: { range: '4-7', count: 0 },     // 穩小區
+                midSmall: { range: '8-10', count: 0 },    // 臨界小區
+                midBig: { range: '11-13', count: 0 },     // 臨界大區
+                highBig: { range: '14-17', count: 0 }     // 穩大區
+            };
+            
+            window.forEach(r => {
+                if (r.sum >= 4 && r.sum <= 7) zones.lowSmall.count++;
+                else if (r.sum >= 8 && r.sum <= 10) zones.midSmall.count++;
+                else if (r.sum >= 11 && r.sum <= 13) zones.midBig.count++;
+                else if (r.sum >= 14 && r.sum <= 17) zones.highBig.count++;
+            });
+            
+            const total = window.length;
+            const midRatio = (zones.midSmall.count + zones.midBig.count) / total;
+            const extremeRatio = (zones.lowSmall.count + zones.highBig.count) / total;
+            
+            return {
+                zones,
+                total,
+                midRatio,      // 臨界區比例
+                extremeRatio,  // 極端區比例
+                hotZone: Object.entries(zones).reduce((a, b) => b[1].count > a[1].count ? b : a)[0]
+            };
+        }
+
+        // ============================================================
+        // 訊號旗標系統（優化版：加入路型、區間分析）
         // ============================================================
         
         function computeSignals(metrics) {
+            const pattern = analyzePattern(records);
+            const sumZones = analyzeSumZones(records);
+            
             const signals = {
                 // 連續趨勢等級
                 streakLevel: 0,
                 streakType: null,
                 // 龍勢狀態
                 dragon: metrics.dragon,
+                // 路型分析
+                pattern,
+                // 總和區間
+                sumZones,
                 // 比例偏離等級
                 deviationLevel: 0,
                 // 近5期極端
@@ -1377,282 +1536,431 @@
                 raw: metrics
             };
             
-            // 連續趨勢（與龍勢配合）
+            // 連續趨勢（優化：更謹慎的判定）
             if (metrics.currentStreak.type && metrics.currentStreak.type !== 'triple') {
                 const streak = metrics.currentStreak.count;
-                if (streak >= 6) signals.streakLevel = 3;      // 長龍可斷
-                else if (streak >= 4) signals.streakLevel = 2; // 長龍進行中
-                else if (streak >= 3) signals.streakLevel = 1; // 龍成形
+                if (streak >= 7) signals.streakLevel = 4;      // 超長龍（高風險區）
+                else if (streak >= 5) signals.streakLevel = 3; // 長龍可斷
+                else if (streak >= 4) signals.streakLevel = 2; // 龍勢確認
+                else if (streak >= 3) signals.streakLevel = 1; // 龍成形（觀察）
                 signals.streakType = metrics.currentStreak.type;
             }
             
-            // 比例偏離
+            // 比例偏離（優化門檻）
             if (metrics.total >= 5) {
-                if (metrics.deviation > 0.3) signals.deviationLevel = 3;
-                else if (metrics.deviation > 0.2) signals.deviationLevel = 2;
-                else if (metrics.deviation > 0.1) signals.deviationLevel = 1;
+                if (metrics.deviation > 0.35) signals.deviationLevel = 3;      // 嚴重失衡
+                else if (metrics.deviation > 0.25) signals.deviationLevel = 2; // 明顯偏離
+                else if (metrics.deviation > 0.15) signals.deviationLevel = 1; // 輕微偏離
             }
             
-            // 近5期極端
+            // 近5期極端（優化：考慮路型）
             if (metrics.recentBig >= 4) signals.extreme5 = 'big';
             else if (metrics.recentSmall >= 4) signals.extreme5 = 'small';
             
-            // 豹子間隔
-            if (metrics.tripleGap >= 20) signals.tripleGapLevel = 2;
-            else if (metrics.tripleGap >= 12) signals.tripleGapLevel = 1;
+            // 豹子間隔（優化：更保守）
+            if (metrics.tripleGap >= 25) signals.tripleGapLevel = 2;
+            else if (metrics.tripleGap >= 15) signals.tripleGapLevel = 1;
             
             return signals;
         }
 
-        // 根據訊號計算信心指數
+        // 根據訊號計算信心指數（優化版）
         function computeConfidence(signals) {
-            let confidence = 30;
+            let confidence = 25; // 基礎值降低，更保守
             const reasons = [];
             const metrics = signals.raw;
             const dragon = signals.dragon;
+            const pattern = signals.pattern;
             
-            // 龍勢分析（優先顯示）
+            // ========== 路型分析（最高權重） ==========
+            if (pattern && pattern.type !== 'insufficient' && pattern.type !== 'random') {
+                if (pattern.type === 'singleJump') {
+                    confidence += Math.min(pattern.confidence * 0.35, 30);
+                    reasons.push(`🔀 單跳路型（信心${pattern.confidence.toFixed(0)}%）`);
+                } else if (pattern.type === 'doubleJump') {
+                    confidence += Math.min(pattern.confidence * 0.3, 25);
+                    reasons.push(`🔄 雙跳路型（信心${pattern.confidence.toFixed(0)}%）`);
+                } else if (pattern.type === 'dragon') {
+                    confidence += Math.min(pattern.confidence * 0.25, 20);
+                    reasons.push(`🐉 ${pattern.description}`);
+                }
+            }
+            
+            // ========== 龍勢分析 ==========
             if (dragon && dragon.strategyHint) {
                 const hint = dragon.strategyHint;
+                const streak = metrics.currentStreak.count;
+                
                 if (dragon.status === 'breakable') {
-                    confidence += 25;
-                    reasons.push(`⚔️ ${hint.reason}`);
+                    // 斷龍信心要打折（逆勢操作）
+                    const breakBonus = streak >= 8 ? 18 : streak >= 7 ? 12 : 8;
+                    confidence += breakBonus;
+                    reasons.push(`⚔️ ${hint.reason}（逆勢風險）`);
                 } else if (dragon.status === 'returning') {
-                    confidence += 20;
+                    confidence += 15;
                     reasons.push(`🔄 ${hint.reason}`);
                 } else if (dragon.status === 'riding') {
-                    confidence += 15;
+                    confidence += streak >= 5 ? 18 : streak >= 4 ? 12 : 8;
                     reasons.push(`🐉 ${hint.reason}`);
                 }
-            } else if (signals.streakLevel >= 1) {
-                // 一般連續趨勢（無明確龍勢策略時）
-                if (signals.streakLevel === 3) {
-                    confidence += 30;
-                    reasons.push(`連續${metrics.currentStreak.count}次${signals.streakType === 'big' ? '大' : '小'}，長龍可斷`);
-                } else if (signals.streakLevel === 2) {
-                    confidence += 20;
-                    reasons.push(`連續${metrics.currentStreak.count}次${signals.streakType === 'big' ? '大' : '小'}，龍勢進行中`);
-                } else if (signals.streakLevel === 1) {
-                    confidence += 12;
-                    reasons.push(`連續${metrics.currentStreak.count}次${signals.streakType === 'big' ? '大' : '小'}`);
-                }
             }
             
-            // 比例偏離
-            if (signals.deviationLevel >= 2) {
-                confidence += 18;
-                reasons.push(`近${metrics.total}期大小比例失衡 (大${(metrics.bigRatio * 100).toFixed(0)}%)`);
-            } else if (signals.deviationLevel === 1) {
-                confidence += 8;
-                reasons.push(`近${metrics.total}期大佔${(metrics.bigRatio * 100).toFixed(0)}%`);
-            }
-            
-            // 近5期極端
-            if (signals.extreme5) {
+            // ========== 比例偏離 ==========
+            if (signals.deviationLevel >= 3) {
+                confidence += 15;
+                reasons.push(`📊 嚴重失衡：大${(metrics.bigRatio * 100).toFixed(0)}%`);
+            } else if (signals.deviationLevel >= 2) {
                 confidence += 10;
+                reasons.push(`📊 比例偏離：大${(metrics.bigRatio * 100).toFixed(0)}%`);
+            } else if (signals.deviationLevel === 1) {
+                confidence += 5;
+            }
+            
+            // ========== 近5期極端 ==========
+            if (signals.extreme5) {
+                confidence += 8;
                 const count = signals.extreme5 === 'big' ? metrics.recentBig : metrics.recentSmall;
                 reasons.push(`近5期${signals.extreme5 === 'big' ? '大' : '小'}出${count}次`);
             }
             
-            // 豹子間隔
-            if (signals.tripleGapLevel === 2) {
-                confidence += 12;
-                reasons.push(`已${metrics.tripleGap}期未出豹子`);
-            } else if (signals.tripleGapLevel === 1) {
-                confidence += 6;
-                reasons.push(`${metrics.tripleGap}期未見豹子`);
+            // ========== 多重信號加成 ==========
+            let signalCount = 0;
+            if (pattern && pattern.type !== 'random' && pattern.type !== 'insufficient') signalCount++;
+            if (dragon && dragon.strategyHint) signalCount++;
+            if (signals.deviationLevel >= 2) signalCount++;
+            if (signals.extreme5) signalCount++;
+            
+            if (signalCount >= 3) {
+                confidence += 10;
+                reasons.push(`🎯 ${signalCount}重信號共振`);
+            } else if (signalCount >= 2) {
+                confidence += 5;
             }
             
-            // 冷熱號
+            // ========== 豹子間隔（弱化，避免誤導）==========
+            if (signals.tripleGapLevel === 2) {
+                reasons.push(`🎲 ${metrics.tripleGap}期未出豹子（僅供參考）`);
+            }
+            
+            // ========== 冷熱號 ==========
             if (metrics.coldNumbers.length > 0) {
-                reasons.push(`近${metrics.total}期冷號: ${metrics.coldNumbers.join(', ')}`);
+                reasons.push(`❄️ 冷號: ${metrics.coldNumbers.join(', ')}`);
             }
             if (metrics.hotNumbers.length > 0) {
-                reasons.push(`近${metrics.total}期熱號: ${metrics.hotNumbers.join(', ')}`);
+                reasons.push(`🔥 熱號: ${metrics.hotNumbers.join(', ')}`);
             }
             
+            // ========== 信心上限（骰子是隨機遊戲）==========
             return {
-                confidence: Math.min(confidence, 90),
+                confidence: Math.min(confidence, 85), // 降低上限
                 reasons
             };
         }
 
         // ============================================================
-        // 投注建議生成（C7：優先級排序而非等比縮放）
+        // 投注建議生成（優化版：路型優先 + 注碼管理）
         // ============================================================
         
         function generateSuggestions(signals, strategy) {
             const suggestions = [];
             const metrics = signals.raw;
+            const pattern = signals.pattern;
             
             // 根據策略使用不同的斷龍門檻：保守7期、激進6期
             const breakThreshold = strategy === 'conservative' ? 7 : 6;
             const dragon = analyzeDragon(records, breakThreshold);
             
+            // ========== 計算基礎注碼（根據信號強度） ==========
+            const calculateBets = (baseAmount, signalStrength) => {
+                // signalStrength: 1-5，影響實際下注量
+                const multiplier = strategy === 'conservative' ? 0.8 : 1.2;
+                return Math.min(Math.round(baseAmount * multiplier * (0.6 + signalStrength * 0.2)), MAX_BETS);
+            };
+            
             if (strategy === 'conservative') {
-                // ========== 保守策略：龍勢為主（7期斷龍）==========
+                // ========== 保守策略：積極給建議，保守給注碼 ==========
+                // 核心原則：保守 = 小注多出手，而非不出手
                 
-                // 優先處理龍勢策略
-                if (dragon && dragon.strategyHint) {
+                const streak = metrics.currentStreak.count;
+                const streakType = metrics.currentStreak.type;
+                
+                // ===== 優先級1：明確路型（降低門檻）=====
+                if (pattern && pattern.type === 'singleJump' && pattern.confidence >= 60) {
+                    const betSize = pattern.confidence >= 75 ? 5 : pattern.confidence >= 65 ? 4 : 3;
+                    suggestions.push({
+                        type: `押${pattern.nextPredict === 'big' ? '大' : '小'}`,
+                        reason: `🔀 單跳路（${pattern.confidence.toFixed(0)}%），預測跳轉`,
+                        bets: betSize,
+                        odds: 2,
+                        priority: 1,
+                        riskLevel: pattern.confidence >= 70 ? 'low' : 'medium'
+                    });
+                } else if (pattern && pattern.type === 'doubleJump' && pattern.confidence >= 55) {
+                    const betSize = pattern.confidence >= 70 ? 4 : 3;
+                    suggestions.push({
+                        type: `押${pattern.nextPredict === 'big' ? '大' : '小'}`,
+                        reason: `🔄 雙跳路（${pattern.confidence.toFixed(0)}%）`,
+                        bets: betSize,
+                        odds: 2,
+                        priority: 1,
+                        riskLevel: 'medium'
+                    });
+                }
+                
+                // ===== 優先級2：龍勢策略（放寬條件）=====
+                if (suggestions.length === 0 && dragon && dragon.strategyHint) {
                     const hint = dragon.strategyHint;
                     
-                    if (dragon.status === 'breakable') {
-                        // 斷龍策略：7期以上長龍，反押
-                        const bets = metrics.currentStreak.count >= 9 ? 10 : metrics.currentStreak.count >= 8 ? 8 : 6;
+                    if (dragon.status === 'breakable' && streak >= 7) {
+                        // 斷龍：7期以上
                         suggestions.push({
                             type: `押${hint.target === 'big' ? '大' : '小'}`,
-                            reason: `⚔️ 斷龍：${hint.reason}`,
-                            bets,
+                            reason: `⚔️ 斷龍：${streak}期${streakType === 'big' ? '大' : '小'}龍`,
+                            bets: streak >= 9 ? 5 : 4,
                             odds: 2,
-                            priority: 1
+                            priority: 2,
+                            riskLevel: 'high',
+                            warning: '逆勢操作，小注試探'
                         });
                     } else if (dragon.status === 'returning') {
-                        // 回龍策略：長龍剛斷，押回原方向
+                        // 回龍
                         suggestions.push({
                             type: `押${hint.target === 'big' ? '大' : '小'}`,
                             reason: `🔄 回龍：${hint.reason}`,
-                            bets: 5,
-                            odds: 2,
-                            priority: 1
-                        });
-                    } else if (dragon.status === 'riding' && metrics.currentStreak.count >= 4) {
-                        // 跟龍策略（保守只在4期以上才跟）
-                        suggestions.push({
-                            type: `押${hint.target === 'big' ? '大' : '小'}`,
-                            reason: `🐉 跟龍：${hint.reason}`,
                             bets: 4,
                             odds: 2,
-                            priority: 1
+                            priority: 2,
+                            riskLevel: 'medium'
+                        });
+                    } else if (dragon.status === 'riding' && streak >= 3) {
+                        // 跟龍：降低到3期（保守用小注）
+                        const betSize = streak >= 5 ? 5 : streak >= 4 ? 4 : 3;
+                        suggestions.push({
+                            type: `押${hint.target === 'big' ? '大' : '小'}`,
+                            reason: `🐉 跟龍：連${streak}期${streakType === 'big' ? '大' : '小'}`,
+                            bets: betSize,
+                            odds: 2,
+                            priority: 2,
+                            riskLevel: streak >= 4 ? 'low' : 'medium'
                         });
                     }
                 }
                 
-                // 如果龍勢沒有觸發，使用訊號積分制
-                if (suggestions.length === 0) {
-                    let signalScore = 0;
-                    let targetBet = null;
+                // ===== 優先級3：比例偏離（降低門檻）=====
+                if (suggestions.length === 0 && signals.deviationLevel >= 2 && metrics.total >= 8) {
+                    const targetBet = metrics.bigRatio > 0.5 ? 'small' : 'big';
+                    const betSize = signals.deviationLevel >= 3 ? 4 : 3;
+                    suggestions.push({
+                        type: `押${targetBet === 'big' ? '大' : '小'}`,
+                        reason: `📊 追回歸：大${(metrics.bigRatio * 100).toFixed(0)}%`,
+                        bets: betSize,
+                        odds: 2,
+                        priority: 3,
+                        riskLevel: 'medium'
+                    });
+                }
+                
+                // ===== 優先級4：近期趨勢延續 =====
+                if (suggestions.length === 0 && streak >= 2 && streakType && streakType !== 'triple') {
+                    // 連2期同向，小注跟隨
+                    suggestions.push({
+                        type: `押${streakType === 'big' ? '大' : '小'}`,
+                        reason: `📈 趨勢延續：連${streak}期${streakType === 'big' ? '大' : '小'}`,
+                        bets: 2,
+                        odds: 2,
+                        priority: 4,
+                        riskLevel: 'medium',
+                        betAdvice: '趨勢尚短，保守試探'
+                    });
+                }
+                
+                // ===== 優先級5：近5期極端 =====
+                if (suggestions.length === 0 && signals.extreme5) {
+                    const targetBet = signals.extreme5 === 'big' ? 'small' : 'big';
+                    const count = signals.extreme5 === 'big' ? metrics.recentBig : metrics.recentSmall;
+                    suggestions.push({
+                        type: `押${targetBet === 'big' ? '大' : '小'}`,
+                        reason: `🎯 近5期${signals.extreme5 === 'big' ? '大' : '小'}出${count}次`,
+                        bets: 2,
+                        odds: 2,
+                        priority: 5,
+                        riskLevel: 'medium'
+                    });
+                }
+                
+                // ===== 優先級6：兜底策略（總要有建議）=====
+                if (suggestions.length === 0 && records.length >= 3) {
+                    // 分析最近3期的趨勢傾向
+                    const recent3 = records.slice(0, 3).filter(r => isBigSmall(r));
+                    const recent3Big = recent3.filter(r => r.type === 'big').length;
+                    const recent3Small = recent3.filter(r => r.type === 'small').length;
                     
-                    if (signals.deviationLevel >= 2) {
-                        signalScore += signals.deviationLevel;
-                        targetBet = metrics.bigRatio > 0.5 ? 'small' : 'big';
+                    let targetBet, reason;
+                    
+                    if (recent3Big > recent3Small) {
+                        // 近期偏大，考慮跟或反
+                        if (records[0].type === 'big') {
+                            targetBet = 'big';
+                            reason = '近期偏大，順勢小押';
+                        } else {
+                            targetBet = 'small';
+                            reason = '近期偏大但剛出小，觀察跳轉';
+                        }
+                    } else if (recent3Small > recent3Big) {
+                        if (records[0].type === 'small') {
+                            targetBet = 'small';
+                            reason = '近期偏小，順勢小押';
+                        } else {
+                            targetBet = 'big';
+                            reason = '近期偏小但剛出大，觀察跳轉';
+                        }
+                    } else {
+                        // 均勢：跟最新一期
+                        targetBet = records[0].type === 'big' ? 'big' : 
+                                   records[0].type === 'small' ? 'small' : 
+                                   (Math.random() > 0.5 ? 'big' : 'small');
+                        reason = '近期均勢，跟隨最新';
                     }
                     
-                    if (signals.extreme5) {
-                        signalScore += 1;
-                        const extremeBet = signals.extreme5 === 'big' ? 'small' : 'big';
-                        if (!targetBet) targetBet = extremeBet;
-                    }
-                    
-                    if (signalScore >= 2 && targetBet) {
-                        const reasons = [];
-                        if (signals.deviationLevel >= 1) {
-                            reasons.push(`大小比例${(metrics.bigRatio * 100).toFixed(0)}%:${((1-metrics.bigRatio) * 100).toFixed(0)}%`);
-                        }
-                        if (signals.extreme5) {
-                            const count = signals.extreme5 === 'big' ? metrics.recentBig : metrics.recentSmall;
-                            reasons.push(`近5期${signals.extreme5 === 'big' ? '大' : '小'}${count}次`);
-                        }
-                        
+                    if (targetBet) {
                         suggestions.push({
                             type: `押${targetBet === 'big' ? '大' : '小'}`,
-                            reason: reasons.join('，'),
-                            bets: signalScore >= 4 ? 6 : 4,
+                            reason: `💡 ${reason}`,
+                            bets: 2,
                             odds: 2,
-                            priority: 2
+                            priority: 6,
+                            riskLevel: 'low',
+                            betAdvice: '信號較弱，最小注試探'
                         });
                     }
                 }
                 
             } else {
-                // ========== 激進策略：龍勢為主 + 豹子（6期斷龍）==========
+                // ========== 激進策略：多重信號 + 追擊 ==========
                 
-                // 優先處理龍勢策略
+                // 優先級1：明確路型
+                if (pattern && (pattern.type === 'singleJump' || pattern.type === 'doubleJump') && pattern.confidence >= 60) {
+                    suggestions.push({
+                        type: `押${pattern.nextPredict === 'big' ? '大' : '小'}`,
+                        reason: `🎯 ${pattern.description}（信心${pattern.confidence.toFixed(0)}%）`,
+                        bets: calculateBets(8, pattern.confidence / 20),
+                        odds: 2,
+                        priority: 1,
+                        riskLevel: 'medium'
+                    });
+                }
+                
+                // 優先級2：龍勢策略
                 if (dragon && dragon.strategyHint) {
                     const hint = dragon.strategyHint;
+                    const streak = metrics.currentStreak.count;
                     
-                    if (dragon.status === 'breakable') {
-                        // 斷龍策略：6期以上大注反押
-                        const bets = metrics.currentStreak.count >= 8 ? 20 : metrics.currentStreak.count >= 7 ? 15 : 10;
+                    // 檢查是否與路型衝突
+                    const patternConflict = suggestions.length > 0 && 
+                        suggestions[0].type.includes(hint.target === 'big' ? '小' : '大');
+                    
+                    if (dragon.status === 'breakable' && streak >= 6 && !patternConflict) {
                         suggestions.push({
                             type: `押${hint.target === 'big' ? '大' : '小'}`,
                             reason: `⚔️ 斷龍：${hint.reason}`,
-                            bets,
+                            bets: calculateBets(streak >= 8 ? 15 : 10, 4),
                             odds: 2,
-                            priority: 1
+                            priority: patternConflict ? 3 : 2,
+                            riskLevel: 'high',
+                            warning: '斷龍風險較高，建議搭配止損'
                         });
-                    } else if (dragon.status === 'returning') {
-                        // 回龍策略
+                    } else if (dragon.status === 'returning' && !patternConflict) {
                         suggestions.push({
                             type: `押${hint.target === 'big' ? '大' : '小'}`,
                             reason: `🔄 回龍：${hint.reason}`,
-                            bets: 8,
+                            bets: calculateBets(8, 3),
                             odds: 2,
-                            priority: 1
+                            priority: 2,
+                            riskLevel: 'medium'
                         });
-                    } else if (dragon.status === 'riding') {
-                        // 跟龍策略（激進3期就跟）
-                        const bets = metrics.currentStreak.count >= 5 ? 10 : metrics.currentStreak.count >= 4 ? 8 : 6;
+                    } else if (dragon.status === 'riding' && streak >= 3) {
+                        // 激進策略3期就跟龍
+                        const existingSameBet = suggestions.find(s => 
+                            s.type === `押${hint.target === 'big' ? '大' : '小'}`);
+                        if (existingSameBet) {
+                            // 同方向：加注
+                            existingSameBet.bets = Math.min(existingSameBet.bets + 4, MAX_BETS);
+                            existingSameBet.reason += ' + 順龍勢';
+                        } else if (!patternConflict) {
+                            suggestions.push({
+                                type: `押${hint.target === 'big' ? '大' : '小'}`,
+                                reason: `🐉 跟龍：${hint.reason}`,
+                                bets: calculateBets(streak >= 5 ? 10 : 6, 3),
+                                odds: 2,
+                                priority: 2,
+                                riskLevel: 'low'
+                            });
+                        }
+                    }
+                }
+                
+                // 優先級3：比例回歸
+                if (signals.deviationLevel >= 2) {
+                    const targetBet = metrics.bigRatio > 0.5 ? 'small' : 'big';
+                    const existingSameBet = suggestions.find(s => 
+                        s.type === `押${targetBet === 'big' ? '大' : '小'}`);
+                    
+                    if (existingSameBet) {
+                        existingSameBet.bets = Math.min(existingSameBet.bets + 3, MAX_BETS);
+                        existingSameBet.reason += ` + 追回歸`;
+                    } else if (suggestions.length === 0) {
                         suggestions.push({
-                            type: `押${hint.target === 'big' ? '大' : '小'}`,
-                            reason: `🐉 跟龍：${hint.reason}`,
-                            bets,
+                            type: `押${targetBet === 'big' ? '大' : '小'}`,
+                            reason: `📊 追回歸：大佔${(metrics.bigRatio * 100).toFixed(0)}%`,
+                            bets: calculateBets(6, 2),
                             odds: 2,
-                            priority: 1
+                            priority: 3,
+                            riskLevel: 'medium'
                         });
                     }
                 }
                 
-                // 比例回歸（沒有龍勢時）
-                if (suggestions.length === 0 && signals.deviationLevel >= 2) {
-                    const underdog = metrics.bigRatio > 0.5 ? '小' : '大';
-                    suggestions.push({
-                        type: `押${underdog}`,
-                        reason: `近${metrics.total}期大佔${(metrics.bigRatio * 100).toFixed(0)}%，追回歸`,
-                        bets: 8,
-                        odds: 2,
-                        priority: 2
-                    });
-                }
-                
-                // 近5期極端（沒有其他建議時）
-                if (suggestions.length === 0 && signals.extreme5) {
-                    const targetType = signals.extreme5 === 'big' ? '小' : '大';
-                    const count = signals.extreme5 === 'big' ? metrics.recentBig : metrics.recentSmall;
-                    suggestions.push({
-                        type: `押${targetType}`,
-                        reason: `近5期${signals.extreme5 === 'big' ? '大' : '小'}出${count}次`,
-                        bets: 5,
-                        odds: 2,
-                        priority: 3
-                    });
-                }
-                
-                // 豹子投注
+                // 優先級4：豹子投注（純娛樂）
                 if (signals.tripleGapLevel >= 1) {
                     suggestions.push({
                         type: '任意豹子',
-                        reason: `${metrics.tripleGap}期未出豹子，娛樂性嘗試`,
-                        bets: signals.tripleGapLevel === 2 ? 3 : 2,
+                        reason: `🎲 ${metrics.tripleGap}期未出豹子（娛樂嘗試）`,
+                        bets: signals.tripleGapLevel === 2 ? 2 : 1,
                         odds: 30,
-                        priority: 4
+                        priority: 4,
+                        riskLevel: 'entertainment'
                     });
                 }
                 
-                // 指定豹子
+                // 優先級5：指定豹子
                 if (signals.tripleGapLevel === 2 && metrics.hotNumbers.length > 0) {
                     suggestions.push({
                         type: `指定豹子 ${metrics.hotNumbers[0]}`,
-                        reason: `熱號嘗試，純娛樂高賠`,
+                        reason: `🎰 熱號嘗試（純娛樂）`,
                         bets: 1,
                         odds: 150,
-                        priority: 5
+                        priority: 5,
+                        riskLevel: 'entertainment'
                     });
                 }
             }
             
-            // 優先級排序，超過上限先砍低優先級
+            // ========== 注碼管理：添加建議 ==========
+            if (suggestions.length > 0) {
+                const totalBetsNow = suggestions.reduce((sum, s) => sum + s.bets, 0);
+                
+                // 添加注碼管理建議
+                if (suggestions[0].riskLevel === 'high') {
+                    suggestions[0].betAdvice = '建議分注：先下一半，中獎再追';
+                } else if (totalBetsNow >= 15) {
+                    suggestions[0].betAdvice = '注碼較大，建議設定止損線';
+                }
+            }
+            
+            // 優先級排序
             suggestions.sort((a, b) => a.priority - b.priority);
             
+            // 超過上限處理
             let totalBets = suggestions.reduce((sum, s) => sum + s.bets, 0);
             while (totalBets > MAX_BETS && suggestions.length > 0) {
                 const lowest = suggestions[suggestions.length - 1];
@@ -1992,6 +2300,10 @@
                 document.getElementById('analysisRange').textContent = '';
             }
 
+            // 路型分析
+            const pattern = analyzePattern(records);
+            renderPattern(pattern);
+
             // 連續趨勢與龍勢
             const streak = metrics.currentStreak;
             const dragon = metrics.dragon;
@@ -2014,6 +2326,59 @@
             
             document.getElementById('maxBigStreak').textContent = metrics.maxStreaks.maxBig;
             document.getElementById('maxSmallStreak').textContent = metrics.maxStreaks.maxSmall;
+        }
+        
+        // 渲染路型分析
+        function renderPattern(pattern) {
+            const typeEl = document.getElementById('patternType');
+            const descEl = document.getElementById('patternDesc');
+            const confEl = document.getElementById('patternConfidence');
+            const predictEl = document.getElementById('patternPredict');
+            
+            if (!pattern || pattern.type === 'insufficient') {
+                typeEl.textContent = '📊';
+                typeEl.style.color = '#888';
+                descEl.textContent = '需要更多數據（至少4期）';
+                confEl.textContent = '-';
+                predictEl.textContent = '-';
+                predictEl.style.color = '#888';
+                return;
+            }
+            
+            // 路型類型與顏色
+            const typeConfig = {
+                singleJump: { icon: '🔀 單跳', color: '#9b59b6' },
+                doubleJump: { icon: '🔄 雙跳', color: '#3498db' },
+                dragon: { icon: '🐉 長龍', color: '#2ecc71' },
+                random: { icon: '📊 亂路', color: '#888' }
+            };
+            
+            const config = typeConfig[pattern.type] || typeConfig.random;
+            typeEl.textContent = config.icon;
+            typeEl.style.color = config.color;
+            descEl.textContent = pattern.description || '-';
+            
+            // 信心度
+            if (pattern.confidence) {
+                confEl.textContent = `${pattern.confidence.toFixed(0)}%`;
+                confEl.style.color = pattern.confidence >= 70 ? '#2ecc71' : 
+                                     pattern.confidence >= 50 ? '#f39c12' : '#888';
+            } else {
+                confEl.textContent = '-';
+            }
+            
+            // 預測
+            if (pattern.nextPredict) {
+                predictEl.textContent = pattern.nextPredict === 'big' ? '大' : '小';
+                predictEl.style.color = pattern.nextPredict === 'big' ? '#e74c3c' : '#3498db';
+            } else if (pattern.currentType) {
+                // 長龍時顯示當前方向
+                predictEl.textContent = `續${pattern.currentType === 'big' ? '大' : '小'}?`;
+                predictEl.style.color = pattern.currentType === 'big' ? '#e74c3c' : '#3498db';
+            } else {
+                predictEl.textContent = '-';
+                predictEl.style.color = '#888';
+            }
         }
 
         function renderTrends(metrics) {
@@ -2105,11 +2470,32 @@
 
             suggestions.forEach(s => {
                 totalBets += s.bets;
+                
+                // 風險等級顏色
+                const riskColors = {
+                    low: '#2ecc71',
+                    medium: '#f39c12',
+                    high: '#e74c3c',
+                    entertainment: '#9b59b6'
+                };
+                const riskLabels = {
+                    low: '低風險',
+                    medium: '中風險',
+                    high: '高風險',
+                    entertainment: '娛樂'
+                };
+                const riskColor = riskColors[s.riskLevel] || '#888';
+                const riskLabel = riskLabels[s.riskLevel] || '';
+                
                 html += `
                     <div class="bet-item">
                         <div>
-                            <div class="bet-type">${escapeHtml(s.type)}</div>
+                            <div class="bet-type">${escapeHtml(s.type)}
+                                ${riskLabel ? `<span style="font-size: 0.75rem; padding: 2px 6px; margin-left: 8px; border-radius: 4px; background: ${riskColor}33; color: ${riskColor};">${riskLabel}</span>` : ''}
+                            </div>
                             <div class="bet-odds">${escapeHtml(s.reason || '')}</div>
+                            ${s.warning ? `<div style="color: #f39c12; font-size: 0.8rem; margin-top: 4px;">⚠️ ${escapeHtml(s.warning)}</div>` : ''}
+                            ${s.betAdvice ? `<div style="color: #3498db; font-size: 0.8rem; margin-top: 4px;">💡 ${escapeHtml(s.betAdvice)}</div>` : ''}
                         </div>
                         <div style="text-align: right;">
                             <div class="bet-amount">${s.bets}注 ($${(s.bets * BET_UNIT).toLocaleString()})</div>
@@ -2120,7 +2506,11 @@
             });
 
             if (suggestions.length === 0) {
-                html = '<p style="text-align: center; color: #888;">目前無明確投注建議，建議觀望</p>';
+                if (currentStrategy === 'aggressive') {
+                    html = '<p style="text-align: center; color: #888;">激進策略目前無強信號，建議切換保守策略或觀望</p>';
+                } else {
+                    html = '<p style="text-align: center; color: #888;">數據不足，請繼續輸入開獎記錄</p>';
+                }
             } else {
                 html += `
                     <div class="total-bet">
@@ -2131,17 +2521,17 @@
             }
 
             html += `<div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                <strong>分析理由：</strong><br>
-                <span style="color: #888; font-size: 0.9rem;">${escapeHtml(reasons.join('；') || '數據樣本較小，建議觀望')}</span>
+                <strong>分析依據：</strong><br>
+                <span style="color: #888; font-size: 0.9rem;">${escapeHtml(reasons.join('；') || '累積更多數據可提高分析準確度')}</span>
             </div>`;
 
             container.innerHTML = html;
 
-            // 更新信心指數
+            // 更新信心指數（優化門檻：40/65）
             const fillEl = document.getElementById('confidenceFill');
             fillEl.style.width = `${confidence}%`;
             fillEl.className = 'meter-fill ' + 
-                (confidence < 40 ? 'meter-low' : confidence < 70 ? 'meter-medium' : 'meter-high');
+                (confidence < 40 ? 'meter-low' : confidence < 65 ? 'meter-medium' : 'meter-high');
             document.getElementById('confidenceText').textContent = `${confidence}%`;
         }
 
@@ -2162,35 +2552,39 @@
             
             if (currentStrategy === 'conservative') {
                 explainEl.innerHTML = `
-                    <div class="title">🛡️ 保守策略原則（龍勢優先）</div>
+                    <div class="title">🛡️ 保守策略原則（積極建議・保守注碼）</div>
+                    <p style="color: #2ecc71; font-size: 0.9em; margin-bottom: 10px;">💡 保守 = 小注多出手，而非不出手</p>
                     <ul>
-                        <li><strong>🐉 跟龍</strong>：連續4期以上才跟龍押順勢（4注）</li>
-                        <li><strong>⚔️ 斷龍</strong>：連續<span style="color:#ffd700">7期</span>以上長龍反押（6~10注）
-                            <ul style="font-size: 0.9em; margin-top: 5px;">
-                                <li>7期長龍 → 6注反押</li>
-                                <li>8期長龍 → 8注反押</li>
-                                <li>9期以上 → 10注反押</li>
-                            </ul>
-                        </li>
-                        <li><strong>🔄 回龍</strong>：長龍（6期+）剛斷後，押回原方向（5注）</li>
-                        <li><strong>只押大小</strong>：不押豹子，避免低機率高風險</li>
+                        <li><strong>🔀 單跳路</strong>（≥60%）：3-5注跟跳</li>
+                        <li><strong>🔄 雙跳路</strong>（≥55%）：3-4注跟路</li>
+                        <li><strong>🐉 跟龍</strong>：連<span style="color:#2ecc71">3期</span>即可小注跟（3-5注）</li>
+                        <li><strong>⚔️ 斷龍</strong>：連<span style="color:#ffd700">7期</span>以上反押（4-5注）</li>
+                        <li><strong style="color:#f39c12;">🔄 回龍</strong>：長龍剛斷押回（4注）</li>
+                        <li><strong>📊 追回歸</strong>：比例偏離>25%時出手（3-4注）</li>
+                        <li><strong>📈 趨勢延續</strong>：連2期同向，小注跟隨（2注）</li>
+                        <li><strong>💡 兜底建議</strong>：無明確信號時，根據近況給最小注（2注）</li>
                     </ul>
+                    <p style="color: #888; font-size: 0.85em; margin-top: 8px;">注碼範圍：2-5注（$10,000-$25,000）</p>
                 `;
             } else {
                 explainEl.innerHTML = `
-                    <div class="title">⚔️ 激進策略原則（龍勢優先）</div>
+                    <div class="title">⚔️ 激進策略原則（多重信號・積極追擊）</div>
                     <ul>
-                        <li><strong>🐉 跟龍</strong>：連續3期即跟龍押順勢（6~10注）</li>
-                        <li><strong>⚔️ 斷龍</strong>：連續<span style="color:#ffd700">6期</span>以上長龍大注反押（10~20注）
-                            <ul style="font-size: 0.9em; margin-top: 5px;">
-                                <li>6期長龍 → 10注反押</li>
-                                <li>7期長龍 → 15注反押</li>
-                                <li>8期以上 → 20注反押</li>
+                        <li><strong>🎯 路型優先</strong>：單跳/雙跳路型明顯時優先跟路</li>
+                        <li><strong>🐉 跟龍</strong>：連續<span style="color:#2ecc71">3期</span>即跟（早期介入）</li>
+                        <li><strong>⚔️ 斷龍</strong>：連續<span style="color:#ffd700">6期</span>以上大注反押
+                            <ul style="font-size: 0.85em; margin-top: 5px;">
+                                <li>6期 → 10注 ｜ 7期 → 15注 ｜ 8期+ → 20注</li>
                             </ul>
                         </li>
-                        <li><strong>🔄 回龍</strong>：長龍剛斷後，積極押回原方向（8注）</li>
-                        <li><strong>追求高賠</strong>：同時押豹子(1:30)、指定豹子(1:150)</li>
-                        <li><strong>娛樂性質</strong>：指定豹子為純娛樂嘗試，非預測</li>
+                        <li><strong style="color:#f39c12;">🔄 回龍</strong>：長龍剛斷後，積極押回原方向（8注）
+                            <ul style="font-size: 0.85em; margin-top: 5px;">
+                                <li>豹子中斷長龍時也適用回龍策略</li>
+                            </ul>
+                        </li>
+                        <li><strong>🔗 信號疊加</strong>：多重信號同向時加注追擊</li>
+                        <li><strong>🎲 豹子娛樂</strong>：15期+未出豹子時小注嘗試</li>
+                        <li style="color: #f39c12;"><strong>⚠️ 風險提示</strong>：建議設定止損線（如連虧3把休息）</li>
                     </ul>
                 `;
             }
