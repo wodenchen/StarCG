@@ -432,18 +432,46 @@
         .confidence-levels .high { background: rgba(231, 76, 60, 0.3); color: #e74c3c; }
 
         /* 路單顯示 */
-        .roadmap { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 15px; }
+        .roadmap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
         .roadmap-cell {
+            width: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        .roadmap-main {
             width: 32px;
             height: 32px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             font-weight: bold;
+            color: #fff;
             cursor: pointer;
         }
+        .roadmap-dice {
+            display: flex;
+            gap: 2px;
+            justify-content: center;
+        }
+        .roadmap-dice-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            font-size: 0.55rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-weight: bold;
+            cursor: help;
+        }
+        .dice-hot { background: #e74c3c; }
+        .dice-warm { background: #f39c12; }
+        .dice-cold { background: #3498db; }
 
         .roadmap-big { background: #e74c3c; }
         .roadmap-small { background: #3498db; }
@@ -608,13 +636,22 @@
             
             /* 路單手機版 */
             .roadmap {
-                gap: 4px;
+                gap: 5px;
             }
             
             .roadmap-cell {
+                width: 34px;
+            }
+            
+            .roadmap-main {
                 width: 26px;
                 height: 26px;
                 font-size: 0.75rem;
+            }
+            
+            .roadmap-dice-dot {
+                width: 8px;
+                height: 8px;
             }
             
             /* 統計區塊手機版 */
@@ -773,9 +810,18 @@
             }
             
             .roadmap-cell {
+                width: 30px;
+            }
+            
+            .roadmap-main {
                 width: 22px;
                 height: 22px;
                 font-size: 0.7rem;
+            }
+            
+            .roadmap-dice-dot {
+                width: 7px;
+                height: 7px;
             }
             
             .trend-grid {
@@ -846,7 +892,11 @@
                 </div>
 
                 <div class="card" style="margin-top: 20px;">
-                    <h2>🛤️ 路單 (大小走勢)</h2>
+                    <h2>🛤️ 路單 (大小走勢 + 骰子冷熱)</h2>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-size: 0.8125rem; color: #aaa;">
+                        <span>結果：<span style="color: #e74c3c;">●大</span> <span style="color: #3498db;">●小</span> <span style="color: #ffd700;">●豹</span></span>
+                        <span>骰子：<span style="color: #e74c3c;">●熱</span> <span style="color: #f39c12;">●溫</span> <span style="color: #3498db;">●冷</span></span>
+                    </div>
                     <div class="roadmap" id="roadmap"></div>
                 </div>
 
@@ -3623,6 +3673,19 @@
         }
 
         function renderRoadmap() {
+            // 計算當前各骰子的冷溫熱狀態
+            const diceAnalysis = analyzeIndividualDice(records, 0); // 分析全部記錄
+            
+            // 取得點數狀態的函數
+            const getDiceStatus = (diceIndex, value) => {
+                if (!diceAnalysis) return 'warm';
+                const dice = diceIndex === 0 ? diceAnalysis.dice1 : 
+                             diceIndex === 1 ? diceAnalysis.dice2 : diceAnalysis.dice3;
+                if (dice.hot.includes(value)) return 'hot';
+                if (dice.cold.includes(value)) return 'cold';
+                return 'warm';
+            };
+            
             document.getElementById('roadmap').innerHTML = [...records].reverse().map(r => {
                 let cls = 'roadmap-';
                 let text = '';
@@ -3636,8 +3699,22 @@
                     cls += 'small';
                     text = '小';
                 }
+                
+                // 三顆骰子的冷溫熱狀態
+                const statusLabel = { hot: '熱', warm: '溫', cold: '冷' };
+                const diceDotsHtml = r.dice.map((d, i) => {
+                    const status = getDiceStatus(i, d);
+                    const label = statusLabel[status];
+                    return `<div class="roadmap-dice-dot dice-${status}" title="骰${i+1}=${d}（${label}號）">${d}</div>`;
+                }).join('');
+                
                 const tooltip = `第${escapeHtml(r.round || '?')}期: ${r.dice.join(',')}=${r.sum}`;
-                return `<div class="roadmap-cell ${cls}" title="${tooltip}">${text}</div>`;
+                return `
+                    <div class="roadmap-cell">
+                        <div class="roadmap-main ${cls}" title="${tooltip}">${text}</div>
+                        <div class="roadmap-dice">${diceDotsHtml}</div>
+                    </div>
+                `;
             }).join('');
         }
 
