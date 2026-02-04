@@ -3305,6 +3305,14 @@
         // 輸入處理（E9、E10）
         // ============================================================
         
+        // 清空骰子輸入框並重設焦點
+        function resetDiceInputs(focusTarget = 'dice1') {
+            document.getElementById('dice1').value = '';
+            document.getElementById('dice2').value = '';
+            document.getElementById('dice3').value = '';
+            document.getElementById(focusTarget).focus();
+        }
+        
         function addRecord() {
             let roundNum = document.getElementById('roundNum').value.trim();
             const d1 = parseInt(document.getElementById('dice1').value);
@@ -3316,12 +3324,14 @@
             
             if (!roundNum) {
                 alert('請輸入期數（僅允許英數字、-、_）');
+                resetDiceInputs('roundNum'); // 清空並聚焦期數
                 return;
             }
 
             if (isNaN(d1) || isNaN(d2) || isNaN(d3) ||
                 d1 < 1 || d1 > 6 || d2 < 1 || d2 > 6 || d3 < 1 || d3 > 6) {
                 alert('請輸入有效的骰子點數 (1-6)');
+                resetDiceInputs('dice1'); // 清空並聚焦骰子1
                 return;
             }
 
@@ -3330,6 +3340,9 @@
             let useRoundNo;
             if (existing) {
                 if (!confirm(`期數 ${roundNum} 已存在，是否覆蓋？`)) {
+                    // 用戶取消：清空骰子並聚焦期數讓用戶修改
+                    resetDiceInputs('roundNum');
+                    document.getElementById('roundNum').select();
                     return;
                 }
                 // 保留舊的 roundNo
@@ -3362,10 +3375,7 @@
 
             const nextRound = autoIncrementRound(roundNum);
             document.getElementById('roundNum').value = nextRound;
-            document.getElementById('dice1').value = '';
-            document.getElementById('dice2').value = '';
-            document.getElementById('dice3').value = '';
-            document.getElementById('dice1').focus();
+            resetDiceInputs('dice1'); // 清空並聚焦骰子1，準備下一期輸入
         }
 
         function autoIncrementRound(currentRound) {
@@ -3494,16 +3504,20 @@
         }
 
         function updateDisplay() {
-            // 統一分析全部記錄
-            const metrics = computeMetrics(records, records.length);
-            const signals = records.length >= 3 ? computeSignals(metrics) : null;
-            
-            renderCurrentResult();
-            renderHistory();
-            renderStats(metrics);
-            renderTrends(metrics);
-            renderRoadmap();
-            renderBetSuggestion(signals, metrics);
+            try {
+                // 統一分析全部記錄
+                const metrics = computeMetrics(records, records.length);
+                const signals = records.length >= 3 ? computeSignals(metrics) : null;
+                
+                renderCurrentResult();
+                renderHistory();
+                renderStats(metrics);
+                renderTrends(metrics);
+                renderRoadmap();
+                renderBetSuggestion(signals, metrics);
+            } catch (err) {
+                console.error('updateDisplay error:', err);
+            }
         }
 
         function renderCurrentResult() {
@@ -3673,49 +3687,61 @@
         }
 
         function renderRoadmap() {
-            // 計算當前各骰子的冷溫熱狀態
-            const diceAnalysis = analyzeIndividualDice(records, 0); // 分析全部記錄
-            
-            // 取得點數狀態的函數
-            const getDiceStatus = (diceIndex, value) => {
-                if (!diceAnalysis) return 'warm';
-                const dice = diceIndex === 0 ? diceAnalysis.dice1 : 
-                             diceIndex === 1 ? diceAnalysis.dice2 : diceAnalysis.dice3;
-                if (dice.hot.includes(value)) return 'hot';
-                if (dice.cold.includes(value)) return 'cold';
-                return 'warm';
-            };
-            
-            document.getElementById('roadmap').innerHTML = [...records].reverse().map(r => {
-                let cls = 'roadmap-';
-                let text = '';
-                if (r.type === 'triple') {
-                    cls += 'triple';
-                    text = r.tripleNumber;
-                } else if (r.type === 'big') {
-                    cls += 'big';
-                    text = '大';
-                } else {
-                    cls += 'small';
-                    text = '小';
-                }
+            try {
+                // 計算當前各骰子的冷溫熱狀態
+                const diceAnalysis = analyzeIndividualDice(records, 0); // 分析全部記錄
                 
-                // 三顆骰子的冷溫熱狀態
+                // 取得點數狀態的函數
+                const getDiceStatus = (diceIndex, value) => {
+                    if (!diceAnalysis) return 'warm';
+                    const dice = diceIndex === 0 ? diceAnalysis.dice1 : 
+                                 diceIndex === 1 ? diceAnalysis.dice2 : diceAnalysis.dice3;
+                    if (!dice) return 'warm';
+                    if (dice.hot && dice.hot.includes(value)) return 'hot';
+                    if (dice.cold && dice.cold.includes(value)) return 'cold';
+                    return 'warm';
+                };
+                
                 const statusLabel = { hot: '熱', warm: '溫', cold: '冷' };
-                const diceDotsHtml = r.dice.map((d, i) => {
-                    const status = getDiceStatus(i, d);
-                    const label = statusLabel[status];
-                    return `<div class="roadmap-dice-dot dice-${status}" title="骰${i+1}=${d}（${label}號）">${d}</div>`;
-                }).join('');
                 
-                const tooltip = `第${escapeHtml(r.round || '?')}期: ${r.dice.join(',')}=${r.sum}`;
-                return `
-                    <div class="roadmap-cell">
-                        <div class="roadmap-main ${cls}" title="${tooltip}">${text}</div>
-                        <div class="roadmap-dice">${diceDotsHtml}</div>
-                    </div>
-                `;
-            }).join('');
+                document.getElementById('roadmap').innerHTML = [...records].reverse().map(r => {
+                    // 防護性檢查
+                    if (!r || !r.dice || !Array.isArray(r.dice) || r.dice.length !== 3) {
+                        return ''; // 跳過損壞的記錄
+                    }
+                    
+                    let cls = 'roadmap-';
+                    let text = '';
+                    if (r.type === 'triple') {
+                        cls += 'triple';
+                        text = r.tripleNumber || '豹';
+                    } else if (r.type === 'big') {
+                        cls += 'big';
+                        text = '大';
+                    } else {
+                        cls += 'small';
+                        text = '小';
+                    }
+                    
+                    // 三顆骰子的冷溫熱狀態
+                    const diceDotsHtml = r.dice.map((d, i) => {
+                        const status = getDiceStatus(i, d);
+                        const label = statusLabel[status];
+                        return `<div class="roadmap-dice-dot dice-${status}" title="骰${i+1}=${d}（${label}號）">${d}</div>`;
+                    }).join('');
+                    
+                    const tooltip = `第${escapeHtml(r.round || '?')}期: ${r.dice.join(',')}=${r.sum || 0}`;
+                    return `
+                        <div class="roadmap-cell">
+                            <div class="roadmap-main ${cls}" title="${tooltip}">${text}</div>
+                            <div class="roadmap-dice">${diceDotsHtml}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('renderRoadmap error:', err);
+                document.getElementById('roadmap').innerHTML = '<p style="color:#888;">路單載入中...</p>';
+            }
         }
 
         function renderBetSuggestion(signals, metrics) {
@@ -4084,14 +4110,22 @@
         function setupAutoJump() {
             ['dice1', 'dice2', 'dice3'].forEach((id, i) => {
                 document.getElementById(id).addEventListener('input', (e) => {
-                    const val = e.target.value;
-                    if (val >= 1 && val <= 6) {
+                    const val = parseInt(e.target.value, 10);
+                    if (!isNaN(val) && val >= 1 && val <= 6) {
                         if (i < 2) {
                             const next = document.getElementById(['dice1', 'dice2', 'dice3'][i + 1]);
                             next.focus();
                             next.select();
                         } else {
-                            setTimeout(() => addRecord(), 100);
+                            // 第三顆骰子輸入完成，延遲執行新增記錄
+                            setTimeout(() => {
+                                try {
+                                    addRecord();
+                                } catch (err) {
+                                    console.error('addRecord error:', err);
+                                    alert('新增記錄時發生錯誤，請重試');
+                                }
+                            }, 150);
                         }
                     }
                 });
