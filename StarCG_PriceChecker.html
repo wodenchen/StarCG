@@ -838,6 +838,28 @@
                     <option value="all">全部</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label>🌱 種子+</label>
+                <select id="seedPlusFilter">
+                    <option value="all" selected>全部</option>
+                    <option value="體">+體</option>
+                    <option value="攻">+攻</option>
+                    <option value="防">+防</option>
+                    <option value="敏">+敏</option>
+                    <option value="魔">+魔</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🌱 種子-</label>
+                <select id="seedMinusFilter">
+                    <option value="all" selected>全部</option>
+                    <option value="體">-體</option>
+                    <option value="攻">-攻</option>
+                    <option value="防">-防</option>
+                    <option value="敏">-敏</option>
+                    <option value="魔">-魔</option>
+                </select>
+            </div>
             <div class="form-group" style="justify-content: flex-end;">
                 <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
                     <input type="checkbox" id="petOnlyFilter" style="width: 18px; height: 18px; cursor: pointer;">
@@ -953,12 +975,21 @@
 /* ========================================
    全域變數
 ======================================== */
-// CORS 代理（多個備援）
+// ★★★ 部署後把這行換成你自己的 Cloudflare Worker 網址（結尾保留 /?u=） ★★★
+const WORKER_URL = 'https://starcg-proxy.raywode13.workers.dev/?u=';
+
+// CORS 代理（主要用自己的 Worker，公共代理僅作備援）
 const CORS_PROXIES = [
-    { prefix: 'https://api.codetabs.com/v1/proxy?quest=', encode: true },
-    { prefix: 'https://api.allorigins.win/raw?url=', encode: true },
-    { prefix: 'https://corsproxy.org/?', encode: true }
+    { prefix: WORKER_URL, encode: true },
+    { prefix: 'https://api.codetabs.com/v1/proxy/?quest=', encode: true },
+    { prefix: 'https://corsproxy.io/?url=', encode: true },
+    { prefix: 'https://api.allorigins.win/raw?url=', encode: true }
 ];
+
+// 本機用 proxy.py 測試時，自動優先走本機代理
+if (['localhost', '127.0.0.1'].includes(location.hostname)) {
+    CORS_PROXIES.unshift({ prefix: '/proxy?u=', encode: true });
+}
 let currentProxyIndex = 0;
 
 const API_MARKET_BASE = 'https://member.starcg.net/market.php';
@@ -1023,7 +1054,7 @@ function initEventListeners() {
     });
     
     // 篩選器變更
-    ['currencyFilter', 'serverFilter', 'durabilityFilter'].forEach(id => {
+    ['currencyFilter', 'serverFilter', 'durabilityFilter', 'seedPlusFilter', 'seedMinusFilter'].forEach(id => {
         document.getElementById(id).addEventListener('change', applyFilters);
     });
     
@@ -1163,14 +1194,21 @@ async function fetchMarketData(keyword) {
                     }
                     
                     // 處理重來的種子 BP 配點顯示
+                    let seedPlusStats = [];
+                    let seedMinusStats = [];
                     if (item.ITEM_TRUENAME.includes('重來的種子') && item.ITEM_ARGUMENT) {
                         const bpNames = ['體', '攻', '防', '敏', '魔'];
                         const bpValues = item.ITEM_ARGUMENT.split('|').map(Number);
                         let plusParts = [];
                         let minusParts = [];
                         bpValues.forEach((val, idx) => {
-                            if (val > 0) plusParts.push(`<span class="bp-plus">+${val}${bpNames[idx]}</span>`);
-                            else if (val < 0) minusParts.push(`<span class="bp-minus">${val}${bpNames[idx]}</span>`);
+                            if (val > 0) {
+                                plusParts.push(`<span class="bp-plus">+${val}${bpNames[idx]}</span>`);
+                                seedPlusStats.push(bpNames[idx]);
+                            } else if (val < 0) {
+                                minusParts.push(`<span class="bp-minus">${val}${bpNames[idx]}</span>`);
+                                seedMinusStats.push(bpNames[idx]);
+                            }
                         });
                         // 固定順序：+1在前，-1在後
                         const allParts = [...plusParts, ...minusParts];
@@ -1181,6 +1219,9 @@ async function fetchMarketData(keyword) {
                         item: displayName,
                         gradeTag: gradeTag,
                         seedTag: seedTag,
+                        isSeed: seedPlusStats.length > 0 || seedMinusStats.length > 0,
+                        seedPlusStats: seedPlusStats,
+                        seedMinusStats: seedMinusStats,
                         itemLevel: itemLevel,
                         price: item.price,
                         pricetype: item.pricetype,
@@ -1325,12 +1366,23 @@ function applyFilters() {
     const server = document.getElementById('serverFilter').value;
     const durability = document.getElementById('durabilityFilter').value;
     const petOnly = document.getElementById('petOnlyFilter').checked;
+    const seedPlus = document.getElementById('seedPlusFilter').value;
+    const seedMinus = document.getElementById('seedMinusFilter').value;
     
     let filtered = [...allMarketItems];
     
     // 只搜尋寵物
     if (petOnly) {
         filtered = filtered.filter(i => i.isPet === true);
+    }
+    
+    // 種子 +/- 配點篩選（只要任一條件啟用，就只保留符合的種子）
+    if (seedPlus !== 'all' || seedMinus !== 'all') {
+        filtered = filtered.filter(i =>
+            i.isSeed &&
+            (seedPlus === 'all' || (i.seedPlusStats || []).includes(seedPlus)) &&
+            (seedMinus === 'all' || (i.seedMinusStats || []).includes(seedMinus))
+        );
     }
     
     // 幣種篩選
