@@ -206,6 +206,44 @@
             opacity: 1;
         }
 
+        .quick-tag .pin {
+            opacity: 0.55;
+            font-size: 0.9rem;
+        }
+
+        .quick-tag .pin:hover {
+            opacity: 1;
+        }
+
+        .quick-tag .label {
+            flex: 1;
+        }
+
+        .quick-tag.pinned {
+            background: #fff4dc;
+            border-color: var(--accent-gold);
+        }
+
+        .quick-tag.pinned .pin {
+            opacity: 1;
+        }
+
+        .clear-tags {
+            background: var(--bg-dark);
+            border: 1px dashed var(--accent-red);
+            color: var(--accent-red);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-tags:hover {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
         /* Stats Cards */
         .stats-grid {
             display: grid;
@@ -792,6 +830,139 @@
             0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
             50% { transform: scale(1.02); box-shadow: 0 0 15px 5px rgba(231, 76, 60, 0.4); }
         }
+
+        /* 攤位地圖 */
+        .location-link {
+            cursor: pointer;
+            color: var(--accent-blue);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .location-link:hover {
+            color: #3d6f9a;
+        }
+
+        .map-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(74, 63, 53, 0.65);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .map-modal.open { display: flex; }
+
+        .map-dialog {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 95vw;
+            max-height: 95vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .map-dialog-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card-hover);
+        }
+        .map-dialog-header h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+        .map-dialog-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .map-dialog-close:hover {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+        }
+        .map-viewer {
+            overflow: auto;
+            max-height: 80vh;
+            display: flex;
+            justify-content: center;
+            padding: 12px;
+        }
+        .map-canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border);
+        }
+
+        /* 懸賞清單 */
+        .bounty-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 18px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .bounty-tab {
+            padding: 8px 18px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            border-bottom: none;
+        }
+        .bounty-tab.active {
+            background: var(--bg-card);
+            color: var(--accent-gold);
+            border-color: var(--border);
+        }
+        .bounty-body {
+            overflow-y: auto;
+            max-height: 70vh;
+            padding: 16px 18px;
+        }
+        .bounty-cat {
+            margin-bottom: 16px;
+        }
+        .bounty-cat-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed var(--border);
+        }
+        .bounty-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .bounty-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .bounty-item:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            background: #fff4dc;
+        }
+        .bounty-item .lv {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-right: 4px;
+        }
     </style>
 </head>
 <body>
@@ -875,6 +1046,9 @@
             </div>
             <div class="form-group">
                 <button id="historyBtn" class="secondary">📈 72H歷史成交</button>
+            </div>
+            <div class="form-group">
+                <button id="bountyBtn" class="secondary">🎯 懸賞清單</button>
             </div>
         </div>
 
@@ -971,6 +1145,37 @@
     </div>
 </div>
 
+<!-- 懸賞清單 Modal -->
+<div class="map-modal" id="bountyModal">
+    <div class="map-dialog" style="width: 900px;">
+        <div class="map-dialog-header">
+            <h3>🎯 懸賞裝備及寵物快速查詢</h3>
+            <button class="map-dialog-close" id="bountyModalClose" title="關閉">✕</button>
+        </div>
+        <div class="bounty-tabs">
+            <div class="bounty-tab active" data-btab="equip">懸賞裝備</div>
+            <div class="bounty-tab" data-btab="pet">懸賞寵物</div>
+        </div>
+        <div class="bounty-body">
+            <div id="bountyEquipPanel"></div>
+            <div id="bountyPetPanel" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 攤位地圖 Modal -->
+<div class="map-modal" id="mapModal">
+    <div class="map-dialog">
+        <div class="map-dialog-header">
+            <h3 id="mapModalTitle">攤位位置</h3>
+            <button class="map-dialog-close" id="mapModalClose" title="關閉">✕</button>
+        </div>
+        <div class="map-viewer">
+            <canvas id="mapCanvas" class="map-canvas"></canvas>
+        </div>
+    </div>
+</div>
+
 <script>
 /* ========================================
    全域變數
@@ -1030,7 +1235,8 @@ async function fetchWithProxy(targetUrl) {
 
 let allMarketItems = [];
 let allHistoryLogs = [];
-let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || ['一箱面包', '一箱法國面包', '一箱壽喜鍋'];
+let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || ['一箱面包', '一箱法國面包', '一箱壽喜鍋'];
+let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || [];
 let currentSort = { field: 'price', order: 'asc' };
 let currentTab = 'market';
 const chartInstances = {};
@@ -1041,7 +1247,41 @@ const chartInstances = {};
 document.addEventListener('DOMContentLoaded', () => {
     renderQuickTags();
     initEventListeners();
+    initMapModal();
+    initQuickTags();
+    initBounty();
 });
+
+function initQuickTags() {
+    document.getElementById('quickTags').addEventListener('click', e => {
+        const act = e.target.dataset.act;
+        if (act === 'clear') return clearHistoryTags();
+
+        const tagEl = e.target.closest('.quick-tag');
+        if (!tagEl) return;
+        const tag = tagEl.dataset.tag;
+        const pinned = tagEl.dataset.pinned === '1';
+
+        if (act === 'search') quickSearch(tag);
+        else if (act === 'pin') togglePin(tag, pinned);
+        else if (act === 'remove') removeTag(tag, pinned);
+    });
+}
+
+function initMapModal() {
+    document.getElementById('mapModalClose').addEventListener('click', closeMapModal);
+    document.getElementById('mapModal').addEventListener('click', e => {
+        if (e.target.id === 'mapModal') closeMapModal();
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { closeMapModal(); closeBountyModal(); }
+    });
+    // 地點欄位點擊（事件委派）
+    document.getElementById('marketBody').addEventListener('click', e => {
+        const link = e.target.closest('.location-link');
+        if (link) showMapModal(link.dataset.x, link.dataset.y);
+    });
+}
 
 function initEventListeners() {
     // 搜尋按鈕
@@ -1078,33 +1318,77 @@ function initEventListeners() {
 /* ========================================
    快速標籤
 ======================================== */
+function saveTags() {
+    localStorage.setItem('starcg_pinnedTags', JSON.stringify(pinnedTags));
+    localStorage.setItem('starcg_quickTags', JSON.stringify(quickTags));
+}
+
+function tagHtml(tag, pinned) {
+    const t = escapeHtml(tag);
+    return `
+        <div class="quick-tag${pinned ? ' pinned' : ''}" data-tag="${t}" data-pinned="${pinned ? 1 : 0}">
+            <span class="pin" data-act="pin" title="${pinned ? '取消釘選' : '釘選保留'}">${pinned ? '📌' : '📍'}</span>
+            <span class="label" data-act="search">${t}</span>
+            <span class="remove" data-act="remove" title="移除">✕</span>
+        </div>`;
+}
+
 function renderQuickTags() {
     const container = document.getElementById('quickTags');
-    container.innerHTML = quickTags.map((tag, i) => `
-        <div class="quick-tag" onclick="quickSearch('${tag}')">
-            ${tag}
-            <span class="remove" onclick="event.stopPropagation(); removeTag(${i})">✕</span>
-        </div>
-    `).join('');
+    const pinnedHtml = pinnedTags.map(tag => tagHtml(tag, true)).join('');
+    const historyHtml = quickTags.map(tag => tagHtml(tag, false)).join('');
+    const clearBtn = quickTags.length > 0
+        ? `<button class="clear-tags" data-act="clear" title="清空非釘選的搜尋紀錄">🗑️ 清空紀錄</button>`
+        : '';
+    container.innerHTML = pinnedHtml + historyHtml + clearBtn;
 }
 
 function quickSearch(tag) {
     document.getElementById('searchInput').value = tag;
+    // 是寵物才勾「只搜尋寵物」，否則自動取消
+    document.getElementById('petOnlyFilter').checked = BOUNTY_PETS.includes(tag);
     searchMarket();
 }
 
-function removeTag(index) {
-    quickTags.splice(index, 1);
-    localStorage.setItem('starcg_quickTags', JSON.stringify(quickTags));
+function removeTag(tag, pinned) {
+    const arr = pinned ? pinnedTags : quickTags;
+    const i = arr.indexOf(tag);
+    if (i !== -1) arr.splice(i, 1);
+    saveTags();
+    renderQuickTags();
+}
+
+function togglePin(tag, pinned) {
+    if (pinned) {
+        // 取消釘選 → 移回歷史
+        const i = pinnedTags.indexOf(tag);
+        if (i !== -1) pinnedTags.splice(i, 1);
+        if (!quickTags.includes(tag)) quickTags.unshift(tag);
+    } else {
+        // 釘選 → 從歷史移到釘選
+        const i = quickTags.indexOf(tag);
+        if (i !== -1) quickTags.splice(i, 1);
+        if (!pinnedTags.includes(tag)) pinnedTags.push(tag);
+    }
+    saveTags();
+    renderQuickTags();
+}
+
+function clearHistoryTags() {
+    if (quickTags.length === 0) return;
+    if (!confirm('確定清空所有非釘選的搜尋紀錄？')) return;
+    quickTags = [];
+    saveTags();
     renderQuickTags();
 }
 
 function addTag(tag) {
-    if (tag && !quickTags.includes(tag)) {
-        quickTags.push(tag);
-        localStorage.setItem('starcg_quickTags', JSON.stringify(quickTags));
-        renderQuickTags();
-    }
+    if (!tag || pinnedTags.includes(tag) || quickTags.includes(tag)) return;
+    quickTags.unshift(tag);
+    // 歷史紀錄上限 30 筆，超過砍最舊
+    if (quickTags.length > 30) quickTags.length = 30;
+    saveTags();
+    renderQuickTags();
 }
 
 /* ========================================
@@ -1232,6 +1516,9 @@ async function fetchMarketData(keyword) {
                         defence: item.ITEM_MODIFYDEFENCE || 0,
                         agility: item.ITEM_MODIFYAGILITY || 0,
                         location: stall.coords,
+                        mapX: stall.x ?? parseCoords(stall.coords)?.x,
+                        mapY: stall.y ?? parseCoords(stall.coords)?.y,
+                        hasMap: isFranCityCoords(stall.coords),
                         server: stall.server,
                         shopName: stall.name,
                         count: item.ITEM_REMAIN,
@@ -1266,6 +1553,9 @@ async function fetchMarketData(keyword) {
                         defence: '-',
                         agility: '-',
                         location: stall.coords,
+                        mapX: stall.x ?? parseCoords(stall.coords)?.x,
+                        mapY: stall.y ?? parseCoords(stall.coords)?.y,
+                        hasMap: isFranCityCoords(stall.coords),
                         server: stall.server,
                         shopName: stall.name,
                         count: 1,
@@ -1510,7 +1800,9 @@ function renderMarketTable(items) {
             </td>
             <td>
                 <span class="server-badge s${item.server}">S${item.server}</span>
-                ${escapeHtml(item.location)}
+                ${item.hasMap && item.mapX != null
+                    ? `<span class="location-link" data-x="${item.mapX}" data-y="${item.mapY}" title="點擊查看地圖">📍 ${escapeHtml(item.location)}</span>`
+                    : escapeHtml(item.location)}
             </td>
             <td>${escapeHtml(item.shopName)}</td>
             <td>${item.durability}</td>
@@ -1815,6 +2107,160 @@ function showEmpty(msg) {
         <div>${msg}</div>
     `;
     document.getElementById('emptyState').style.display = 'block';
+}
+
+/* ========================================
+   攤位地圖（參考 StarCG-Market-Assistant）
+======================================== */
+const MAP_IMAGE_URL = 'maps/map.png';
+const mapImg = new Image();
+mapImg.src = MAP_IMAGE_URL;
+
+function isFranCityCoords(coords) {
+    return coords && coords.includes('法蘭城');
+}
+
+function parseCoords(coords) {
+    const m = coords && coords.match(/\[東[:：](\d+)\s*南[:：](\d+)\]/);
+    return m ? { x: Number(m[1]), y: Number(m[2]) } : null;
+}
+
+// 等距座標轉像素（公式來自 Baconrad/StarCG-Market-Assistant）
+function gameToPixel(gx, gy) {
+    const refGX = 248, refGY = 88, refPX = 710.9, refPY = 133.1;
+    const dgX = gx - refGX, dgY = gy - refGY;
+    const ux_px = 2.6285, ux_py = -1.9188;
+    const uy_px = 2.6285, uy_py = 1.9188;
+    return {
+        x: refPX + dgX * ux_px + dgY * uy_px,
+        y: refPY + dgX * ux_py + dgY * uy_py
+    };
+}
+
+function drawMapMarker(x, y) {
+    const canvas = document.getElementById('mapCanvas');
+    if (!canvas || !mapImg.complete || !mapImg.naturalWidth) return;
+
+    const ctx = canvas.getContext('2d');
+    if (canvas.width !== mapImg.width || canvas.height !== mapImg.height) {
+        canvas.width = mapImg.width;
+        canvas.height = mapImg.height;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(mapImg, 0, 0);
+
+    const pos = gameToPixel(x, y);
+
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = 'red';
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.shadowColor = 'black';
+    ctx.shadowBlur = 4;
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(`${x}, ${y}`, pos.x + 15, pos.y + 5);
+    ctx.shadowBlur = 0;
+}
+
+function showMapModal(x, y) {
+    const gx = Number(x), gy = Number(y);
+    if (isNaN(gx) || isNaN(gy)) return alert('無法解析座標');
+
+    document.getElementById('mapModalTitle').textContent = `攤位位置 (X: ${gx}, Y: ${gy})`;
+    document.getElementById('mapModal').classList.add('open');
+
+    if (mapImg.complete && mapImg.naturalWidth) {
+        drawMapMarker(gx, gy);
+    } else {
+        mapImg.onload = () => drawMapMarker(gx, gy);
+        mapImg.onerror = () => alert('地圖圖片載入失敗，請確認 maps/map.png 存在');
+    }
+}
+
+function closeMapModal() {
+    document.getElementById('mapModal').classList.remove('open');
+}
+
+/* ========================================
+   懸賞清單（資料來自 StarCG-Market-Assistant）
+======================================== */
+const BOUNTY_EQUIPMENT = {
+    '劍': [['1A','長劍'],['1B','闊劍'],['2A','突刺劍'],['2B','火舌劍'],['3A','面包劍'],['3B','雙手劍'],['4A','雙刃長劍'],['4B','鎖刃劍'],['5A','格斗劍'],['5B','長鍔劍'],['6A','豬牙劍'],['6B','雙刃闊劍']],
+    '斧': [['1A','手斧'],['1B','勇氣之斧'],['2A','寬手斧'],['2B','戰斗手斧'],['3A','格斗手斧'],['3B','鋼斧'],['4A','長戰斧'],['4B','雙刃斧'],['5A','鈎爪斧'],['5B','闊刃斧'],['6A','彎月大戰斧'],['6B','大型闊刃斧']],
+    '矛': [['1A','短矛'],['1B','攻城槍'],['2A','刺槍'],['2B','金屬槍'],['3A','長柄彎槍'],['3B','長柄尖槍'],['4A','穗槍'],['4B','雙叉戟'],['5A','護衛槍'],['5B','騎士槍'],['6A','大砍槍'],['6B','長尖槍']],
+    '弓': [['1A','輕型弓'],['1B','威力短弓'],['2A','短戰弓'],['2B','獵弓'],['3A','強弓'],['3B','格斗弓'],['4A','狙擊弓'],['4B','超強狙擊弓'],['5A','殺手長弓'],['5B','沖擊弓'],['6A','巨弓'],['6B','長格斗弓']],
+    '杖': [['1A','短杖'],['1B','權杖'],['2A','大地之杖'],['2B','激流權杖'],['3A','魔之手杖'],['3B','魔之權杖'],['4A','賢者手杖'],['4B','賢者權杖'],['5A','琥珀杖'],['5B','琥珀權杖'],['6A','元素之杖'],['6B','神聖之杖']],
+    '小刀': [['1A','小刀'],['1B','銳刃小刀'],['2A','圓盤小刀'],['2B','細刃擲刀'],['3A','滑翔小刀'],['3B','細直刃小刀'],['4A','耳柄小刀'],['4B','騎士小刀'],['5A','球鍔小刀'],['5B','雙刃小刀'],['6A','闊刃小刀'],['6B','觸角小刀']],
+    '回力鏢': [['1A','木制大型回力鏢'],['1B','青銅回力鏢'],['2A','追跡者'],['2B','彩光回力鏢'],['3A','暗殺回力鏢'],['3B','殺敵回力鏢'],['4A','獅子回力鏢'],['4B','銳角回力鏢'],['5A','翼鹿回力鏢'],['5B','阿修塔羅回力鏢'],['6A','蛇獅回力鏢'],['6B','鶇回力鏢']],
+    '頭盔': [['1A','硬皮頭盔'],['1B','銅制頭盔'],['2A','鐵板布盔'],['2B','銅鐵皮盔'],['3A','金屬護額'],['3B','鐵制頭盔'],['4A','霸葛頭盔'],['4B','角飾頭盔'],['5A','開放式頭盔'],['5B','葛理克頭盔'],['6A','巴比克頭盔'],['6B','利刃頭盔']],
+    '帽子': [['1A','麻布帽'],['1B','硬帽'],['2A','輕帽'],['2B','皮帽'],['3A','硬皮帽'],['3B','可愛的帽子'],['4A','時髦帽子'],['4B','鴨舌帽'],['5A','藍徽章之帽'],['5B','高級帽子'],['6A','裝飾着花的帽子'],['6B','青銅帽子']],
+    '鎧甲': [['1A','軟皮甲'],['1B','護心甲'],['2A','青銅鎧甲'],['2B','輕型鎧甲'],['3A','輕型鎖鏈甲'],['3B','環甲'],['4A','鋼鐵鎧甲'],['4B','金屬皮甲'],['5A','長型金屬鎧甲'],['5B','索狀鎧甲'],['6A','重鐵板甲'],['6B','鐵板半身甲']],
+    '衣服': [['1A','旅人之服'],['1B','保護衣'],['2A','羽毛裝'],['2B','皮裝'],['3A','硬皮服'],['3B','鎖鏈裝'],['4A','布甲'],['4B','櫬甲'],['5A','環服'],['5B','士兵護衣'],['6A','長索錐衣'],['6B','索錐上衣']],
+    '袍': [['1A','羽毛袍'],['1B','輕皮袍'],['2A','網袍'],['2B','風袍'],['3A','硬皮袍'],['3B','環袍'],['4A','烏鴉之袍'],['4B','月亮之袍'],['4C','狐皮披風'],['5A','東方法衣'],['5B','聖堂之袍'],['6A','聖者之袍'],['6B','戰斗長袍']],
+    '靴子': [['1A','軟皮靴'],['1B','皮靴'],['2A','硬皮靴'],['2B','長靴'],['3A','厚底靴'],['3B','編織的靴子'],['4A','鎖鏈長靴'],['4B','鎖鏈靴'],['5A','蜥蜴靴'],['5B','蜥蜴長靴'],['6A','鋼靴'],['6B','鋼制長靴']],
+    '鞋': [['1A','運動鞋'],['1B','馬車鞋'],['2A','皮鞋'],['2B','安全鞋'],['3A','光之鞋'],['3B','戰鞋'],['4A','薄板鞋'],['4B','鎖鏈鞋'],['5A','蜥蜴鞋'],['5B','維京鞋'],['6A','戰斗鞋'],['6B','騎士鞋']],
+    '盾': [['1A','小圓盾'],['1B','小型盾'],['2A','板盾'],['2B','鳶盾'],['3A','漩渦重盾'],['3B','哥特盾'],['4A','士兵盾'],['4B','重盾'],['5A','蜥蜴盾'],['5B','反光之盾'],['6A','風之盾'],['6B','獅子盾']]
+};
+const BOUNTY_PETS = ['大地鼠','迷你蝙蝠','哥布林','紅帽哥布林','樹精','妖草','異型蜂','惡魔螃蟹','穴熊','大蝙蝠','火蜘蛛','火焰鼠','小惡魔','蜥蜴戰士','印地安仙人掌','殺手蠍','紅蠍','火焰哥布林','烈風哥布林','蔓陀羅草','幻歌妖','烈風鳥人','胖蝙蝠','死亡蜂','死亡樹精','殺人蜂','黃色口臭鬼'];
+
+function renderBounty() {
+    const equipPanel = document.getElementById('bountyEquipPanel');
+    equipPanel.innerHTML = Object.entries(BOUNTY_EQUIPMENT).map(([cat, items]) => `
+        <div class="bounty-cat">
+            <div class="bounty-cat-title">${cat}</div>
+            <div class="bounty-grid">
+                ${items.map(([lv, name]) => `
+                    <span class="bounty-item" data-name="${escapeHtml(name)}">
+                        <span class="lv">${lv}</span>${escapeHtml(name)}
+                    </span>`).join('')}
+            </div>
+        </div>`).join('');
+
+    const petPanel = document.getElementById('bountyPetPanel');
+    petPanel.innerHTML = `
+        <div class="bounty-grid">
+            ${BOUNTY_PETS.map(name => `
+                <span class="bounty-item" data-name="${escapeHtml(name)}" data-pet="1">${escapeHtml(name)}</span>`).join('')}
+        </div>`;
+}
+
+function openBountyModal() {
+    document.getElementById('bountyModal').classList.add('open');
+}
+function closeBountyModal() {
+    document.getElementById('bountyModal').classList.remove('open');
+}
+
+function initBounty() {
+    renderBounty();
+    document.getElementById('bountyBtn').addEventListener('click', openBountyModal);
+    document.getElementById('bountyModalClose').addEventListener('click', closeBountyModal);
+    document.getElementById('bountyModal').addEventListener('click', e => {
+        if (e.target.id === 'bountyModal') closeBountyModal();
+    });
+    // tab 切換
+    document.querySelectorAll('.bounty-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.bounty-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const isEquip = tab.dataset.btab === 'equip';
+            document.getElementById('bountyEquipPanel').style.display = isEquip ? 'block' : 'none';
+            document.getElementById('bountyPetPanel').style.display = isEquip ? 'none' : 'block';
+        });
+    });
+    // 點裝備/寵物 → 帶入搜尋
+    document.getElementById('bountyModal').addEventListener('click', e => {
+        const item = e.target.closest('.bounty-item');
+        if (!item) return;
+        closeBountyModal();
+        quickSearch(item.dataset.name);
+    });
 }
 
 function escapeHtml(str) {
