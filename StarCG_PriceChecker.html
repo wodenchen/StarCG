@@ -2112,9 +2112,31 @@ function showEmpty(msg) {
 /* ========================================
    攤位地圖（參考 StarCG-Market-Assistant）
 ======================================== */
-const MAP_IMAGE_URL = 'maps/map.png';
+// 地圖圖片來源（本地優先，失敗自動改用 GitHub 線上圖，公開網址不上傳圖也能顯示）
+const MAP_IMAGE_SOURCES = [
+    'map.png',
+    'https://raw.githubusercontent.com/wodenchen/StarCG/main/map.png',
+    'https://raw.githubusercontent.com/Baconrad/StarCG-Market-Assistant/main/web/public/map.png'
+];
+let mapSrcIndex = 0;
+let mapPending = null;
 const mapImg = new Image();
-mapImg.src = MAP_IMAGE_URL;
+
+mapImg.onload = () => {
+    if (mapPending) {
+        const { x, y } = mapPending;
+        drawMapMarker(x, y);
+    }
+};
+mapImg.onerror = () => {
+    mapSrcIndex++;
+    if (mapSrcIndex < MAP_IMAGE_SOURCES.length) {
+        mapImg.src = MAP_IMAGE_SOURCES[mapSrcIndex];
+    } else {
+        alert('地圖圖片載入失敗');
+    }
+};
+mapImg.src = MAP_IMAGE_SOURCES[mapSrcIndex];
 
 function isFranCityCoords(coords) {
     return coords && coords.includes('法蘭城');
@@ -2175,12 +2197,11 @@ function showMapModal(x, y) {
     document.getElementById('mapModalTitle').textContent = `攤位位置 (X: ${gx}, Y: ${gy})`;
     document.getElementById('mapModal').classList.add('open');
 
+    mapPending = { x: gx, y: gy };
     if (mapImg.complete && mapImg.naturalWidth) {
         drawMapMarker(gx, gy);
-    } else {
-        mapImg.onload = () => drawMapMarker(gx, gy);
-        mapImg.onerror = () => alert('地圖圖片載入失敗，請確認 maps/map.png 存在');
     }
+    // 否則等 onload（含 fallback 換源）後自動繪製
 }
 
 function closeMapModal() {
