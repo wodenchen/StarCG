@@ -665,8 +665,12 @@
         /* Loading */
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 24px 16px 12px;
             color: var(--text-secondary);
+        }
+
+        .loading #loadingText {
+            min-height: 1.4em;
         }
 
         .loading .spinner {
@@ -1214,10 +1218,6 @@
                 <label>&nbsp;</label>
                 <button id="searchBtn">🔍 搜尋市場</button>
             </div>
-            <div class="form-group">
-                <label>&nbsp;</label>
-                <button id="historyBtn" class="secondary">📈 72H歷史成交</button>
-            </div>
         </div>
 
         <!-- 第二行：篩選 -->
@@ -1324,13 +1324,14 @@
     <!-- Tabs -->
     <div class="tabs" id="tabsContainer" style="display: none;">
         <div class="tab active" data-tab="market">🏪 市場攤位</div>
-        <div class="tab" data-tab="history">📜 歷史成交</div>
+        <div class="tab" data-tab="history36">📜 36H歷史</div>
+        <div class="tab" data-tab="history72">📜 72H歷史</div>
     </div>
 
     <!-- Loading -->
     <div class="loading" id="loading" style="display: none;">
         <div class="spinner"></div>
-        <div>正在載入資料...</div>
+        <div id="loadingText">正在載入資料...</div>
     </div>
 
     <!-- Market Table -->
@@ -1456,6 +1457,7 @@ function parseJsonResponse(text, context = '') {
 const API_MARKET_BASE = 'https://member.starcg.net/market.php';
 const API_HISTORY_BASE = 'https://member.starcg.net/marketrecord.php';
 const MAX_PAGES = 20;
+const MARKET_PAGE_CONCURRENCY = 4;
 
 // 嘗試 fetch，失敗則換下一個 proxy
 async function fetchWithProxy(targetUrl) {
@@ -1492,6 +1494,9 @@ async function fetchWithProxy(targetUrl) {
 let allMarketItems = [];
 let allHistoryLogs = [];
 let lastSearchKeyword = '';
+let lastHistoryKeyword = '';
+let lastHistoryHours = 0;
+let historyHours = 36;
 let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || [];
 let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || [];
 let currentSort = { field: 'price', order: 'asc' };
@@ -1555,7 +1560,6 @@ function updateExchangeRateHint() {
 function initEventListeners() {
     // 搜尋按鈕
     document.getElementById('searchBtn').addEventListener('click', searchMarket);
-    document.getElementById('historyBtn').addEventListener('click', searchHistory);
     
     // Enter 鍵搜尋
     document.getElementById('searchInput').addEventListener('keypress', e => {
@@ -1677,23 +1681,43 @@ async function searchMarket() {
     if (!keyword) return alert('請輸入搜尋關鍵字');
     lastSearchKeyword = keyword;
     
-    showLoading(true);
+    showLoading(true, '正在連線搜尋…');
     hideAll();
     
-    // 清空舊的歷史資料和圖表，讓切換 tab 時重新搜尋
     allHistoryLogs = [];
+    lastHistoryKeyword = '';
+    lastHistoryHours = 0;
     // 銷毀所有圖表實例
     Object.values(chartInstances).forEach(chart => chart.destroy());
     Object.keys(chartInstances).forEach(key => delete chartInstances[key]);
     
+    let marketShown = false;
     try {
-        allMarketItems = await fetchMarketData(keyword);
+        allMarketItems = [];
+        await fetchMarketData(keyword, {
+            onProgress(page, totalPages, count) {
+                showLoading(true, `載入第 ${page}/${totalPages} 頁…（已找到 ${count} 筆）`);
+            },
+            onPartial(newItems) {
+                allMarketItems.push(...newItems);
+                if (!marketShown && allMarketItems.length > 0) {
+                    marketShown = true;
+                    addTag(keyword);
+                    document.getElementById('tabsContainer').style.display = 'flex';
+                    switchTab('market');
+                    document.getElementById('emptyState').style.display = 'none';
+                }
+                if (marketShown) applyFilters();
+            }
+        });
         
         if (allMarketItems.length > 0) {
-            addTag(keyword);
-            document.getElementById('tabsContainer').style.display = 'flex';
-            switchTab('market');
-            applyFilters();
+            if (!marketShown) {
+                addTag(keyword);
+                document.getElementById('tabsContainer').style.display = 'flex';
+                switchTab('market');
+                applyFilters();
+            }
         } else {
             showEmpty('找不到符合的物品');
         }
@@ -1719,28 +1743,33 @@ function normalizeStr(str) {
         .replace(/　/g, ' ');
 }
 
-async function fetchMarketData(keyword) {
+const MARKET_STAT_TAG_DEFS = [
+    ['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'],
+    ['ITEM_MODIFYRECOVERY', '回復', 'st-recov'],
+    ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid'],
+    ['ITEM_ADM', '魔攻', 'st-madm'],
+    ['ITEM_MODIFYMAGIC', '精神', 'st-spirit'],
+    ['ITEM_MODIFYHITRATE', '命中', 'st-hit'],
+    ['ITEM_MODIFYCOUNTER', '反擊', 'st-counter']
+];
+const MARKET_SOUL_COLORS = {
+    1007001: { label: '藍', cls: 'soul-blue', extra: [] },
+    1007002: { label: '紅', cls: 'soul-red', extra: [['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'], ['ITEM_MODIFYRECOVERY', '回復', 'st-recov']] },
+    1007003: { label: '黃', cls: 'soul-yellow', extra: [['ITEM_ADM', '魔攻', 'st-madm'], ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid']] }
+};
+const MARKET_ACC_EXTRA = ['ITEM_MODIFYFORCEPOINT', 'ITEM_MODIFYRECOVERY', 'ITEM_MODIFYCRITICAL', 'ITEM_MODIFYCOUNTER', 'ITEM_MODIFYHITRATE', 'ITEM_MODIFYAVOID', 'ITEM_MODIFYMAGIC'];
+
+function processMarketPageData(data, normalizedKeyword) {
     const items = [];
-    let page = 1;
-    let hasMore = true;
-    const normalizedKeyword = normalizeStr(keyword);
-    
-    while (hasMore && page <= MAX_PAGES) {
-        const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=0&page=${page}&search=${encodeURIComponent(keyword)}`;
-        const text = await fetchWithProxy(targetUrl);
-        const data = parseJsonResponse(text, '市場資料');
-        
-        if (data.totalFiltered === 0) break;
-        if (data.totalFiltered > 300) {
-            alert('結果太多，請輸入更精確的關鍵字');
-            return [];
-        }
-        
-        // 處理攤位資料
-        const itemsMap = data.itemsByCd || {};
-        const petsMap = data.petsByCd || {};
-        
-        (data.stalls || []).forEach(stall => {
+    const itemsMap = data.itemsByCd || {};
+    const petsMap = data.petsByCd || {};
+    const buildStatTags = (item, defs) => defs
+        .map(([k, lbl, sc]) => [item[k] || 0, lbl, sc])
+        .filter(([v]) => v !== 0)
+        .map(([v, lbl, sc]) => `<span class="soul-stat ${sc}">${lbl}+${v}</span>`)
+        .join(' ');
+
+    (data.stalls || []).forEach(stall => {
             const cdkey = stall.cdkey;
             
             // 道具
@@ -1782,47 +1811,23 @@ async function fetchMarketData(keyword) {
                         if (allParts.length > 0) seedTag = allParts.join(' ');
                     }
                     
-                    // 隨機屬性標籤（必殺/回復/閃躲/魔攻/精神/命中/反擊）
-                    const STAT_TAG_DEFS = [
-                        ['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'],
-                        ['ITEM_MODIFYRECOVERY', '回復', 'st-recov'],
-                        ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid'],
-                        ['ITEM_ADM', '魔攻', 'st-madm'],
-                        ['ITEM_MODIFYMAGIC', '精神', 'st-spirit'],
-                        ['ITEM_MODIFYHITRATE', '命中', 'st-hit'],
-                        ['ITEM_MODIFYCOUNTER', '反擊', 'st-counter']
-                    ];
-                    const buildStatTags = (defs) => defs
-                        .map(([k, lbl, sc]) => [item[k] || 0, lbl, sc])
-                        .filter(([v]) => v !== 0)
-                        .map(([v, lbl, sc]) => `<span class="soul-stat ${sc}">${lbl}+${v}</span>`)
-                        .join(' ');
-
                     // 英靈之誓：用 ITEM_ID 區分顏色變體
                     let colorTag = '';
                     let statTag = '';
                     let soulColor = '';
-                    const SOUL_COLORS = {
-                        1007001: { label: '藍', cls: 'soul-blue', extra: [] },
-                        1007002: { label: '紅', cls: 'soul-red', extra: [['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'], ['ITEM_MODIFYRECOVERY', '回復', 'st-recov']] },
-                        1007003: { label: '黃', cls: 'soul-yellow', extra: [['ITEM_ADM', '魔攻', 'st-madm'], ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid']] }
-                    };
-                    if (SOUL_COLORS[item.ITEM_ID]) {
-                        const c = SOUL_COLORS[item.ITEM_ID];
+                    if (MARKET_SOUL_COLORS[item.ITEM_ID]) {
+                        const c = MARKET_SOUL_COLORS[item.ITEM_ID];
                         soulColor = c.label;
                         colorTag = `<span class="soul-tag ${c.cls}">${c.label}</span>`;
-                        const ex = buildStatTags(c.extra);
+                        const ex = buildStatTags(item, c.extra);
                         if (ex) colorTag += ' ' + ex;
                     }
 
-                    // 判斷是否飾品（飾品的 ADM 代表魔攻而非攻擊力，需修正攻擊欄）
-                    const ACC_EXTRA = ['ITEM_MODIFYFORCEPOINT', 'ITEM_MODIFYRECOVERY', 'ITEM_MODIFYCRITICAL', 'ITEM_MODIFYCOUNTER', 'ITEM_MODIFYHITRATE', 'ITEM_MODIFYAVOID', 'ITEM_MODIFYMAGIC'];
-                    const isAccessory = ACC_EXTRA.some(k => (item[k] || 0) !== 0);
+                    const isAccessory = MARKET_ACC_EXTRA.some(k => (item[k] || 0) !== 0);
 
-                    // 其他有隨機屬性的裝備（半魔之飾、寵書等）：顯示隨機屬性標籤
                     if (!soulColor) {
-                        const defs = isAccessory ? STAT_TAG_DEFS : STAT_TAG_DEFS.filter(([k]) => k !== 'ITEM_ADM');
-                        const tags = buildStatTags(defs);
+                        const defs = isAccessory ? MARKET_STAT_TAG_DEFS : MARKET_STAT_TAG_DEFS.filter(([k]) => k !== 'ITEM_ADM');
+                        const tags = buildStatTags(item, defs);
                         if (tags) statTag = tags;
                     }
                     
@@ -1896,47 +1901,104 @@ async function fetchMarketData(keyword) {
                 }
             });
         });
-        
-        if (page * (data.perPage || 20) >= data.totalFiltered) hasMore = false;
-        page++;
-    }
-    
+
     return items;
 }
 
+async function fetchMarketPage(keyword, page, normalizedKeyword) {
+    const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=0&page=${page}&search=${encodeURIComponent(keyword)}`;
+    const text = await fetchWithProxy(targetUrl);
+    const data = parseJsonResponse(text, '市場資料');
+    return {
+        page,
+        totalFiltered: data.totalFiltered || 0,
+        perPage: data.perPage || 20,
+        items: processMarketPageData(data, normalizedKeyword)
+    };
+}
+
+async function fetchMarketData(keyword, callbacks = {}) {
+    const normalizedKeyword = normalizeStr(keyword);
+    const { onProgress, onPartial } = callbacks;
+
+    const first = await fetchMarketPage(keyword, 1, normalizedKeyword);
+    if (first.totalFiltered === 0) return [];
+    if (first.totalFiltered > 300) {
+        alert('結果太多，請輸入更精確的關鍵字');
+        return [];
+    }
+
+    const totalPages = Math.min(MAX_PAGES, Math.ceil(first.totalFiltered / first.perPage));
+    const items = [...first.items];
+    onPartial?.(first.items);
+    onProgress?.(1, totalPages, items.length);
+
+    for (let start = 2; start <= totalPages; start += MARKET_PAGE_CONCURRENCY) {
+        const pageNums = [];
+        for (let p = start; p < start + MARKET_PAGE_CONCURRENCY && p <= totalPages; p++) {
+            pageNums.push(p);
+        }
+        const pages = await Promise.all(pageNums.map(p => fetchMarketPage(keyword, p, normalizedKeyword)));
+        for (const pg of pages) {
+            items.push(...pg.items);
+            onPartial?.(pg.items);
+        }
+        onProgress?.(Math.min(start + MARKET_PAGE_CONCURRENCY - 1, totalPages), totalPages, items.length);
+    }
+
+    return items;
+}
+
+function isHistoryTab(tab) {
+    return tab === 'history36' || tab === 'history72';
+}
+
+function tabToHistoryHours(tab) {
+    return tab === 'history72' ? 72 : 36;
+}
+
 /* ========================================
-   歷史成交搜尋
+   歷史成交（36H / 72H）
 ======================================== */
-async function searchHistory() {
+async function loadHistoryTab() {
     const keyword = document.getElementById('searchInput').value.trim();
-    if (!keyword) return alert('請輸入搜尋關鍵字');
-    
-    showLoading(true);
-    hideAll();
-    
+    if (!keyword) return false;
+
+    if (keyword === lastHistoryKeyword && historyHours === lastHistoryHours && allHistoryLogs.length > 0) {
+        renderHistoryData();
+        return true;
+    }
+
+    showLoading(true, `載入 ${historyHours}H 歷史成交…`);
+    document.getElementById('historySection').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+
     try {
-        allHistoryLogs = await fetchHistoryData(keyword);
-        
+        allHistoryLogs = await fetchHistoryData(keyword, historyHours);
+        lastHistoryKeyword = keyword;
+        lastHistoryHours = historyHours;
+
         if (allHistoryLogs.length > 0) {
             addTag(keyword);
             document.getElementById('tabsContainer').style.display = 'flex';
-            switchTab('history');
             renderHistoryData();
-        } else {
-            showEmpty('找不到歷史成交記錄');
+            return true;
         }
+        showEmpty('找不到歷史成交記錄');
+        return false;
     } catch (err) {
         console.error(err);
         alert('搜尋失敗，請稍後再試或檢查網路連線');
-        showEmpty('搜尋失敗');
+        showEmpty('搜尋歷史失敗');
+        return false;
     } finally {
         showLoading(false);
     }
 }
 
-async function fetchHistoryData(keyword) {
+async function fetchHistoryData(keyword, hours = 36) {
     const logs = [];
-    const TIME_RANGE = 72 * 60 * 60 * 1000; // 72小時
+    const TIME_RANGE = hours * 60 * 60 * 1000;
     const now = Date.now();
     let page = 1;
     let keepFetching = true;
@@ -2409,40 +2471,38 @@ function updateStats(items) {
    UI 輔助
 ======================================== */
 async function switchTab(tab) {
+    if (isHistoryTab(tab) && !document.getElementById('searchInput').value.trim()) {
+        alert('請先輸入搜尋關鍵字');
+        tab = 'market';
+    }
+
+    if (isHistoryTab(tab)) {
+        historyHours = tabToHistoryHours(tab);
+    }
+
     currentTab = tab;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
-    
+
+    const onHistory = isHistoryTab(tab);
     document.getElementById('marketSection').style.display = tab === 'market' ? 'block' : 'none';
-    document.getElementById('historySection').style.display = tab === 'history' ? 'block' : 'none';
+    document.getElementById('historySection').style.display = onHistory ? 'block' : 'none';
     document.getElementById('statsGrid').style.display = tab === 'market' ? 'grid' : 'none';
-    
-    // 切換到歷史成交時，如果還沒有資料就自動搜尋
-    if (tab === 'history' && allHistoryLogs.length === 0) {
-        const keyword = document.getElementById('searchInput').value.trim();
-        if (keyword) {
-            showLoading(true);
-            document.getElementById('historySection').style.display = 'none';
-            try {
-                allHistoryLogs = await fetchHistoryData(keyword);
-                if (allHistoryLogs.length > 0) {
-                    renderHistoryData();
-                    document.getElementById('historySection').style.display = 'block';
-                } else {
-                    showEmpty('找不到歷史成交記錄');
-                }
-            } catch (err) {
-                console.error(err);
-                showEmpty('搜尋歷史失敗');
-            } finally {
-                showLoading(false);
-            }
+    document.getElementById('emptyState').style.display = 'none';
+
+    if (onHistory) {
+        const ok = await loadHistoryTab();
+        if (!ok && isHistoryTab(currentTab)) {
+            switchTab('market');
         }
     }
 }
 
-function showLoading(show) {
+function showLoading(show, message) {
     document.getElementById('loading').style.display = show ? 'block' : 'none';
+    if (show && message) {
+        document.getElementById('loadingText').textContent = message;
+    }
 }
 
 function hideAll() {
