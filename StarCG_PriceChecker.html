@@ -85,11 +85,65 @@
             margin-bottom: 20px;
         }
 
+        .file-protocol-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #664d03;
+        }
+        .file-protocol-warning code {
+            background: rgba(0,0,0,0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .file-protocol-warning a {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
         .search-row {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             align-items: flex-end;
+        }
+
+        .search-row.filter-row {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            align-self: flex-end;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
 
         .form-group {
@@ -435,6 +489,36 @@
             vertical-align: middle;
         }
 
+        /* 英靈之誓顏色變體標籤 */
+        .soul-tag {
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-left: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .soul-blue { background: #2980b9; }
+        .soul-red { background: #c0392b; }
+        .soul-yellow { background: #e69b00; }
+        .soul-stat {
+            background: #34495e;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            margin-left: 4px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .soul-stat.st-crit { background: #e67e22; }
+        .soul-stat.st-recov { background: #16a085; }
+        .soul-stat.st-madm { background: #8e44ad; }
+        .soul-stat.st-avoid { background: #00b4d8; }
+
         /* 重來的種子 BP 標籤 */
         .bp-plus {
             background: #27ae60;
@@ -638,6 +722,12 @@
 
             .search-row button {
                 width: 100%;
+            }
+
+            .checkbox-group {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 14px;
             }
 
             .stats-grid {
@@ -944,6 +1034,59 @@
             flex-wrap: wrap;
             gap: 8px;
         }
+        /* 子分頁（左側選單） */
+        .sub-layout {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .sub-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex-shrink: 0;
+            min-width: 96px;
+            border-right: 1px solid var(--border);
+            padding-right: 12px;
+            position: sticky;
+            top: 0;
+        }
+        .sub-tab {
+            padding: 8px 14px;
+            cursor: pointer;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+        .sub-tab:hover {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+        }
+        .sub-tab.active {
+            background: var(--accent-gold);
+            color: #fff;
+        }
+        .sub-content {
+            flex: 1;
+            min-width: 0;
+        }
+        @media (max-width: 600px) {
+            .sub-layout {
+                flex-direction: column;
+            }
+            .sub-tabs {
+                flex-direction: row;
+                flex-wrap: wrap;
+                min-width: 0;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding-right: 0;
+                padding-bottom: 8px;
+                position: static;
+            }
+        }
         .bounty-item {
             background: var(--bg-dark);
             border: 1px solid var(--border);
@@ -980,11 +1123,34 @@
 
     <!-- Search Panel -->
     <div class="search-panel">
+        <div id="fileProtocolWarning" class="file-protocol-warning" style="display:none;">
+            ⚠️ 偵測到直接用檔案開啟（<code>file://</code>），瀏覽器會擋住 API 請求。
+            請在資料夾執行 <code>python proxy.py</code>，再用
+            <a href="http://localhost:8000/StarCG_PriceChecker.html">http://localhost:8000/StarCG_PriceChecker.html</a> 開啟。
+            或部署到 GitHub Pages 使用公開網址。
+        </div>
+        <!-- 第一行：搜尋框 + 主要按鈕 -->
         <div class="search-row">
             <div class="form-group grow">
                 <label>🔍 搜尋物品/寵物名稱</label>
                 <input type="text" id="searchInput" placeholder="輸入名稱關鍵字...">
             </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <button id="searchBtn">🔍 搜尋市場</button>
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <button id="historyBtn" class="secondary">📈 72H歷史成交</button>
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <button id="bountyBtn" class="secondary">📋 快捷清單</button>
+            </div>
+        </div>
+
+        <!-- 第二行：篩選下拉 -->
+        <div class="search-row filter-row">
             <div class="form-group">
                 <label>💰 幣種</label>
                 <select id="currencyFilter">
@@ -994,19 +1160,21 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>🖥️ 分流</label>
-                <select id="serverFilter">
+                <label>📜 改造圖</label>
+                <select id="gradeFilter">
                     <option value="all" selected>全部</option>
-                    <option value="1">S1</option>
-                    <option value="2">S2</option>
-                    <option value="3">S3</option>
+                    <option value="普通">普通</option>
+                    <option value="銀">銀</option>
+                    <option value="金">金</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>🛡️ 耐久</label>
-                <select id="durabilityFilter">
-                    <option value="full" selected>耐久滿</option>
-                    <option value="all">全部</option>
+                <label>🎖️ 英靈之誓</label>
+                <select id="soulColorFilter">
+                    <option value="all" selected>全部</option>
+                    <option value="藍">藍</option>
+                    <option value="紅">紅</option>
+                    <option value="黃">黃</option>
                 </select>
             </div>
             <div class="form-group">
@@ -1031,24 +1199,27 @@
                     <option value="魔">-魔</option>
                 </select>
             </div>
-            <div class="form-group" style="justify-content: flex-end;">
-                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                    <input type="checkbox" id="petOnlyFilter" style="width: 18px; height: 18px; cursor: pointer;">
-                    🐾 只搜尋寵物
-                </label>
-            </div>
             <div class="form-group exchange-rate-group">
                 <label>💱 匯率 (魔幣:魔晶)</label>
                 <input type="number" id="exchangeRate" value="260" min="1">
             </div>
-            <div class="form-group">
-                <button id="searchBtn">🔍 搜尋市場</button>
-            </div>
-            <div class="form-group">
-                <button id="historyBtn" class="secondary">📈 72H歷史成交</button>
-            </div>
-            <div class="form-group">
-                <button id="bountyBtn" class="secondary">🎯 懸賞清單</button>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="durabilityFullFilter">
+                    🛡️ 耐久滿
+                </label>
+                <label>
+                    <input type="checkbox" id="exactSearchFilter">
+                    🎯 精確搜尋
+                </label>
+                <label>
+                    <input type="checkbox" id="petOnlyFilter">
+                    🐾 只搜尋寵物
+                </label>
+                <label>
+                    <input type="checkbox" id="babyOnlyFilter">
+                    🍼 1等寶寶
+                </label>
             </div>
         </div>
 
@@ -1145,21 +1316,15 @@
     </div>
 </div>
 
-<!-- 懸賞清單 Modal -->
+<!-- 常用清單 Modal -->
 <div class="map-modal" id="bountyModal">
     <div class="map-dialog" style="width: 900px;">
         <div class="map-dialog-header">
-            <h3>🎯 懸賞裝備及寵物快速查詢</h3>
+            <h3>📋 快捷清單快速查詢</h3>
             <button class="map-dialog-close" id="bountyModalClose" title="關閉">✕</button>
         </div>
-        <div class="bounty-tabs">
-            <div class="bounty-tab active" data-btab="equip">懸賞裝備</div>
-            <div class="bounty-tab" data-btab="pet">懸賞寵物</div>
-        </div>
-        <div class="bounty-body">
-            <div id="bountyEquipPanel"></div>
-            <div id="bountyPetPanel" style="display: none;"></div>
-        </div>
+        <div class="bounty-tabs" id="commonTabs"></div>
+        <div class="bounty-body" id="commonBody"></div>
     </div>
 </div>
 
@@ -1197,6 +1362,23 @@ if (['localhost', '127.0.0.1'].includes(location.hostname)) {
 }
 let currentProxyIndex = 0;
 
+function looksLikeJson(text) {
+    const t = text.trim();
+    return t.startsWith('{') || t.startsWith('[');
+}
+
+function parseJsonResponse(text, context = '') {
+    if (!looksLikeJson(text)) {
+        const preview = text.trim().slice(0, 80).replace(/\s+/g, ' ');
+        throw new Error(`${context}回應不是 JSON（可能是代理錯誤頁）: ${preview}`);
+    }
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        throw new Error(`${context}JSON 解析失敗: ${e.message}`);
+    }
+}
+
 const API_MARKET_BASE = 'https://member.starcg.net/market.php';
 const API_HISTORY_BASE = 'https://member.starcg.net/marketrecord.php';
 const MAX_PAGES = 20;
@@ -1217,8 +1399,8 @@ async function fetchWithProxy(targetUrl) {
             const resp = await fetch(url, { cache: 'no-store' });
             const text = await resp.text();
             
-            // 檢查是否為錯誤回應
-            if (!resp.ok || text.startsWith('<!') || text.startsWith('<html') || text.includes('error code:')) {
+            // 檢查是否為錯誤回應（含 PHP/HTML 錯誤頁）
+            if (!resp.ok || !looksLikeJson(text) || text.includes('error code:')) {
                 throw new Error(`Proxy ${proxyIndex} failed: ${resp.status}`);
             }
             
@@ -1235,6 +1417,7 @@ async function fetchWithProxy(targetUrl) {
 
 let allMarketItems = [];
 let allHistoryLogs = [];
+let lastSearchKeyword = '';
 let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || ['一箱面包', '一箱法國面包', '一箱壽喜鍋'];
 let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || [];
 let currentSort = { field: 'price', order: 'asc' };
@@ -1245,6 +1428,9 @@ const chartInstances = {};
    初始化
 ======================================== */
 document.addEventListener('DOMContentLoaded', () => {
+    if (location.protocol === 'file:') {
+        document.getElementById('fileProtocolWarning').style.display = 'block';
+    }
     renderQuickTags();
     initEventListeners();
     initMapModal();
@@ -1294,12 +1480,15 @@ function initEventListeners() {
     });
     
     // 篩選器變更
-    ['currencyFilter', 'serverFilter', 'durabilityFilter', 'seedPlusFilter', 'seedMinusFilter'].forEach(id => {
+    ['currencyFilter', 'seedPlusFilter', 'seedMinusFilter', 'soulColorFilter', 'gradeFilter'].forEach(id => {
         document.getElementById(id).addEventListener('change', applyFilters);
     });
     
     // 只搜尋寵物 checkbox
     document.getElementById('petOnlyFilter').addEventListener('change', applyFilters);
+    document.getElementById('exactSearchFilter').addEventListener('change', applyFilters);
+    document.getElementById('babyOnlyFilter').addEventListener('change', applyFilters);
+    document.getElementById('durabilityFullFilter').addEventListener('change', applyFilters);
     
     // 匯率變更時重新渲染
     document.getElementById('exchangeRate').addEventListener('input', applyFilters);
@@ -1343,10 +1532,12 @@ function renderQuickTags() {
     container.innerHTML = pinnedHtml + historyHtml + clearBtn;
 }
 
-function quickSearch(tag) {
+function quickSearch(tag, exact = false) {
     document.getElementById('searchInput').value = tag;
     // 是寵物才勾「只搜尋寵物」，否則自動取消
     document.getElementById('petOnlyFilter').checked = BOUNTY_PETS.includes(tag);
+    // 常用清單來的項目預設精確搜尋
+    document.getElementById('exactSearchFilter').checked = exact;
     searchMarket();
 }
 
@@ -1397,6 +1588,7 @@ function addTag(tag) {
 async function searchMarket() {
     const keyword = document.getElementById('searchInput').value.trim();
     if (!keyword) return alert('請輸入搜尋關鍵字');
+    lastSearchKeyword = keyword;
     
     showLoading(true);
     hideAll();
@@ -1420,7 +1612,10 @@ async function searchMarket() {
         }
     } catch (err) {
         console.error(err);
-        alert('搜尋失敗，請稍後再試或檢查網路連線');
+        const hint = location.protocol === 'file:'
+            ? '\n\n你目前用 file:// 開啟，請改執行 python proxy.py 後用 http://localhost:8000/ 開啟。'
+            : '';
+        alert('搜尋失敗：' + (err.message || '請稍後再試') + hint);
         showEmpty('搜尋失敗');
     } finally {
         showLoading(false);
@@ -1446,7 +1641,7 @@ async function fetchMarketData(keyword) {
     while (hasMore && page <= MAX_PAGES) {
         const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=0&page=${page}&search=${encodeURIComponent(keyword)}`;
         const text = await fetchWithProxy(targetUrl);
-        const data = JSON.parse(text);
+        const data = parseJsonResponse(text, '市場資料');
         
         if (data.totalFiltered === 0) break;
         if (data.totalFiltered > 300) {
@@ -1468,12 +1663,13 @@ async function fetchMarketData(keyword) {
                     // 處理改造圖等級區分（嘗試多種可能的欄位名）
                     let displayName = item.ITEM_TRUENAME;
                     let gradeTag = '';
+                    let grade = '';
                     let seedTag = '';
                     const itemLevel = item.ITEM_LEVEL || item.level || item.Level || item.ITEM_LV || item.lv || 0;
                     if (item.ITEM_TRUENAME.includes('改造圖') && itemLevel > 0) {
-                        if (itemLevel === 5) gradeTag = '<span class="grade-normal">普通</span>';
-                        else if (itemLevel === 6) gradeTag = '<span class="grade-silver">銀</span>';
-                        else if (itemLevel === 7) gradeTag = '<span class="grade-gold">金</span>';
+                        if (itemLevel === 5) { gradeTag = '<span class="grade-normal">普通</span>'; grade = '普通'; }
+                        else if (itemLevel === 6) { gradeTag = '<span class="grade-silver">銀</span>'; grade = '銀'; }
+                        else if (itemLevel === 7) { gradeTag = '<span class="grade-gold">金</span>'; grade = '金'; }
                         else gradeTag = `<span class="grade-normal">Lv${itemLevel}</span>`;
                     }
                     
@@ -1499,10 +1695,55 @@ async function fetchMarketData(keyword) {
                         if (allParts.length > 0) seedTag = allParts.join(' ');
                     }
                     
+                    // 隨機屬性標籤（必殺/回復/閃躲/魔攻）
+                    const STAT_TAG_DEFS = [
+                        ['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'],
+                        ['ITEM_MODIFYRECOVERY', '回復', 'st-recov'],
+                        ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid'],
+                        ['ITEM_ADM', '魔攻', 'st-madm']
+                    ];
+                    const buildStatTags = (defs) => defs
+                        .map(([k, lbl, sc]) => [item[k] || 0, lbl, sc])
+                        .filter(([v]) => v !== 0)
+                        .map(([v, lbl, sc]) => `<span class="soul-stat ${sc}">${lbl}+${v}</span>`)
+                        .join(' ');
+
+                    // 英靈之誓：用 ITEM_ID 區分顏色變體
+                    let colorTag = '';
+                    let statTag = '';
+                    let soulColor = '';
+                    const SOUL_COLORS = {
+                        1007001: { label: '藍', cls: 'soul-blue', extra: [] },
+                        1007002: { label: '紅', cls: 'soul-red', extra: [['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'], ['ITEM_MODIFYRECOVERY', '回復', 'st-recov']] },
+                        1007003: { label: '黃', cls: 'soul-yellow', extra: [['ITEM_ADM', '魔攻', 'st-madm'], ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid']] }
+                    };
+                    if (SOUL_COLORS[item.ITEM_ID]) {
+                        const c = SOUL_COLORS[item.ITEM_ID];
+                        soulColor = c.label;
+                        colorTag = `<span class="soul-tag ${c.cls}">${c.label}</span>`;
+                        const ex = buildStatTags(c.extra);
+                        if (ex) colorTag += ' ' + ex;
+                    }
+
+                    // 判斷是否飾品（飾品的 ADM 代表魔攻而非攻擊力，需修正攻擊欄）
+                    const ACC_EXTRA = ['ITEM_MODIFYFORCEPOINT', 'ITEM_MODIFYRECOVERY', 'ITEM_MODIFYCRITICAL', 'ITEM_MODIFYCOUNTER', 'ITEM_MODIFYHITRATE', 'ITEM_MODIFYAVOID', 'ITEM_MODIFYMAGIC'];
+                    const isAccessory = ACC_EXTRA.some(k => (item[k] || 0) !== 0);
+
+                    // 其他有隨機屬性的裝備（半魔之飾、寵書等）：顯示必殺/回復/閃躲/魔攻標籤
+                    if (!soulColor) {
+                        const defs = isAccessory ? STAT_TAG_DEFS : STAT_TAG_DEFS.filter(([k]) => k !== 'ITEM_ADM');
+                        const tags = buildStatTags(defs);
+                        if (tags) statTag = tags;
+                    }
+                    
                     items.push({
                         item: displayName,
                         gradeTag: gradeTag,
+                        grade: grade,
                         seedTag: seedTag,
+                        colorTag: colorTag,
+                        statTag: statTag,
+                        soulColor: soulColor,
                         isSeed: seedPlusStats.length > 0 || seedMinusStats.length > 0,
                         seedPlusStats: seedPlusStats,
                         seedMinusStats: seedMinusStats,
@@ -1512,7 +1753,7 @@ async function fetchMarketData(keyword) {
                         durability: `${item.ITEM_DURABILITY}/${item.ITEM_MAXDURABILITY}`,
                         durCurrent: item.ITEM_DURABILITY,
                         durMax: item.ITEM_MAXDURABILITY,
-                        attack: Math.max(item.ITEM_ADM || 0, item.ITEM_MODIFYATTACK || 0),
+                        attack: isAccessory ? (item.ITEM_MODIFYATTACK || 0) : Math.max(item.ITEM_ADM || 0, item.ITEM_MODIFYATTACK || 0),
                         defence: item.ITEM_MODIFYDEFENCE || 0,
                         agility: item.ITEM_MODIFYAGILITY || 0,
                         location: stall.coords,
@@ -1559,7 +1800,8 @@ async function fetchMarketData(keyword) {
                         server: stall.server,
                         shopName: stall.name,
                         count: 1,
-                        isPet: true
+                        isPet: true,
+                        petLv: petLv
                     });
                 }
             });
@@ -1612,7 +1854,7 @@ async function fetchHistoryData(keyword) {
     while (keepFetching && page <= 100) {
         const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=all&page=${page}&search=${encodeURIComponent(keyword)}`;
         const text = await fetchWithProxy(targetUrl);
-        const data = JSON.parse(text);
+        const data = parseJsonResponse(text, '歷史成交');
         
         if (!data.logs || data.logs.length === 0) break;
         
@@ -1653,13 +1895,42 @@ async function fetchHistoryData(keyword) {
 ======================================== */
 function applyFilters() {
     const currency = document.getElementById('currencyFilter').value;
-    const server = document.getElementById('serverFilter').value;
-    const durability = document.getElementById('durabilityFilter').value;
     const petOnly = document.getElementById('petOnlyFilter').checked;
     const seedPlus = document.getElementById('seedPlusFilter').value;
     const seedMinus = document.getElementById('seedMinusFilter').value;
+    const soulColor = document.getElementById('soulColorFilter').value;
+    const grade = document.getElementById('gradeFilter').value;
+    const exactSearch = document.getElementById('exactSearchFilter').checked;
+    const babyOnly = document.getElementById('babyOnlyFilter').checked;
+    const durabilityFull = document.getElementById('durabilityFullFilter').checked;
     
     let filtered = [...allMarketItems];
+    
+    // 耐久滿：只留耐久全滿的（寵物不受影響）
+    if (durabilityFull) {
+        filtered = filtered.filter(i => i.isPet || i.durCurrent === i.durMax);
+    }
+    
+    // 精確搜尋：名稱需完全等於搜尋字詞
+    if (exactSearch) {
+        const nk = normalizeStr(lastSearchKeyword);
+        filtered = filtered.filter(i => normalizeStr(i.item) === nk);
+    }
+    
+    // 1等寶寶：只留 1 等寵物
+    if (babyOnly) {
+        filtered = filtered.filter(i => i.isPet && i.petLv === 1);
+    }
+    
+    // 英靈之誓顏色篩選（只保留指定顏色）
+    if (soulColor !== 'all') {
+        filtered = filtered.filter(i => i.soulColor === soulColor);
+    }
+    
+    // 改造圖等級篩選（只保留指定等級）
+    if (grade !== 'all') {
+        filtered = filtered.filter(i => i.grade === grade);
+    }
     
     // 只搜尋寵物
     if (petOnly) {
@@ -1678,16 +1949,6 @@ function applyFilters() {
     // 幣種篩選
     if (currency !== 'all') {
         filtered = filtered.filter(i => i.pricetype.toString() === currency);
-    }
-    
-    // 分流篩選
-    if (server !== 'all') {
-        filtered = filtered.filter(i => i.server.toString() === server);
-    }
-    
-    // 耐久篩選
-    if (durability === 'full') {
-        filtered = filtered.filter(i => i.isPet || i.durCurrent === i.durMax);
     }
     
     // 排序
@@ -1765,7 +2026,7 @@ function renderMarketTable(items) {
             merged[uniqueKey] = { ...item };
         } else {
             // 一般物品：同攤位+同物品+同價格+同數值+同BP配點才合併
-            const key = `${item.location}-${item.item}-${item.price}-${item.server}-${item.durability}-${item.attack}-${item.defence}-${item.agility}-${item.seedTag || ''}`;
+            const key = `${item.location}-${item.item}-${item.price}-${item.server}-${item.durability}-${item.attack}-${item.defence}-${item.agility}-${item.seedTag || ''}-${item.colorTag || ''}-${item.statTag || ''}`;
             if (!merged[key]) {
                 merged[key] = { ...item };
             } else {
@@ -1791,7 +2052,7 @@ function renderMarketTable(items) {
         
         return `
         <tr>
-            <td><strong>${escapeHtml(item.item)}</strong> ${item.gradeTag || ''}${item.seedTag || ''}${item.transTag || ''}</td>
+            <td><strong>${escapeHtml(item.item)}</strong> ${item.colorTag || ''}${item.statTag || ''}${item.gradeTag || ''}${item.seedTag || ''}${item.transTag || ''}</td>
             <td>
                 <span class="price ${item.pricetype === 0 ? 'coin' : 'crystal'}">
                     ${item.pricetype === 0 ? '💰' : '💎'} ${item.price.toLocaleString()}
@@ -2212,43 +2473,180 @@ function closeMapModal() {
    懸賞清單（資料來自 StarCG-Market-Assistant）
 ======================================== */
 const BOUNTY_EQUIPMENT = {
-    '劍': [['1A','長劍'],['1B','闊劍'],['2A','突刺劍'],['2B','火舌劍'],['3A','面包劍'],['3B','雙手劍'],['4A','雙刃長劍'],['4B','鎖刃劍'],['5A','格斗劍'],['5B','長鍔劍'],['6A','豬牙劍'],['6B','雙刃闊劍']],
-    '斧': [['1A','手斧'],['1B','勇氣之斧'],['2A','寬手斧'],['2B','戰斗手斧'],['3A','格斗手斧'],['3B','鋼斧'],['4A','長戰斧'],['4B','雙刃斧'],['5A','鈎爪斧'],['5B','闊刃斧'],['6A','彎月大戰斧'],['6B','大型闊刃斧']],
-    '矛': [['1A','短矛'],['1B','攻城槍'],['2A','刺槍'],['2B','金屬槍'],['3A','長柄彎槍'],['3B','長柄尖槍'],['4A','穗槍'],['4B','雙叉戟'],['5A','護衛槍'],['5B','騎士槍'],['6A','大砍槍'],['6B','長尖槍']],
-    '弓': [['1A','輕型弓'],['1B','威力短弓'],['2A','短戰弓'],['2B','獵弓'],['3A','強弓'],['3B','格斗弓'],['4A','狙擊弓'],['4B','超強狙擊弓'],['5A','殺手長弓'],['5B','沖擊弓'],['6A','巨弓'],['6B','長格斗弓']],
-    '杖': [['1A','短杖'],['1B','權杖'],['2A','大地之杖'],['2B','激流權杖'],['3A','魔之手杖'],['3B','魔之權杖'],['4A','賢者手杖'],['4B','賢者權杖'],['5A','琥珀杖'],['5B','琥珀權杖'],['6A','元素之杖'],['6B','神聖之杖']],
-    '小刀': [['1A','小刀'],['1B','銳刃小刀'],['2A','圓盤小刀'],['2B','細刃擲刀'],['3A','滑翔小刀'],['3B','細直刃小刀'],['4A','耳柄小刀'],['4B','騎士小刀'],['5A','球鍔小刀'],['5B','雙刃小刀'],['6A','闊刃小刀'],['6B','觸角小刀']],
-    '回力鏢': [['1A','木制大型回力鏢'],['1B','青銅回力鏢'],['2A','追跡者'],['2B','彩光回力鏢'],['3A','暗殺回力鏢'],['3B','殺敵回力鏢'],['4A','獅子回力鏢'],['4B','銳角回力鏢'],['5A','翼鹿回力鏢'],['5B','阿修塔羅回力鏢'],['6A','蛇獅回力鏢'],['6B','鶇回力鏢']],
-    '頭盔': [['1A','硬皮頭盔'],['1B','銅制頭盔'],['2A','鐵板布盔'],['2B','銅鐵皮盔'],['3A','金屬護額'],['3B','鐵制頭盔'],['4A','霸葛頭盔'],['4B','角飾頭盔'],['5A','開放式頭盔'],['5B','葛理克頭盔'],['6A','巴比克頭盔'],['6B','利刃頭盔']],
-    '帽子': [['1A','麻布帽'],['1B','硬帽'],['2A','輕帽'],['2B','皮帽'],['3A','硬皮帽'],['3B','可愛的帽子'],['4A','時髦帽子'],['4B','鴨舌帽'],['5A','藍徽章之帽'],['5B','高級帽子'],['6A','裝飾着花的帽子'],['6B','青銅帽子']],
-    '鎧甲': [['1A','軟皮甲'],['1B','護心甲'],['2A','青銅鎧甲'],['2B','輕型鎧甲'],['3A','輕型鎖鏈甲'],['3B','環甲'],['4A','鋼鐵鎧甲'],['4B','金屬皮甲'],['5A','長型金屬鎧甲'],['5B','索狀鎧甲'],['6A','重鐵板甲'],['6B','鐵板半身甲']],
-    '衣服': [['1A','旅人之服'],['1B','保護衣'],['2A','羽毛裝'],['2B','皮裝'],['3A','硬皮服'],['3B','鎖鏈裝'],['4A','布甲'],['4B','櫬甲'],['5A','環服'],['5B','士兵護衣'],['6A','長索錐衣'],['6B','索錐上衣']],
-    '袍': [['1A','羽毛袍'],['1B','輕皮袍'],['2A','網袍'],['2B','風袍'],['3A','硬皮袍'],['3B','環袍'],['4A','烏鴉之袍'],['4B','月亮之袍'],['4C','狐皮披風'],['5A','東方法衣'],['5B','聖堂之袍'],['6A','聖者之袍'],['6B','戰斗長袍']],
-    '靴子': [['1A','軟皮靴'],['1B','皮靴'],['2A','硬皮靴'],['2B','長靴'],['3A','厚底靴'],['3B','編織的靴子'],['4A','鎖鏈長靴'],['4B','鎖鏈靴'],['5A','蜥蜴靴'],['5B','蜥蜴長靴'],['6A','鋼靴'],['6B','鋼制長靴']],
-    '鞋': [['1A','運動鞋'],['1B','馬車鞋'],['2A','皮鞋'],['2B','安全鞋'],['3A','光之鞋'],['3B','戰鞋'],['4A','薄板鞋'],['4B','鎖鏈鞋'],['5A','蜥蜴鞋'],['5B','維京鞋'],['6A','戰斗鞋'],['6B','騎士鞋']],
-    '盾': [['1A','小圓盾'],['1B','小型盾'],['2A','板盾'],['2B','鳶盾'],['3A','漩渦重盾'],['3B','哥特盾'],['4A','士兵盾'],['4B','重盾'],['5A','蜥蜴盾'],['5B','反光之盾'],['6A','風之盾'],['6B','獅子盾']]
+    // ---- 武器 ----
+    '劍': [['1A','長劍'],['1B','闊劍'],['2A','突刺劍'],['2B','火舌劍'],['3A','面包劍'],['3B','雙手劍'],['4A','雙刃長劍'],['4B','鎖刃劍'],['5A','格斗劍'],['5B','長鍔劍'],['5C','黑作太刀'],['6A','豬牙劍'],['6B','雙刃闊劍'],['7A','巨劍'],['7B','長軍刀'],['8A','護身短劍'],['8B','細柄短劍'],['8C','長軍刀+'],['9A','細刃重劍'],['9B','剛硬巨劍'],['10A','青龍刀'],['10B','曲刀'],['11A','彎勾劍'],['11B','剛毅']],
+    '斧': [['1A','手斧'],['1B','勇氣之斧'],['2A','寬手斧'],['2B','戰斗手斧'],['3A','格斗手斧'],['3B','鋼斧'],['4A','長戰斧'],['4B','雙刃斧'],['5A','鈎爪斧'],['5B','闊刃斧'],['5C','鑽保雷格之斧'],['6A','彎月大戰斧'],['6B','大型闊刃斧'],['7A','大型雙刃斧'],['7B','超大皇帝斧'],['8A','新月斧'],['8B','米諾陶斯戰斧'],['8C','大型雙刃斧+'],['9A','薄刃鈎爪斧'],['9B','彎月長柄斧'],['10A','金屬重斧'],['10B','處刑斧'],['11A','高速斧'],['11B','重擊斧']],
+    '槍': [['1A','短矛'],['1B','攻城槍'],['2A','刺槍'],['2B','金屬槍'],['3A','長柄彎槍'],['3B','長柄尖槍'],['4A','穗槍'],['4B','雙叉戟'],['5A','護衛槍'],['5B','騎士槍'],['5C','偃月刀'],['6A','大砍槍'],['6B','長尖槍'],['7A','蠍槍'],['7B','雙刃槍'],['8A','闊刃槍'],['8B','東方長刺鎗'],['8C','蠍槍+'],['9A','鈎爪槍'],['9B','原始槍'],['10A','三叉戰戟'],['10B','異型槍'],['11A','痛擊槍'],['11B','穿刺槍']],
+    '弓': [['1A','輕型弓'],['1B','威力短弓'],['2A','短戰弓'],['2B','獵弓'],['3A','強弓'],['3B','格斗弓'],['4A','狙擊弓'],['4B','超強狙擊弓'],['5A','殺手長弓'],['5B','沖擊弓'],['5C','米斯特汀之弓'],['6A','巨弓'],['6B','長格斗弓'],['7A','破邪長弓'],['7B','月光長弓'],['8A','原始石弓'],['8B','重弦弓'],['8C','月光長弓+'],['9A','平行弓'],['9B','靈魂之弓'],['10A','摘星之弓'],['10B','魔彈'],['11A','調和之弓'],['11B','月之弓']],
+    '杖': [['1A','短杖'],['1B','權杖'],['2A','大地之杖'],['2B','激流權杖'],['3A','魔之手杖'],['3B','魔之權杖'],['4A','賢者手杖'],['4B','賢者權杖'],['5A','琥珀杖'],['5B','琥珀權杖'],['5C','魔晶之杖'],['6A','元素之杖'],['6B','神聖之杖'],['7A','怒音之杖'],['7B','隱者之杖'],['8A','光明短杖'],['8B','惡魔之杖'],['8C','落雷權杖+'],['9A','太陽短杖'],['9B','天使之杖'],['10A','聖者之杖'],['10B','星屑短杖'],['11A','王者之手'],['11B','星錘杖']],
+    '小刀': [['1A','小刀'],['1B','銳刃小刀'],['2A','圓盤小刀'],['2B','細刃擲刀'],['3A','滑翔小刀'],['3B','細直刃小刀'],['4A','耳柄小刀'],['4B','騎士小刀'],['5A','球鍔小刀'],['5B','雙刃小刀'],['5C','忍者飛鏢'],['6A','闊刃小刀'],['6B','觸角小刀'],['7A','漢拉提小刀'],['7B','兇殺刀'],['8A','切肉小刀'],['8B','古傳小刀'],['8C','疾速短刀+'],['9A','華麗小刀'],['9B','手里劍'],['10A','勾爪擲刀'],['10B','幻之匕首'],['11A','破滅刀'],['11B','兇殘刀']],
+    '回力鏢': [['1A','木制大型回力鏢'],['1B','青銅回力鏢'],['2A','追跡者'],['2B','彩光回力鏢'],['3A','暗殺回力鏢'],['3B','殺敵回力鏢'],['4A','獅子回力鏢'],['4B','銳角回力鏢'],['5A','翼鹿回力鏢'],['5B','阿修塔羅回力鏢'],['5C','北斗之鎌刀'],['6A','蛇獅回力鏢'],['6B','鶇回力鏢'],['7A','雄翼牛回力鏢'],['7B','閃光回力鏢'],['8A','凶豹回力鏢'],['8B','赤獅回力鏢'],['8C','雄翼牛回力鏢+'],['9A','天使之翼'],['9B','普利辛回力鏢'],['10A','治愈回力鏢'],['10B','天秤回力鏢'],['11A','基盤飛鏢'],['11B','節制飛鏢']],
+
+    // ---- 防具 ----
+    '盔': [['1A','硬皮頭盔'],['1B','銅制頭盔'],['2A','鐵板布盔'],['2B','銅鐵皮盔'],['3A','金屬護額'],['3B','鐵制頭盔'],['4A','霸葛頭盔'],['4B','角飾頭盔'],['5A','開放式頭盔'],['5B','葛理克頭盔'],['5C','聖騎士之盔'],['6A','巴比克頭盔'],['6B','利刃頭盔'],['7A','騎士頭盔'],['7B','鋼製頭盔'],['8A','博流蓋爾頭盔'],['8B','鉚釘頭盔'],['8C','鋼製頭盔+'],['9A','羽毛頭盔'],['9B','龍盔'],['10A','白金頭盔'],['10B','聖龍頭盔'],['11A','正義頭盔'],['11B','靈力頭盔']],
+    '帽': [['1A','麻布帽'],['1B','硬帽'],['2A','輕帽'],['2B','皮帽'],['3A','硬皮帽'],['3B','可愛的帽子'],['4A','時髦帽子'],['4B','鴨舌帽'],['5A','藍徽章之帽'],['5B','高級帽子'],['5C','劍客帽'],['6A','裝飾着花的帽子'],['6B','青銅帽子'],['7A','淑女帽'],['7B','可愛的扁帽子'],['8A','軍帽'],['8B','時髦避暑帽'],['8C','可愛的扁帽子+'],['9A','羽毛帽'],['9B','魔術師之帽'],['10A','黃昏之帽'],['10B','妖精之帽'],['11A','貝斯神帽'],['11B','神官帽']],
+    '鎧': [['1A','軟皮甲'],['1B','護心甲'],['2A','青銅鎧甲'],['2B','輕型鎧甲'],['3A','輕型鎖鏈甲'],['3B','環甲'],['4A','鋼鐵鎧甲'],['4B','金屬皮甲'],['5A','長型金屬鎧甲'],['5B','索狀鎧甲'],['5C','劍齒鎧甲'],['6A','重鐵板甲'],['6B','鐵板半身甲'],['7A','實戰鎧甲'],['7B','黃金鎧甲'],['8A','重金屬鎧甲'],['8B','野獸之鎧'],['8C','輕短鎧甲+'],['9A','帝王之鎧'],['9B','亡靈鎧甲'],['10A','漆黑之鎧'],['10B','騎士鎧甲'],['11A','紅繩威鎧'],['11B','守護鎧甲']],
+    '衣': [['1A','旅人之服'],['1B','保護衣'],['2A','羽毛裝'],['2B','皮裝'],['3A','硬皮服'],['3B','鎖鏈裝'],['4A','布甲'],['4B','櫬甲'],['5A','環服'],['5B','士兵護衣'],['5C','功夫裝'],['6A','長索錐衣'],['6B','索錐上衣'],['7A','骨衣'],['7B','超級衣服'],['8A','疾風之衣'],['8B','步兵戰衣'],['8C','獸骨之衣+'],['9A','勇者之衣'],['9B','女神之衣'],['10A','不死鳥之服'],['10B','靈魂之服'],['11A','海洋之服'],['11B','幻想之服']],
+    '袍': [['1A','羽毛袍'],['1B','輕皮袍'],['2A','網袍'],['2B','風袍'],['3A','硬皮袍'],['3B','環袍'],['4A','烏鴉之袍'],['4B','月亮之袍'],['4C','狐皮披風'],['5A','東方法衣'],['5B','聖堂之袍'],['5C','治愈之袍'],['6A','聖者之袍'],['6B','戰斗長袍'],['7A','冠軍之袍'],['7B','時之袍'],['8A','死神之袍'],['8B','勇者之袍'],['8C','潔淨之袍+'],['9A','黑暗之袍'],['9B','聖袍'],['10A','靈魂之袍'],['10B','奇蹟之袍'],['11A','共嗚之袍'],['11B','和平之袍']],
+    '靴': [['1A','軟皮靴'],['1B','皮靴'],['2A','硬皮靴'],['2B','長靴'],['3A','厚底靴'],['3B','編織的靴子'],['4A','鎖鏈長靴'],['4B','鎖鏈靴'],['5A','蜥蜴靴'],['5B','蜥蜴長靴'],['5C','防護靴'],['6A','鋼靴'],['6B','鋼制長靴'],['7A','水晶靴'],['7B','銀靴'],['8A','流水之靴'],['8B','芙蕾雅之靴'],['8C','標準長靴+'],['9A','鑽石靴'],['9B','鑽石長靴'],['10A','秘密之靴'],['10B','龍之靴'],['11A','幸運靴'],['11B','試力鞋']],
+    '鞋': [['1A','運動鞋'],['1B','馬車鞋'],['2A','皮鞋'],['2B','安全鞋'],['3A','光之鞋'],['3B','戰鞋'],['4A','薄板鞋'],['4B','鎖鏈鞋'],['5A','蜥蜴鞋'],['5B','維京鞋'],['5C','特製舞鞋'],['6A','戰斗鞋'],['6B','騎士鞋'],['7A','妖精鞋'],['7B','紫水晶鞋'],['8A','白金鞋'],['8B','精緻高根鞋'],['8C','妖精鞋+'],['9A','神秘之鞋'],['9B','力量之鞋'],['10A','黃金鞋'],['10B','龍之鞋'],['11A','守護之鞋'],['11B','大木屐']],
+    '盾': [['1A','小圓盾'],['1B','小型盾'],['2A','板盾'],['2B','鳶盾'],['3A','漩渦重盾'],['3B','哥特盾'],['4A','士兵盾'],['4B','重盾'],['5A','蜥蜴盾'],['5B','反光之盾'],['5C','聖者之盾'],['6A','風之盾'],['6B','獅子盾'],['7A','防守之盾'],['7B','黃金之盾'],['8A','鏡之盾'],['8B','力量之盾'],['8C','防禦之盾+'],['9A','漆黑之盾'],['9B','火龍之盾'],['10A','黑暗之盾'],['10B','勇者之盾'],['11A','突猛盾'],['11B','重型防禦盾']],
+
+    // ---- 系列裝 ----
+    '弗旦系列': ['弗旦頭盔','弗旦帽','弗旦鎧','弗旦衣','弗旦之袍','弗旦靴','弗旦鞋','弗旦之盾','弗旦之戒'],
+    '弗旦+系列': ['弗旦頭盔+','弗旦帽+','弗旦鎧+','弗旦衣+','弗旦之袍+','弗旦靴+','弗旦鞋+','弗旦之盾+','弗旦之戒+'],
+    '水龍系列': ['水龍之劍','水龍之斧','水龍之槍','水龍之弓','水龍之杖','水龍的小刀','冰龍','水龍之盔','水龍之帽','水龍鎧甲','水龍之衣','水龍法袍','水龍之靴','水龍之鞋','水龍之盾']
 };
-const BOUNTY_PETS = ['大地鼠','迷你蝙蝠','哥布林','紅帽哥布林','樹精','妖草','異型蜂','惡魔螃蟹','穴熊','大蝙蝠','火蜘蛛','火焰鼠','小惡魔','蜥蜴戰士','印地安仙人掌','殺手蠍','紅蠍','火焰哥布林','烈風哥布林','蔓陀羅草','幻歌妖','烈風鳥人','胖蝙蝠','死亡蜂','死亡樹精','殺人蜂','黃色口臭鬼'];
+const BOUNTY_PETS = ['大地鼠','地獄看門犬','液態史萊姆','迷你蝙蝠','哥布林','紅帽哥布林','樹精','妖草','異型蜂','惡魔螃蟹','穴熊','大蝙蝠','火蜘蛛','火焰鼠','小惡魔','蜥蜴戰士','印地安仙人掌','殺手蠍','紅蠍','火焰哥布林','烈風哥布林','蔓陀羅草','幻歌妖','烈風鳥人','胖蝙蝠','死亡蜂','死亡樹精','殺人蜂','黃色口臭鬼','鐵剪螃蟹'];
+
+// 飾品 / 藥水 / 料理（待補，格式：{ 子分類: [[等級或null, 名稱], ...] }）
+const COMMON_ACCESSORIES = {
+    '飾品': ['索爾護腕','頓納護腕','英靈之誓','水晶鏈墜','屈原的戒指','狂怒繃帶','「年」的頸圈','受詛咒的姜餅人'],
+    '特殊': ['魔幣箱（100萬）','魔幣箱（50萬）','魔幣箱（10萬）','貓頭鷹頭盔','偷襲密卷','聖魔石','再生靈藥','寵物再生藥劑','改名卡','魔族的水晶','誓言之證','宇治金時','風龍蜥的甲殼','鋼騎之礦','德特家的布','火焰之魂','曼陀羅草的皮','妖草的血','火的水晶碎片','風的水晶碎片','水的水晶碎片','地的水晶碎片'],
+    '寵書(普)': ['乾坤一擊[普]','高級必殺[普]','必殺之心[普]','命中之眼[普]','魔力之源[普]','閃避奧義[普]','烈焰之力[普]','狂風之力[普]','寒冰之力[普]','巨石之力[普]','魔法抵御[普]','閃避要訣[普]','野蠻沖擊[普]','反擊之力[普]'],
+    '寵書(良)': ['乾坤一擊[良]','高級必殺[良]','必殺之心[良]','命中之眼[良]','魔力之源[良]','閃避奧義[良]','烈焰之力[良]','狂風之力[良]','寒冰之力[良]','巨石之力[良]','魔法抵御[良]','閃避要訣[良]','野蠻沖擊[良]','反擊之力[良]'],
+    '寵書(優)': ['乾坤一擊[優]','高級必殺[優]','必殺之心[優]','命中之眼[優]','魔力之源[優]','閃避奧義[優]','烈焰之力[優]','狂風之力[優]','寒冰之力[優]','巨石之力[優]','魔法抵御[優]','閃避要訣[優]','野蠻沖擊[優]','反擊之力[優]'],
+    '半魔(物攻)': ['氣功彈之飾','亂射之飾','回旋利刃之飾','騎士之譽之飾','乾坤之飾','戰栗之飾','一擊必中之飾','戒驕戒躁之飾','迅速果斷之飾','崩擊之飾','連擊之飾','諸刃之飾','聖盾之飾','陽炎之飾','偷竊之飾','護衛之飾','反擊之飾','穿心一擊之飾'],
+    '半魔(魔法)': ['超強火焰魔法之飾','超強風刃魔法之飾','超強冰凍魔法之飾','超強隕石魔法之飾','火陷魔法之飾','風刃魔法之飾','冰凍魔法之飾','隕石魔法之飾','強力火陷魔法之飾','強力風刃魔法之飾','強力冰凍魔法之飾','強力隕石魔法之飾','吸血魔法之飾'],
+    '半魔(輔助)': ['超強補血魔法之飾','超強恢復魔法之飾','氣絕回復之飾','潔淨魔法之飾','神聖光芒之飾','神聖之力之飾','補血魔法之飾','恢復魔法之飾','強力補血魔法之飾','強力恢復魔法之飾','攻擊無效之飾','魔法無效之飾','攻擊反彈之飾','魔法反彈之飾','攻擊吸收之飾','魔法吸收之飾'],
+    '半魔(狀態)': ['超強中毒魔法之飾','超強石化魔法之飾','超強昏睡魔法之飾','超強混亂魔法之飾','超強遺忘魔法之飾','超強酒醉魔法之飾','中毒魔法之飾','石化魔法之飾','昏睡魔法之飾','混亂魔法之飾','遺忘魔法之飾','酒醉魔法之飾','火焰祈禱之飾','群雲祈禱之飾','海洋祈禱之飾','大地祈禱之飾','強力中毒魔法之飾','強力石化魔法之飾','強力昏睡魔法之飾','強力混亂魔法之飾','強力遺忘魔法之飾','強力酒醉魔法之飾'],
+};
+const COMMON_POTIONS = {
+    '藥水(一包)': ['一包生命藥(100)','一包生命藥(150)','一包生命藥(200)','一包生命藥(300)','一包生命藥(400)','一包生命藥(500)','一包生命藥(600)','一包生命藥(800)','一包生命藥(1000)','一包生命藥(1400)'],
+    '料理(一箱)': ['一箱面包','一箱蛋包飯','一箱法國面包','一箱炒面','一箱青椒肉絲','一箱燒雞','一箱親子丼','一箱漢堡','一箱炒面面包','一箱壽喜鍋','一箱咖哩飯','一箱韓式泡菜飯','一箱螃蟹鍋','一箱牛排','一箱醋飯壽司','一箱豪華壽司組','一箱鱉料理','一箱韓式海鮮鍋'],
+    '藥水(單個)': ['生命力回復藥（100）','生命力回復藥（150）','生命力回復藥（200）','生命力回復藥（300）','生命力回復藥（400）','生命力回復藥（500）','生命力回復藥（600）','生命力回復藥（800）','生命力回復藥（1000）','生命力回復藥（1400）'],
+    '料理(單個)': ['面包','蛋包飯','法國面包','炒面','青椒肉絲','燒雞','親子丼','漢堡','炒面面包','壽喜鍋','咖哩飯','韓式泡菜飯','螃蟹鍋','牛排','醋飯壽司','豪華壽司組','鱉料理','韓式海鮮鍋'],
+};
+const COMMON_FOODS = {
+};
+const MATERIAL_HUNT = [
+    ['Lv1','小麥粉'],['Lv1','鹿皮'],['Lv1','雞蛋'],['Lv1','神聖米'],
+    ['Lv2','青椒'],['Lv2','蔥'],['Lv2','牛奶'],['Lv2','大豆'],
+    ['Lv3','鹽'],['Lv3','醬油'],
+    ['Lv4','雞肉'],['Lv4','芹菜'],['Lv4','竹筍'],['Lv4','海苔'],
+    ['Lv5','牛肉'],['Lv5','星鰻'],['Lv5','姜'],['Lv5','馬鈴薯'],['Lv5','胡椒'],
+    ['Lv6','米'],
+    ['Lv7','咖哩塊'],['Lv7','辣椒'],['Lv7','高級奶油'],
+    ['Lv8','霜降牛肉'],['Lv8','螃蟹'],
+    ['Lv9','伊勢蝦'],['Lv9','海膽'],
+    ['Lv10','魚翅'],['Lv10','鱉']
+];
+const MATERIAL_MINE = [
+    ['Lv1','銅條'],
+    ['Lv2','鐵條'],
+    ['Lv3','銀條'],['Lv3','鋁條'],
+    ['Lv4','純銀條'],
+    ['Lv5','金條'],
+    ['Lv6','白金條'],
+    ['Lv7','幻之鋼條'],
+    ['Lv8','幻之銀條'],['Lv8','藍龍之鱗'],['Lv8','永久冰石'],['Lv8','達馬斯礦條'],
+    ['Lv9','勒格耐席鉧條'],['Lv9','謝爾哈特礦條'],
+    ['Lv10','喜馬拉斯礦條'],['Lv10','奧利哈鋼條']
+];
+const MATERIAL_WOOD = [
+    ['Lv1','印度輕木'],['Lv1','蘋果薄荷'],
+    ['Lv2','榿'],['Lv2','檸檬草'],
+    ['Lv3','黃月木'],['Lv3','蝴蝶花'],
+    ['Lv4','鐵杉'],['Lv4','果梨'],
+    ['Lv5','琵琶木'],['Lv5','茉莫木'],['Lv5','桃木'],
+    ['Lv6','赤松'],['Lv6','番紅花'],
+    ['Lv7','樸'],['Lv7','百里香'],
+    ['Lv8','杉'],['Lv8','單木'],['Lv8','香草'],['Lv8','罌粟'],['Lv8','魔法紅蘿卜'],
+    ['Lv9','絲柏'],['Lv9','苗香'],
+    ['Lv10','樺'],['Lv10','七葉樹']
+];
+const MATERIAL_NO_BAG = new Set(['永久冰石']);
+const materialBag = items => items
+    .filter(([, name]) => !MATERIAL_NO_BAG.has(name))
+    .map(([lv, name]) => [lv, '一袋' + name]);
+const COMMON_MATERIALS = {
+    '狩獵(一袋)': materialBag(MATERIAL_HUNT),
+    '挖掘(一袋)': materialBag(MATERIAL_MINE),
+    '伐木(一袋)': materialBag(MATERIAL_WOOD),
+    '狩獵(單個)': MATERIAL_HUNT,
+    '挖掘(單個)': MATERIAL_MINE,
+    '伐木(單個)': MATERIAL_WOOD,
+};
+const GEM_NAMES = ['石榴石', '黃寶石', '綠寶石', '藍寶石', '冒險之星', '紫水晶', '騎士寶石', '珍珠'];
+const GEM_TIERS = [
+    g => `${g}的碎片`,
+    g => `破損的很嚴重的${g}`,
+    g => `破破的${g}`,
+    g => `有點破損的${g}`,
+    g => g,
+    g => `還不錯的${g}`,
+    g => `優良的${g}`,
+    g => `非常優良的${g}`,
+    g => `接近完美的${g}`,
+    g => `完全結晶體的${g}`
+];
+const COMMON_GEMS = {};
+GEM_NAMES.forEach(g => {
+    COMMON_GEMS[g] = GEM_TIERS.map((fn, i) => [String(i + 1), fn(g)]);
+});
+const COMMON_ENCHANTS = {
+    '防禦（全身）': [['Lv1','附魔石【海綿】'],['Lv2','附魔石【石蠟】'],['Lv3','附魔石【石膏】'],['Lv4','附魔石【滑石】'],['Lv5','附魔石【云母】'],['Lv6','附魔石【螢石】'],['Lv7','附魔石【輝石】'],['Lv8','附魔石【石英】'],['Lv9','附魔石【剛玉】'],['Lv10','附魔石【金剛玉】']],
+    '敏捷（足部）': [['Lv1','附魔石【微風】'],['Lv2','附魔石【暖風】'],['Lv3','附魔石【清風】'],['Lv4','附魔石【強風】'],['Lv5','附魔石【疾風】'],['Lv6','附魔石【烈風】'],['Lv7','附魔石【狂風】'],['Lv8','附魔石【暴風】'],['Lv9','附魔石【颶風】'],['Lv10','附魔石【罡風】']],
+    '生命（全身）': [['Lv1','附魔石【落葉】'],['Lv2','附魔石【小草】'],['Lv3','附魔石【歌聲】'],['Lv4','附魔石【月影】'],['Lv5','附魔石【春風】'],['Lv6','附魔石【風雲】'],['Lv7','附魔石【金星】'],['Lv8','附魔石【慈雨】'],['Lv9','附魔石【太陽】'],['Lv10','附魔石【寂靜】']],
+    '魔力（頭部）': [['Lv1','附魔石【霧氣】'],['Lv2','附魔石【露水】'],['Lv3','附魔石【水窪】'],['Lv4','附魔石【池塘】'],['Lv5','附魔石【山澗】'],['Lv6','附魔石【小溪】'],['Lv7','附魔石【湖泊】'],['Lv8','附魔石【河流】'],['Lv9','附魔石【港灣】'],['Lv10','附魔石【海洋】']],
+    '攻擊（武器）': [['Lv1','附魔石【預備兵】'],['Lv2','附魔石【斥侯】'],['Lv3','附魔石【列兵】'],['Lv4','附魔石【老兵】'],['Lv5','附魔石【騎士】'],['Lv6','附魔石【百夫長】'],['Lv7','附魔石【萬夫長】'],['Lv8','附魔石【將軍】'],['Lv9','附魔石【司令】'],['Lv10','附魔石【元帥】']],
+    '回復（防具）': [['Lv1','附魔石【火花】'],['Lv2','附魔石【螢火】'],['Lv3','附魔石【燭火】'],['Lv4','附魔石【篝火】'],['Lv5','附魔石【灶火】'],['Lv6','附魔石【烽火】'],['Lv7','附魔石【戰火】'],['Lv8','附魔石【業火】'],['Lv9','附魔石【聖火】'],['Lv10','附魔石【神火】']],
+    '精神（武器）': [['Lv1','附魔石【農夫】'],['Lv2','附魔石【學徒】'],['Lv3','附魔石【學者】'],['Lv4','附魔石【教師】'],['Lv5','附魔石【教授】'],['Lv6','附魔石【魔法師】'],['Lv7','附魔石【魔導師】'],['Lv8','附魔石【法皇】'],['Lv9','附魔石【賢者】'],['Lv10','附魔石【聖賢】']],
+};
+
+function pickGroups(cats) {
+    const o = {};
+    cats.forEach(c => { if (BOUNTY_EQUIPMENT[c]) o[c] = BOUNTY_EQUIPMENT[c]; });
+    return o;
+}
+
+// 分頁設定（要新增分頁，往這裡加一筆即可）
+const COMMON_TABS = [
+    { label: '武器', groups: pickGroups(['劍', '斧', '槍', '弓', '杖', '小刀', '回力鏢']) },
+    { label: '防具', groups: pickGroups(['盔', '帽', '鎧', '衣', '袍', '靴', '鞋', '盾']) },
+    { label: '系列裝', groups: pickGroups(['弗旦系列', '弗旦+系列', '水龍系列']) },
+    { label: '水料', groups: { ...COMMON_POTIONS, ...COMMON_FOODS } },
+    { label: '懸賞寵物', groups: { '': BOUNTY_PETS.map(n => [null, n]) } },
+    { label: '採集材料', groups: COMMON_MATERIALS },
+    { label: '寶石', groups: COMMON_GEMS },
+    { label: '附魔石', groups: COMMON_ENCHANTS },
+    { label: '其他', groups: COMMON_ACCESSORIES }
+];
+
+function renderItems(arr) {
+    return arr.map(it => {
+        const [lv, name] = Array.isArray(it)
+            ? (it.length === 1 ? [null, it[0]] : it)
+            : [null, it];
+        return `<span class="bounty-item" data-name="${escapeHtml(name)}">${lv ? `<span class="lv">${lv}</span>` : ''}${escapeHtml(name)}</span>`;
+    }).join('');
+}
+
+function renderGroups(groups) {
+    const cats = Object.keys(groups).filter(c => groups[c] && groups[c].length);
+    if (cats.length === 0) {
+        return '<div style="color:var(--text-secondary);padding:30px;text-align:center;">尚未設定項目（提供清單給我即可加入）</div>';
+    }
+    // 無子分類（單一空 key）→ 直接顯示項目，不用左側選單
+    if (cats.length === 1 && cats[0] === '') {
+        return `<div class="bounty-grid">${renderItems(groups[''])}</div>`;
+    }
+    const subTabs = cats.map((c, i) =>
+        `<div class="sub-tab${i === 0 ? ' active' : ''}" data-sub="${i}">${escapeHtml(c)}</div>`
+    ).join('');
+    const subPanels = cats.map((c, i) =>
+        `<div class="sub-panel" data-sub="${i}" style="display:${i === 0 ? 'block' : 'none'}"><div class="bounty-grid">${renderItems(groups[c])}</div></div>`
+    ).join('');
+    return `<div class="sub-layout"><div class="sub-tabs">${subTabs}</div><div class="sub-content">${subPanels}</div></div>`;
+}
 
 function renderBounty() {
-    const equipPanel = document.getElementById('bountyEquipPanel');
-    equipPanel.innerHTML = Object.entries(BOUNTY_EQUIPMENT).map(([cat, items]) => `
-        <div class="bounty-cat">
-            <div class="bounty-cat-title">${cat}</div>
-            <div class="bounty-grid">
-                ${items.map(([lv, name]) => `
-                    <span class="bounty-item" data-name="${escapeHtml(name)}">
-                        <span class="lv">${lv}</span>${escapeHtml(name)}
-                    </span>`).join('')}
-            </div>
-        </div>`).join('');
-
-    const petPanel = document.getElementById('bountyPetPanel');
-    petPanel.innerHTML = `
-        <div class="bounty-grid">
-            ${BOUNTY_PETS.map(name => `
-                <span class="bounty-item" data-name="${escapeHtml(name)}" data-pet="1">${escapeHtml(name)}</span>`).join('')}
-        </div>`;
+    document.getElementById('commonTabs').innerHTML = COMMON_TABS.map((t, i) =>
+        `<div class="bounty-tab${i === 0 ? ' active' : ''}" data-idx="${i}">${escapeHtml(t.label)}</div>`
+    ).join('');
+    document.getElementById('commonBody').innerHTML = COMMON_TABS.map((t, i) =>
+        `<div class="common-panel" data-idx="${i}" style="display:${i === 0 ? 'block' : 'none'}">${renderGroups(t.groups)}</div>`
+    ).join('');
 }
 
 function openBountyModal() {
@@ -2266,21 +2664,34 @@ function initBounty() {
         if (e.target.id === 'bountyModal') closeBountyModal();
     });
     // tab 切換
-    document.querySelectorAll('.bounty-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.bounty-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            const isEquip = tab.dataset.btab === 'equip';
-            document.getElementById('bountyEquipPanel').style.display = isEquip ? 'block' : 'none';
-            document.getElementById('bountyPetPanel').style.display = isEquip ? 'none' : 'block';
+    document.getElementById('commonTabs').addEventListener('click', e => {
+        const tab = e.target.closest('.bounty-tab');
+        if (!tab) return;
+        const idx = tab.dataset.idx;
+        document.querySelectorAll('#commonTabs .bounty-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('#commonBody .common-panel').forEach(p => {
+            p.style.display = p.dataset.idx === idx ? 'block' : 'none';
         });
     });
-    // 點裝備/寵物 → 帶入搜尋
+    // 左側子分頁切換
+    document.getElementById('commonBody').addEventListener('click', e => {
+        const sub = e.target.closest('.sub-tab');
+        if (!sub) return;
+        const layout = sub.closest('.sub-layout');
+        const idx = sub.dataset.sub;
+        layout.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+        sub.classList.add('active');
+        layout.querySelectorAll('.sub-panel').forEach(p => {
+            p.style.display = p.dataset.sub === idx ? 'block' : 'none';
+        });
+    });
+    // 點項目 → 帶入搜尋
     document.getElementById('bountyModal').addEventListener('click', e => {
         const item = e.target.closest('.bounty-item');
         if (!item) return;
         closeBountyModal();
-        quickSearch(item.dataset.name);
+        quickSearch(item.dataset.name, true);
     });
 }
 
