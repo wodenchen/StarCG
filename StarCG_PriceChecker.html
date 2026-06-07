@@ -118,18 +118,57 @@
             border-top: 1px solid var(--border);
         }
 
-        .seed-group .seed-title {
+        .search-row.filter-row .form-group {
+            align-items: center;
+        }
+        .search-row.filter-row .form-group > label {
             text-align: center;
             width: 100%;
+            white-space: nowrap;
         }
+        .search-row.filter-row select,
+        .search-row.filter-row .exchange-rate-group input,
+        .search-row.filter-row #bountyBtn {
+            height: 38px;
+            padding: 6px 10px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .search-row.filter-row select {
+            width: 88px;
+        }
+        .search-row.filter-row .exchange-rate-group input {
+            width: 108px;
+            text-align: center;
+        }
+
         .seed-group .seed-pair {
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            gap: 4px;
         }
         .seed-group select {
             width: 64px;
             padding: 10px 6px;
+        }
+
+        .bounty-group #bountyBtn {
+            width: auto;
+            min-width: 108px;
+            min-height: 46px;
+            height: auto;
+            padding: 10px 16px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c49a6c, #9a7348);
+            border: 2px solid #7a5a38;
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(139, 107, 74, 0.35);
+        }
+        .bounty-group #bountyBtn:hover {
+            background: linear-gradient(135deg, #d4aa7c, #a88358);
+            box-shadow: 0 4px 10px rgba(139, 107, 74, 0.45);
         }
 
         .checkbox-group {
@@ -1161,12 +1200,12 @@
 
         <!-- 第二行：篩選 -->
         <div class="search-row filter-row">
-            <div class="form-group">
+            <div class="form-group bounty-group">
                 <label>📋 快捷清單</label>
-                <button id="bountyBtn" class="secondary">開啟清單</button>
+                <button id="bountyBtn" type="button">📋 開啟清單</button>
             </div>
             <div class="form-group">
-                <label>💰 幣種</label>
+                <label>💰 幣別</label>
                 <select id="currencyFilter">
                     <option value="all" selected>全部</option>
                     <option value="0">魔幣 💰</option>
@@ -1548,7 +1587,7 @@ function renderQuickTags() {
 function quickSearch(tag, exact = false) {
     document.getElementById('searchInput').value = tag;
     // 是寵物才勾「只搜尋寵物」，否則自動取消
-    document.getElementById('petOnlyFilter').checked = BOUNTY_PETS.includes(tag);
+    document.getElementById('petOnlyFilter').checked = BOUNTY_PET_NAMES.includes(tag);
     // 常用清單來的項目預設精確搜尋
     document.getElementById('exactSearchFilter').checked = exact;
     searchMarket();
@@ -2510,7 +2549,24 @@ const BOUNTY_EQUIPMENT = {
     '弗旦+系列': ['弗旦頭盔+','弗旦帽+','弗旦鎧+','弗旦衣+','弗旦之袍+','弗旦靴+','弗旦鞋+','弗旦之盾+','弗旦之戒+'],
     '水龍系列': ['水龍之劍','水龍之斧','水龍之槍','水龍之弓','水龍之杖','水龍的小刀','冰龍','水龍之盔','水龍之帽','水龍鎧甲','水龍之衣','水龍法袍','水龍之靴','水龍之鞋','水龍之盾']
 };
-const BOUNTY_PETS = ['大地鼠','地獄看門犬','液態史萊姆','迷你蝙蝠','哥布林','紅帽哥布林','樹精','妖草','異型蜂','惡魔螃蟹','穴熊','大蝙蝠','火蜘蛛','火焰鼠','小惡魔','蜥蜴戰士','印地安仙人掌','殺手蠍','紅蠍','火焰哥布林','烈風哥布林','蔓陀羅草','幻歌妖','烈風鳥人','胖蝙蝠','死亡蜂','死亡樹精','殺人蜂','黃色口臭鬼','鐵剪螃蟹'];
+const BOUNTY_PET_RARITY = {
+    '經常': [
+        ['Lv1','大地鼠'],['Lv1','迷你蝙蝠'],['Lv1','哥布林'],['Lv1','紅帽哥布林'],['Lv1','火焰鼠']
+    ],
+    '罕見': [
+        ['Lv2','樹精'],['Lv2','妖草'],['Lv2','異型蜂'],['Lv2','惡魔螃蟹'],['Lv2','大蝙蝠'],['Lv2','火蜘蛛'],['Lv2','小惡魔'],['Lv2','火焰哥布林'],['Lv2','液態史萊姆'],
+        ['Lv3','穴熊'],['Lv3','蜥蜴戰士'],['Lv3','印地安仙人掌'],['Lv3','紅蠍'],['Lv3','地獄看門犬'],['Lv3','黃色口臭鬼']
+    ],
+    '極少': [
+        ['Lv2','烈風哥布林'],
+        ['Lv3','殺手蠍'],['Lv3','蔓陀羅草'],['Lv3','幻歌妖'],['Lv3','烈風鳥人'],['Lv3','胖蝙蝠'],['Lv3','死亡蜂'],['Lv3','死亡樹精'],['Lv3','殺人蜂'],['Lv3','鐵剪螃蟹']
+    ],
+};
+const BOUNTY_PETS = {
+    '全部': [...BOUNTY_PET_RARITY['經常'], ...BOUNTY_PET_RARITY['罕見'], ...BOUNTY_PET_RARITY['極少']],
+    ...BOUNTY_PET_RARITY
+};
+const BOUNTY_PET_NAMES = Object.values(BOUNTY_PET_RARITY).flat().map(([, name]) => name);
 
 // 飾品 / 藥水 / 料理（待補，格式：{ 子分類: [[等級或null, 名稱], ...] }）
 const COMMON_ACCESSORIES = {
@@ -2619,7 +2675,7 @@ const COMMON_TABS = [
     { label: '防具', groups: pickGroups(['盔', '帽', '鎧', '衣', '袍', '靴', '鞋', '盾']) },
     { label: '系列裝', groups: pickGroups(['弗旦系列', '弗旦+系列', '水龍系列']) },
     { label: '水料', groups: { ...COMMON_POTIONS, ...COMMON_FOODS } },
-    { label: '懸賞寵物', groups: { '': BOUNTY_PETS.map(n => [null, n]) } },
+    { label: '懸賞寵物', groups: BOUNTY_PETS },
     { label: '採集材料', groups: COMMON_MATERIALS },
     { label: '寶石', groups: COMMON_GEMS },
     { label: '附魔石', groups: COMMON_ENCHANTS },
