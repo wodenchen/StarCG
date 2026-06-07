@@ -134,7 +134,7 @@
             font-size: 0.95rem;
             box-sizing: border-box;
         }
-        .search-row.filter-row select {
+        .search-row.filter-row .form-group:not(.seed-group) select {
             width: 88px;
         }
         .search-row.filter-row .exchange-rate-group input {
@@ -148,9 +148,14 @@
             justify-content: center;
             gap: 4px;
         }
-        .seed-group select {
-            width: 64px;
-            padding: 10px 6px;
+        .search-row.filter-row .seed-group select {
+            width: 50px;
+            min-width: 50px;
+            max-width: 50px;
+            padding: 6px 0;
+            font-size: 0.85rem;
+            text-align: center;
+            text-align-last: center;
         }
 
         .bounty-group #bountyBtn {
@@ -1364,7 +1369,7 @@
     <div class="empty-state" id="emptyState">
         <div class="icon">🔍</div>
         <div>輸入物品名稱開始搜尋</div>
-        <div style="margin-top: 8px; font-size: 0.85rem;">支援模糊搜尋，例如：面包、壽喜、轉蛋</div>
+        <div style="margin-top: 8px; font-size: 0.85rem;">支援模糊搜尋，例如：面包、壽喜、生命藥</div>
     </div>
 </div>
 
