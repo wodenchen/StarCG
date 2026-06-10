@@ -479,6 +479,121 @@
             color: var(--accent-gold);
         }
 
+        th.th-with-stat-sort {
+            cursor: default;
+        }
+
+        th.th-with-stat-sort:hover {
+            color: var(--text-secondary);
+        }
+
+        .th-item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .th-sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .th-sortable:hover {
+            color: var(--accent-blue);
+        }
+
+        .stat-sort-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-sort-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .stat-sort-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 10px;
+            pointer-events: none;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1;
+        }
+
+        .stat-sort-select {
+            font-family: 'Noto Sans TC', -apple-system, sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 5px 30px 5px 12px;
+            border-radius: 8px;
+            border: 1px solid #d8cbb8;
+            background: #fffbf5;
+            color: #8b7355;
+            cursor: pointer;
+            min-width: 104px;
+            line-height: 1.35;
+            letter-spacing: 0.01em;
+            appearance: none;
+            -webkit-appearance: none;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 1px 2px rgba(74, 63, 53, 0.06);
+            transition: border-color 0.15s, box-shadow 0.15s, color 0.15s, background 0.15s;
+        }
+
+        .stat-sort-select:hover {
+            border-color: #c9a227;
+            color: var(--text-primary);
+        }
+
+        .stat-sort-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(91, 140, 184, 0.18);
+        }
+
+        .stat-sort-select.has-value {
+            background: linear-gradient(135deg, #faf6ee, #f3ebdc);
+            border-color: #c9a227;
+            color: var(--text-primary);
+        }
+
+        .stat-sort-order-btn {
+            font-family: 'Noto Sans TC', -apple-system, sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border-radius: 8px;
+            border: 1px solid #d8cbb8;
+            background: #fffbf5;
+            color: #8b7355;
+            cursor: pointer;
+            line-height: 1;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 1px 2px rgba(74, 63, 53, 0.06);
+            transition: border-color 0.15s, color 0.15s, background 0.15s, opacity 0.15s;
+        }
+
+        .stat-sort-order-btn:hover:not(:disabled) {
+            border-color: #c9a227;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #faf6ee, #f3ebdc);
+        }
+
+        .stat-sort-order-btn:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+
+        .stat-sort-order-btn.active {
+            border-color: #c9a227;
+            color: var(--accent-gold);
+            background: linear-gradient(135deg, #faf6ee, #f3ebdc);
+        }
+
         td {
             padding: 14px 12px;
             border-bottom: 1px solid var(--border);
@@ -1340,7 +1455,19 @@
             <table id="marketTable">
                 <thead>
                     <tr>
-                        <th data-sort="item">物品名稱</th>
+                        <th class="th-with-stat-sort">
+                            <div class="th-item-header">
+                                <span class="th-sortable" data-sort="item">物品名稱</span>
+                                <span class="stat-sort-group">
+                                    <span class="stat-sort-wrap">
+                                        <select id="statSortFilter" class="stat-sort-select" title="依加成屬性排序">
+                                            <option value="" selected>屬性排序</option>
+                                        </select>
+                                    </span>
+                                    <button type="button" id="statSortOrderBtn" class="stat-sort-order-btn" title="切換排序方向（高→低 / 低→高）" disabled>▼</button>
+                                </span>
+                            </div>
+                        </th>
                         <th data-sort="price">價格 <span class="sort-icon active">▲</span></th>
                         <th>分流/地點</th>
                         <th>攤位名稱</th>
@@ -1500,6 +1627,7 @@ let historyHours = 36;
 let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || [];
 let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || [];
 let currentSort = { field: 'price', order: 'asc' };
+let statSortOrder = 'desc';
 let currentTab = 'market';
 const chartInstances = {};
 
@@ -1512,10 +1640,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     renderQuickTags();
     initEventListeners();
+    initStatSortFilter();
     initMapModal();
     initQuickTags();
     initBounty();
 });
+
+function updateStatSortStyle() {
+    const sel = document.getElementById('statSortFilter');
+    const btn = document.getElementById('statSortOrderBtn');
+    const hasStat = !!sel.value;
+    sel.classList.toggle('has-value', hasStat);
+    btn.disabled = !hasStat;
+    btn.classList.toggle('active', hasStat);
+    btn.textContent = statSortOrder === 'desc' ? '▼' : '▲';
+    btn.title = hasStat
+        ? (statSortOrder === 'desc' ? '目前：高→低（點擊改為低→高）' : '目前：低→高（點擊改為高→低）')
+        : '請先選擇屬性';
+}
+
+function initStatSortFilter() {
+    const sel = document.getElementById('statSortFilter');
+    MARKET_STAT_TAG_DEFS.forEach(([key, label]) => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = label;
+        sel.appendChild(opt);
+    });
+    updateStatSortStyle();
+}
 
 function initQuickTags() {
     document.getElementById('quickTags').addEventListener('click', e => {
@@ -1570,6 +1723,16 @@ function initEventListeners() {
     ['currencyFilter', 'seedPlusFilter', 'seedMinusFilter', 'soulColorFilter', 'gradeFilter'].forEach(id => {
         document.getElementById(id).addEventListener('change', applyFilters);
     });
+    document.getElementById('statSortFilter').addEventListener('change', () => {
+        if (!document.getElementById('statSortFilter').value) statSortOrder = 'desc';
+        updateStatSortStyle();
+        applyFilters();
+    });
+    document.getElementById('statSortOrderBtn').addEventListener('click', () => {
+        statSortOrder = statSortOrder === 'desc' ? 'asc' : 'desc';
+        updateStatSortStyle();
+        applyFilters();
+    });
     
     // 只搜尋寵物 checkbox
     document.getElementById('petOnlyFilter').addEventListener('change', applyFilters);
@@ -1590,8 +1753,8 @@ function initEventListeners() {
     });
     
     // 表頭排序
-    document.querySelectorAll('#marketTable th[data-sort]').forEach(th => {
-        th.addEventListener('click', () => sortTable(th.dataset.sort));
+    document.querySelectorAll('#marketTable [data-sort]').forEach(el => {
+        el.addEventListener('click', () => sortTable(el.dataset.sort));
     });
 }
 
@@ -1691,10 +1854,12 @@ async function searchMarket() {
     Object.values(chartInstances).forEach(chart => chart.destroy());
     Object.keys(chartInstances).forEach(key => delete chartInstances[key]);
     
+    const exactSearch = document.getElementById('exactSearchFilter').checked;
     let marketShown = false;
     try {
         allMarketItems = [];
         await fetchMarketData(keyword, {
+            exact: exactSearch,
             onProgress(page, totalPages, count) {
                 showLoading(true, `載入第 ${page}/${totalPages} 頁…（已找到 ${count} 筆）`);
             },
@@ -1757,9 +1922,20 @@ const MARKET_SOUL_COLORS = {
     1007002: { label: '紅', cls: 'soul-red', extra: [['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'], ['ITEM_MODIFYRECOVERY', '回復', 'st-recov']] },
     1007003: { label: '黃', cls: 'soul-yellow', extra: [['ITEM_ADM', '魔攻', 'st-madm'], ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid']] }
 };
-const MARKET_ACC_EXTRA = ['ITEM_MODIFYFORCEPOINT', 'ITEM_MODIFYRECOVERY', 'ITEM_MODIFYCRITICAL', 'ITEM_MODIFYCOUNTER', 'ITEM_MODIFYHITRATE', 'ITEM_MODIFYAVOID', 'ITEM_MODIFYMAGIC'];
+function buildStatMods(rawItem) {
+    const mods = {};
+    MARKET_STAT_TAG_DEFS.forEach(([key]) => {
+        const v = rawItem[key] || 0;
+        if (v !== 0) mods[key] = v;
+    });
+    return mods;
+}
 
-function processMarketPageData(data, normalizedKeyword) {
+function marketNameMatches(normalizedName, normalizedKeyword, exact) {
+    return exact ? normalizedName === normalizedKeyword : normalizedName.includes(normalizedKeyword);
+}
+
+function processMarketPageData(data, normalizedKeyword, exact = false) {
     const items = [];
     const itemsMap = data.itemsByCd || {};
     const petsMap = data.petsByCd || {};
@@ -1775,7 +1951,7 @@ function processMarketPageData(data, normalizedKeyword) {
             // 道具
             (itemsMap[cdkey] || []).forEach(item => {
                 const normalizedItemName = normalizeStr(item.ITEM_TRUENAME);
-                if (normalizedItemName.includes(normalizedKeyword)) {
+                if (marketNameMatches(normalizedItemName, normalizedKeyword, exact)) {
                     // 處理改造圖等級區分（嘗試多種可能的欄位名）
                     let displayName = item.ITEM_TRUENAME;
                     let gradeTag = '';
@@ -1823,11 +1999,8 @@ function processMarketPageData(data, normalizedKeyword) {
                         if (ex) colorTag += ' ' + ex;
                     }
 
-                    const isAccessory = MARKET_ACC_EXTRA.some(k => (item[k] || 0) !== 0);
-
                     if (!soulColor) {
-                        const defs = isAccessory ? MARKET_STAT_TAG_DEFS : MARKET_STAT_TAG_DEFS.filter(([k]) => k !== 'ITEM_ADM');
-                        const tags = buildStatTags(item, defs);
+                        const tags = buildStatTags(item, MARKET_STAT_TAG_DEFS);
                         if (tags) statTag = tags;
                     }
                     
@@ -1838,6 +2011,7 @@ function processMarketPageData(data, normalizedKeyword) {
                         seedTag: seedTag,
                         colorTag: colorTag,
                         statTag: statTag,
+                        statMods: buildStatMods(item),
                         soulColor: soulColor,
                         isSeed: seedPlusStats.length > 0 || seedMinusStats.length > 0,
                         seedPlusStats: seedPlusStats,
@@ -1848,7 +2022,7 @@ function processMarketPageData(data, normalizedKeyword) {
                         durability: `${item.ITEM_DURABILITY}/${item.ITEM_MAXDURABILITY}`,
                         durCurrent: item.ITEM_DURABILITY,
                         durMax: item.ITEM_MAXDURABILITY,
-                        attack: isAccessory ? (item.ITEM_MODIFYATTACK || 0) : Math.max(item.ITEM_ADM || 0, item.ITEM_MODIFYATTACK || 0),
+                        attack: item.ITEM_MODIFYATTACK || 0,
                         defence: item.ITEM_MODIFYDEFENCE || 0,
                         agility: item.ITEM_MODIFYAGILITY || 0,
                         location: stall.coords,
@@ -1866,7 +2040,7 @@ function processMarketPageData(data, normalizedKeyword) {
             // 寵物
             (petsMap[cdkey] || []).forEach(pet => {
                 const normalizedPetName = normalizeStr(pet.Name);
-                if (normalizedPetName.includes(normalizedKeyword)) {
+                if (marketNameMatches(normalizedPetName, normalizedKeyword, exact)) {
                     // 寵物標籤：等級、改造、技能欄數
                     const petLv = pet.Lv || 1;
                     const trans = pet.Trans || 0;
@@ -1880,6 +2054,7 @@ function processMarketPageData(data, normalizedKeyword) {
                         item: pet.Name,
                         transTag: petTags,
                         gradeTag: '',
+                        statMods: {},
                         price: pet.price,
                         pricetype: pet.pricetype,
                         durability: '-',
@@ -1905,25 +2080,25 @@ function processMarketPageData(data, normalizedKeyword) {
     return items;
 }
 
-async function fetchMarketPage(keyword, page, normalizedKeyword) {
-    const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=0&page=${page}&search=${encodeURIComponent(keyword)}`;
+async function fetchMarketPage(keyword, page, normalizedKeyword, exact = false) {
+    const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=${exact ? 1 : 0}&page=${page}&search=${encodeURIComponent(keyword)}`;
     const text = await fetchWithProxy(targetUrl);
     const data = parseJsonResponse(text, '市場資料');
     return {
         page,
         totalFiltered: data.totalFiltered || 0,
         perPage: data.perPage || 20,
-        items: processMarketPageData(data, normalizedKeyword)
+        items: processMarketPageData(data, normalizedKeyword, exact)
     };
 }
 
 async function fetchMarketData(keyword, callbacks = {}) {
     const normalizedKeyword = normalizeStr(keyword);
-    const { onProgress, onPartial } = callbacks;
+    const { exact = false, onProgress, onPartial } = callbacks;
 
-    const first = await fetchMarketPage(keyword, 1, normalizedKeyword);
+    const first = await fetchMarketPage(keyword, 1, normalizedKeyword, exact);
     if (first.totalFiltered === 0) return [];
-    if (first.totalFiltered > 300) {
+    if (!exact && first.totalFiltered > 300) {
         alert('結果太多，請輸入更精確的關鍵字');
         return [];
     }
@@ -1938,7 +2113,7 @@ async function fetchMarketData(keyword, callbacks = {}) {
         for (let p = start; p < start + MARKET_PAGE_CONCURRENCY && p <= totalPages; p++) {
             pageNums.push(p);
         }
-        const pages = await Promise.all(pageNums.map(p => fetchMarketPage(keyword, p, normalizedKeyword)));
+        const pages = await Promise.all(pageNums.map(p => fetchMarketPage(keyword, p, normalizedKeyword, exact)));
         for (const pg of pages) {
             items.push(...pg.items);
             onPartial?.(pg.items);
@@ -2046,6 +2221,7 @@ async function fetchHistoryData(keyword, hours = 36) {
    篩選與排序
 ======================================== */
 function applyFilters() {
+    updateStatSortStyle();
     const currency = document.getElementById('currencyFilter').value;
     const petOnly = document.getElementById('petOnlyFilter').checked;
     const seedPlus = document.getElementById('seedPlusFilter').value;
@@ -2113,23 +2289,42 @@ function applyFilters() {
     renderMarketTable(filtered);
 }
 
+function compareSortField(a, b, field, order) {
+    let valA = a[field];
+    let valB = b[field];
+
+    if (field === 'durability') {
+        valA = a.durCurrent;
+        valB = b.durCurrent;
+    }
+
+    if (typeof valA === 'string' || typeof valB === 'string') {
+        valA = valA ?? '';
+        valB = valB ?? '';
+        return order === 'asc' ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+    }
+    return order === 'asc' ? (valA || 0) - (valB || 0) : (valB || 0) - (valA || 0);
+}
+
+function getStatSortValue(item, statKey) {
+    const v = item.statMods?.[statKey];
+    if (v == null) return statSortOrder === 'desc' ? -1 : Infinity;
+    return v;
+}
+
 function sortItems(items) {
+    const statKey = document.getElementById('statSortFilter').value;
     const { field, order } = currentSort;
-    
+
     return [...items].sort((a, b) => {
-        let valA = a[field];
-        let valB = b[field];
-        
-        // 耐久特殊處理
-        if (field === 'durability') {
-            valA = a.durCurrent;
-            valB = b.durCurrent;
+        if (statKey) {
+            const statA = getStatSortValue(a, statKey);
+            const statB = getStatSortValue(b, statKey);
+            if (statA !== statB) {
+                return statSortOrder === 'desc' ? statB - statA : statA - statB;
+            }
         }
-        
-        if (typeof valA === 'string') {
-            return order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-        }
-        return order === 'asc' ? valA - valB : valB - valA;
+        return compareSortField(a, b, field, order);
     });
 }
 
@@ -2146,7 +2341,7 @@ function sortTable(field) {
         icon.textContent = '▲';
     });
     
-    const th = document.querySelector(`#marketTable th[data-sort="${field}"]`);
+    const th = document.querySelector(`#marketTable [data-sort="${field}"]`);
     if (th) {
         const icon = th.querySelector('.sort-icon') || document.createElement('span');
         icon.className = 'sort-icon active';
@@ -2640,7 +2835,7 @@ const BOUNTY_EQUIPMENT = {
     '袍': [['1A','羽毛袍'],['1B','輕皮袍'],['2A','網袍'],['2B','風袍'],['3A','硬皮袍'],['3B','環袍'],['4A','烏鴉之袍'],['4B','月亮之袍'],['4C','狐皮披風'],['5A','東方法衣'],['5B','聖堂之袍'],['5C','治愈之袍'],['6A','聖者之袍'],['6B','戰斗長袍'],['7A','冠軍之袍'],['7B','時之袍'],['8A','死神之袍'],['8B','勇者之袍'],['8C','潔淨之袍+'],['9A','黑暗之袍'],['9B','聖袍'],['10A','靈魂之袍'],['10B','奇蹟之袍'],['11A','共嗚之袍'],['11B','和平之袍']],
     '靴': [['1A','軟皮靴'],['1B','皮靴'],['2A','硬皮靴'],['2B','長靴'],['3A','厚底靴'],['3B','編織的靴子'],['4A','鎖鏈長靴'],['4B','鎖鏈靴'],['5A','蜥蜴靴'],['5B','蜥蜴長靴'],['5C','防護靴'],['6A','鋼靴'],['6B','鋼制長靴'],['7A','水晶靴'],['7B','銀靴'],['8A','流水之靴'],['8B','芙蕾雅之靴'],['8C','標準長靴+'],['9A','鑽石靴'],['9B','鑽石長靴'],['10A','秘密之靴'],['10B','龍之靴'],['11A','幸運靴'],['11B','試力鞋']],
     '鞋': [['1A','運動鞋'],['1B','馬車鞋'],['2A','皮鞋'],['2B','安全鞋'],['3A','光之鞋'],['3B','戰鞋'],['4A','薄板鞋'],['4B','鎖鏈鞋'],['5A','蜥蜴鞋'],['5B','維京鞋'],['5C','特製舞鞋'],['6A','戰斗鞋'],['6B','騎士鞋'],['7A','妖精鞋'],['7B','紫水晶鞋'],['8A','白金鞋'],['8B','精緻高根鞋'],['8C','妖精鞋+'],['9A','神秘之鞋'],['9B','力量之鞋'],['10A','黃金鞋'],['10B','龍之鞋'],['11A','守護之鞋'],['11B','大木屐']],
-    '盾': [['1A','小圓盾'],['1B','小型盾'],['2A','板盾'],['2B','鳶盾'],['3A','漩渦重盾'],['3B','哥特盾'],['4A','士兵盾'],['4B','重盾'],['5A','蜥蜴盾'],['5B','反光之盾'],['5C','聖者之盾'],['6A','風之盾'],['6B','獅子盾'],['7A','防守之盾'],['7B','黃金之盾'],['8A','鏡之盾'],['8B','力量之盾'],['8C','防禦之盾+'],['9A','漆黑之盾'],['9B','火龍之盾'],['10A','黑暗之盾'],['10B','勇者之盾'],['11A','突猛盾'],['11B','重型防禦盾']],
+    '盾': [['1A','小圓盾'],['1B','小型盾'],['2A','板盾'],['2B','鳶盾'],['3A','漩渦重盾'],['3B','哥特盾'],['4A','士兵盾'],['4B','重盾'],['5A','蜥蜴盾'],['5B','反光之盾'],['5C','聖者之盾'],['6A','風之盾'],['6B','獅子盾'],['7A','防守之盾'],['7B','黃金之盾'],['8A','鏡之盾'],['8B','力量之盾'],['8C','防禦之盾+'],['9A','漆黑之盾'],['9B','火龍之盾'],['10A','黑暗之盾'],['10B','勇者之盾'],['11A','突猛盾'],['11B','重型防御盾']],
 
     // ---- 系列裝 ----
     '弗旦系列': ['弗旦頭盔','弗旦帽','弗旦鎧','弗旦衣','弗旦之袍','弗旦靴','弗旦鞋','弗旦之盾','弗旦之戒'],
@@ -2669,7 +2864,7 @@ const BOUNTY_PET_NAMES = Object.values(BOUNTY_PET_RARITY).flat().map(([, name]) 
 // 飾品 / 藥水 / 料理（待補，格式：{ 子分類: [[等級或null, 名稱], ...] }）
 const COMMON_ACCESSORIES = {
     '飾品': ['索爾護腕','頓納護腕','英靈之誓','水晶鏈墜','屈原的戒指','狂怒繃帶','「年」的頸圈','受詛咒的姜餅人','洗禮的護符','真·戰符'],
-    '特殊': ['魔幣箱（100萬）','魔幣箱（50萬）','魔幣箱（10萬）','貓頭鷹頭盔','偷襲密卷','聖魔石','再生靈藥','寵物再生藥劑','改名卡','重來的種子','魔族的水晶','誓言之證','宇治金時','風龍蜥的甲殼','鋼騎之礦','德特家的布','火焰之魂','曼陀羅草的皮','妖草的血','火的水晶碎片','風的水晶碎片','水的水晶碎片','地的水晶碎片'],
+    '特殊': ['魔幣箱（100萬）','魔幣箱（50萬）','魔幣箱（10萬）','特技突破石','貓頭鷹頭盔','偷襲密卷','聖魔石','再生靈藥','寵物再生藥劑','改名卡','魔族的水晶','誓言之證','宇治金時','風龍蜥的甲殼','鋼騎之礦','德特家的布','火焰之魂','曼陀羅草的皮','妖草的血','火的水晶碎片','風的水晶碎片','水的水晶碎片','地的水晶碎片'],
     '寵書(普)': ['乾坤一擊[普]','高級必殺[普]','必殺之心[普]','命中之眼[普]','魔力之源[普]','閃避奧義[普]','烈焰之力[普]','狂風之力[普]','寒冰之力[普]','巨石之力[普]','魔法抵御[普]','閃避要訣[普]','野蠻沖擊[普]','反擊之力[普]'],
     '寵書(良)': ['乾坤一擊[良]','高級必殺[良]','必殺之心[良]','命中之眼[良]','魔力之源[良]','閃避奧義[良]','烈焰之力[良]','狂風之力[良]','寒冰之力[良]','巨石之力[良]','魔法抵御[良]','閃避要訣[良]','野蠻沖擊[良]','反擊之力[良]'],
     '寵書(優)': ['乾坤一擊[優]','高級必殺[優]','必殺之心[優]','命中之眼[優]','魔力之源[優]','閃避奧義[優]','烈焰之力[優]','狂風之力[優]','寒冰之力[優]','巨石之力[優]','魔法抵御[優]','閃避要訣[優]','野蠻沖擊[優]','反擊之力[優]'],
@@ -2680,9 +2875,9 @@ const COMMON_ACCESSORIES = {
 };
 const COMMON_POTIONS = {
     '藥水(一包)': ['一包生命藥(100)','一包生命藥(150)','一包生命藥(200)','一包生命藥(300)','一包生命藥(400)','一包生命藥(500)','一包生命藥(600)','一包生命藥(800)','一包生命藥(1000)','一包生命藥(1400)'],
-    '料理(一箱)': ['一箱面包','一箱蛋包飯','一箱法國面包','一箱炒面','一箱青椒肉絲','一箱燒雞','一箱親子丼','一箱漢堡','一箱炒面面包','一箱壽喜鍋','一箱咖哩飯','一箱韓式泡菜飯','一箱螃蟹鍋','一箱牛排','一箱醋飯壽司','一箱豪華壽司組','一箱鱉料理','一箱韓式海鮮鍋'],
+    '料理(一箱)': ['一箱面包','一箱蛋包飯','一箱法國面包','一箱炒面','一箱青椒肉絲','一箱燒雞','一箱親子丼','一箱漢堡','一箱炒面面包','一箱壽喜鍋','一箱咖哩飯','一箱韓式泡菜飯','一箱螃蟹鍋','一箱牛排','一箱醋飯壽司','一箱豪華壽司組','一箱魚翅湯','一箱鱉料理','一箱韓式海鮮鍋'],
     '藥水(單個)': ['生命力回復藥（100）','生命力回復藥（150）','生命力回復藥（200）','生命力回復藥（300）','生命力回復藥（400）','生命力回復藥（500）','生命力回復藥（600）','生命力回復藥（800）','生命力回復藥（1000）','生命力回復藥（1400）'],
-    '料理(單個)': ['面包','蛋包飯','法國面包','炒面','青椒肉絲','燒雞','親子丼','漢堡','炒面面包','壽喜鍋','咖哩飯','韓式泡菜飯','螃蟹鍋','牛排','醋飯壽司','豪華壽司組','鱉料理','韓式海鮮鍋'],
+    '料理(單個)': ['面包','蛋包飯','法國面包','炒面','青椒肉絲','燒雞','親子丼','漢堡','炒面面包','壽喜鍋','咖哩飯','韓式泡菜飯','螃蟹鍋','牛排','醋飯壽司','豪華壽司組','魚翅湯','鱉料理','韓式海鮮鍋'],
 };
 const COMMON_FOODS = {
 };
