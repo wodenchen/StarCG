@@ -938,6 +938,31 @@
             font-weight: 600;
             margin-left: 4px;
         }
+        /* 檔次：琥珀色（滿檔/掉檔同色） */
+        .pet-grade {
+            background: #d35400;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+        .pet-grade.pet-grade-drop {
+            cursor: help;
+        }
+        /* 星數：紫羅蘭色（滿星/星數同色） */
+        .pet-star {
+            background: #7d3c98;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 4px;
+            font-variant-numeric: tabular-nums;
+        }
 
         /* Price Display */
         .price {
@@ -1863,6 +1888,7 @@
             display: block;
         }
     </style>
+    <script src="pet_profiles_data.js"></script>
 </head>
 <body>
 
@@ -2027,7 +2053,7 @@
                                     </select>
                                 </span>
                                 <button type="button" id="statSortOrderBtn" class="stat-sort-order-btn" title="切換排序方向（高→低 / 低→高）" disabled>▼</button>
-                                <span class="stat-tag-hint" data-tip="僅顯示浮動屬性；固定數值不列標籤" tabindex="0" role="note" aria-label="僅顯示浮動屬性；固定數值不列標籤">ⓘ</span>
+                                <span class="stat-tag-hint" data-tip="裝備僅顯示浮動屬性，固定數值不列標籤；寵物若為起始星數與天生滿星不顯示標籤" tabindex="0" role="note" aria-label="僅顯示浮動屬性；固定數值不列標籤">ⓘ</span>
                             </span>
                         </div>
                     </th>
@@ -2305,6 +2331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (location.protocol === 'file:') {
         document.getElementById('fileProtocolWarning').style.display = 'block';
     }
+    loadPetProfilesFromGuide();
     renderQuickTags();
     initEventListeners();
     initStatSortFilter();
@@ -2330,6 +2357,12 @@ function updateStatSortStyle() {
 
 function initStatSortFilter() {
     const sel = document.getElementById('statSortFilter');
+    PET_STAT_SORT_DEFS.forEach(([key, label]) => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = label;
+        sel.appendChild(opt);
+    });
     MARKET_STAT_TAG_DEFS.forEach(([key, label]) => {
         const opt = document.createElement('option');
         opt.value = key;
@@ -2388,7 +2421,7 @@ function hidePeakFloatingTip() {
 
 function initPeakFloatingTip() {
     const body = document.getElementById('marketBody');
-    const peakSelector = '.stat-peak-tag, .stat-break-tag, .stat-peak-mix-tag';
+    const peakSelector = '.stat-peak-tag, .stat-break-tag, .stat-peak-mix-tag, .pet-grade-drop';
 
     body.addEventListener('mouseover', e => {
         const tag = e.target.closest(peakSelector);
@@ -2576,6 +2609,8 @@ async function searchMarket() {
     if (!keyword) return alert('請輸入搜尋關鍵字');
     lastSearchKeyword = keyword;
     
+    showLoading(true, '正在載入寵物圖鑑…');
+    await loadPetProfilesFromGuide();
     showLoading(true, '正在連線搜尋…');
     hideAll();
     
@@ -2639,6 +2674,11 @@ function normalizeStr(str) {
         .replace(/】/g, ']')
         .replace(/　/g, ' ');
 }
+
+const PET_STAT_SORT_DEFS = [
+    ['petFull', '滿檔'],
+    ['petMaxStar', '滿星']
+];
 
 const MARKET_STAT_TAG_DEFS = [
     ['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'],
@@ -2719,6 +2759,289 @@ function buildPeakTags(rawItem, itemName, itemId) {
 
 function marketNameMatches(normalizedName, normalizedKeyword, exact) {
     return exact ? normalizedName === normalizedKeyword : normalizedName.includes(normalizedKeyword);
+}
+
+// 寵物檔次：AllocPoint=原始檔，PetAllocPoint=升星補檔（體/力/強/敏/魔 × 64^4~64^0）
+const PET_ALLOC_POWERS = [64 ** 4, 64 ** 3, 64 ** 2, 64, 1];
+
+function decodePetAllocPoint(point) {
+    let remain = Math.max(0, Math.floor(Number(point) || 0));
+    return PET_ALLOC_POWERS.map(power => {
+        const stat = Math.floor(remain / power);
+        remain -= stat * power;
+        return stat;
+    });
+}
+
+function formatPetAllocStats(stats) {
+    return stats.join('/');
+}
+
+function sumPetStats(stats) {
+    return (stats || []).reduce((s, v) => s + v, 0);
+}
+
+// 寵物基準（名稱→{ rarity, bornStar, perfect[5] }）；補上後可顯示扣檔、總星、上限
+const PET_RARITY_MAX_ALLOC = { '普': 125, '銀': 127, '金': 129 };
+const PET_RARITY_BASE_ALLOC = { '普': 100, '銀': 102, '金': 104 };
+const PET_GUIDE_JSON_URL = 'https://guide.starcg.net/data/pets.json';
+const PET_LOCAL_JSON_URL = 'pets-local.json';       // 自備完整快照（覆蓋遠端同名）
+const PET_PATCH_JSON_URL = 'pet_profiles_patch.json'; // 只補遺漏／修正少數幾筆
+const PET_PROFILES = {};
+const PET_NAME_ALIASES = {}; // 市場名 → 圖鑑名
+let petProfilesLoadPromise = null;
+
+function buildPetProfileFromGuide(pet) {
+    const rarity = pet.cardTier;
+    const base = PET_RARITY_BASE_ALLOC[rarity] ?? 100;
+    const perfect = pet.perfect ?? [pet.hp, pet.power, pet.defense, pet.speed, pet.magic];
+    const total = pet.total ?? (pet.bornStar != null ? base + pet.bornStar : null);
+    return {
+        rarity,
+        bornStar: pet.bornStar ?? ((total ?? base) - base),
+        perfect,
+        total,
+        skillSlots: pet.skillSlots
+    };
+}
+
+function mergePetGuideEntries(pets, sourceLabel) {
+    if (!Array.isArray(pets)) return 0;
+    let n = 0;
+    pets.forEach(p => {
+        if (!p?.name) return;
+        PET_PROFILES[p.name] = buildPetProfileFromGuide(p);
+        n++;
+    });
+    if (n > 0) console.info(`[寵物圖鑑] +${n} 筆（${sourceLabel}）`);
+    return n;
+}
+
+function petProfileToGuideEntry(name, profile = {}) {
+    const p = profile.perfect || [];
+    return {
+        name,
+        cardTier: profile.rarity,
+        total: profile.total,
+        bornStar: profile.bornStar,
+        hp: p[0],
+        power: p[1],
+        defense: p[2],
+        speed: p[3],
+        magic: p[4],
+        skillSlots: profile.skillSlots
+    };
+}
+
+function mergePetProfileOverrides(overrides, sourceLabel) {
+    if (!overrides || typeof overrides !== 'object') return 0;
+    let n = 0;
+    Object.entries(overrides).forEach(([name, patch]) => {
+        if (!patch || typeof patch !== 'object') return;
+        const prev = petProfileToGuideEntry(name, PET_PROFILES[name] || {});
+        PET_PROFILES[name] = buildPetProfileFromGuide({
+            ...prev,
+            ...patch,
+            name,
+            cardTier: patch.cardTier ?? patch.rarity ?? prev.cardTier
+        });
+        n++;
+    });
+    if (n > 0) console.info(`[寵物圖鑑] 覆寫 ${n} 筆（${sourceLabel}）`);
+    return n;
+}
+
+function mergePetNameAliases(aliases, sourceLabel) {
+    if (!aliases || typeof aliases !== 'object') return 0;
+    let n = 0;
+    Object.entries(aliases).forEach(([from, to]) => {
+        if (!from || !to) return;
+        PET_NAME_ALIASES[from] = to;
+        n++;
+    });
+    if (n > 0) console.info(`[寵物圖鑑] 別名 ${n} 筆（${sourceLabel}）`);
+    return n;
+}
+
+async function fetchPetJson(url, useProxy = false) {
+    const text = useProxy ? await fetchWithProxy(url) : await (await fetch(url, { cache: 'no-store' })).text();
+    return JSON.parse(text);
+}
+
+function mergePetGuideEntriesFillOnly(pets, sourceLabel) {
+    if (!Array.isArray(pets)) return 0;
+    let n = 0;
+    pets.forEach(p => {
+        if (!p?.name || PET_PROFILES[p.name]) return;
+        PET_PROFILES[p.name] = buildPetProfileFromGuide(p);
+        n++;
+    });
+    if (n > 0) console.info(`[寵物圖鑑] 補 ${n} 筆（${sourceLabel}，不覆寫本地）`);
+    return n;
+}
+
+async function loadPetProfilesFromGuide() {
+    if (petProfilesLoadPromise) return petProfilesLoadPromise;
+    petProfilesLoadPromise = (async () => {
+        let total = 0;
+        let localLoaded = false;
+        try {
+            if (Array.isArray(self.PET_PROFILES_RAW)) {
+                total += mergePetGuideEntries(self.PET_PROFILES_RAW, 'pet_profiles_data.js');
+                localLoaded = true;
+            }
+            try {
+                const local = await fetchPetJson(PET_LOCAL_JSON_URL, false);
+                if (Array.isArray(local)) {
+                    total += mergePetGuideEntries(local, 'pets-local.json');
+                    localLoaded = true;
+                } else {
+                    if (local.pets) {
+                        total += mergePetGuideEntries(local.pets, 'pets-local.json');
+                        localLoaded = true;
+                    }
+                    if (local.aliases) mergePetNameAliases(local.aliases, 'pets-local.json');
+                    if (local.overrides) mergePetProfileOverrides(local.overrides, 'pets-local.json');
+                }
+            } catch (_) { /* 無本地快照則略過 */ }
+            if (!localLoaded) {
+                try {
+                    total += mergePetGuideEntries(await fetchPetJson(PET_GUIDE_JSON_URL, true), 'guide.starcg.net');
+                } catch (e) {
+                    console.warn('[寵物圖鑑] 本地與遠端皆載入失敗', e);
+                }
+            } else {
+                try {
+                    total += mergePetGuideEntriesFillOnly(
+                        await fetchPetJson(PET_GUIDE_JSON_URL, true),
+                        'guide.starcg.net'
+                    );
+                } catch (_) { /* 遠端補漏失敗不影響本地 */ }
+            }
+            try {
+                const patch = await fetchPetJson(PET_PATCH_JSON_URL, false);
+                if (Array.isArray(patch)) {
+                    total += mergePetGuideEntries(patch, 'pet_profiles_patch.json');
+                } else {
+                    if (patch.pets) total += mergePetGuideEntries(patch.pets, 'pet_profiles_patch.json');
+                    if (patch.overrides) mergePetProfileOverrides(patch.overrides, 'pet_profiles_patch.json');
+                    if (patch.aliases) mergePetNameAliases(patch.aliases, 'pet_profiles_patch.json');
+                }
+            } catch (_) { /* 無 patch 則略過 */ }
+            const count = Object.keys(PET_PROFILES).length;
+            console.info(`[寵物圖鑑] 合計 ${count} 隻（有效合併 ${total} 筆）`);
+            if (count > 0 && allMarketItems.length > 0) {
+                refreshPetAllocTagsOnItems(allMarketItems);
+                if (document.querySelector('.tab[data-tab="market"]')?.classList.contains('active')) applyFilters();
+            }
+            return count;
+        } catch (e) {
+            console.warn('[寵物圖鑑] 載入失敗，扣檔/滿檔標籤將不可用', e);
+            petProfilesLoadPromise = null;
+            return 0;
+        }
+    })();
+    return petProfilesLoadPromise;
+}
+
+function resolvePetProfileName(name) {
+    return PET_NAME_ALIASES[name] || name;
+}
+
+function getPetProfile(name) {
+    const key = resolvePetProfileName(name);
+    return PET_PROFILES[key] || PET_PROFILES[name] || null;
+}
+
+const PET_STAT_LABELS = ['體', '力', '強', '敏', '魔'];
+const PET_MAX_STAR = 25;
+
+function calcPetGradeDeficit(baseStats, perfect) {
+    if (!perfect) return null;
+    return -perfect.reduce((def, p, i) => def + Math.max(0, p - (baseStats[i] || 0)), 0);
+}
+
+function calcPetDeficitDetail(baseStats, perfect) {
+    if (!perfect) return '';
+    return PET_STAT_LABELS.map((label, i) => {
+        const drop = perfect[i] - (baseStats[i] || 0);
+        return drop > 0 ? `${label}-${drop}` : null;
+    }).filter(Boolean).join(',');
+}
+
+function buildPetGradeTag(petName, baseStats) {
+    const profile = getPetProfile(petName);
+    if (!profile?.perfect) return '';
+    const deficit = calcPetGradeDeficit(baseStats, profile.perfect);
+    if (deficit === 0) {
+        return '<span class="pet-grade pet-grade-full">滿檔</span>';
+    }
+    const drop = -deficit;
+    const detail = calcPetDeficitDetail(baseStats, profile.perfect);
+    return `<span class="pet-grade pet-grade-drop" data-tip="${escapeAttr(detail)}" tabindex="0" role="note" aria-label="${escapeAttr(detail)}">掉${drop}檔</span>`;
+}
+
+function buildPetStarTag(petName, starStats) {
+    const profile = getPetProfile(petName);
+    if (!profile || profile.bornStar == null) return '';
+    const starUp = sumPetStats(starStats);
+    const totalStar = profile.bornStar + starUp;
+    if (totalStar === profile.bornStar) return '';
+    if (totalStar >= PET_MAX_STAR) {
+        return '<span class="pet-star pet-star-max">滿星</span>';
+    }
+    return `<span class="pet-star">${totalStar}★</span>`;
+}
+
+function computePetGradeMeta(petName, petAllocBase, petAllocStar) {
+    const profile = getPetProfile(petName);
+    const starUp = petAllocStar ? sumPetStats(petAllocStar) : 0;
+    const bornStar = profile?.bornStar ?? null;
+    const totalStar = bornStar != null ? bornStar + starUp : null;
+    let petGradeDrop = null;
+    let petFullGrade = false;
+    if (petAllocBase && profile?.perfect) {
+        const deficit = calcPetGradeDeficit(petAllocBase, profile.perfect);
+        if (deficit != null) {
+            petGradeDrop = deficit === 0 ? 0 : -deficit;
+            petFullGrade = deficit === 0;
+        }
+    }
+    const petMaxStar = totalStar != null && totalStar >= PET_MAX_STAR;
+    return { petGradeDrop, petFullGrade, petMaxStar, petTotalStar: totalStar, petBornStar: bornStar, petStarUp: starUp };
+}
+
+function buildPetTags(petName, petLv, trans, slot, petAllocBase, petAllocStar) {
+    let tags = `<span class="pet-lv">Lv${petLv}</span>`;
+    tags += `<span class="pet-trans">${trans}改</span>`;
+    tags += `<span class="pet-slot">${slot}技</span>`;
+    if (petAllocBase) {
+        tags += buildPetGradeTag(petName, petAllocBase);
+        tags += buildPetStarTag(petName, petAllocStar || [0, 0, 0, 0, 0]);
+    }
+    return tags;
+}
+
+function refreshPetAllocTagsOnItems(items) {
+    if (!items?.length || !Object.keys(PET_PROFILES).length) return;
+    for (const item of items) {
+        if (!item.isPet || !item.petAllocBase) continue;
+        item.transTag = buildPetTags(
+            item.item,
+            item.petLv,
+            item.petTrans ?? 0,
+            item.petSlot ?? 6,
+            item.petAllocBase,
+            item.petAllocStar
+        );
+        const meta = computePetGradeMeta(item.item, item.petAllocBase, item.petAllocStar);
+        item.petGradeDrop = meta.petGradeDrop;
+        item.petFullGrade = meta.petFullGrade;
+        item.petMaxStar = meta.petMaxStar;
+        item.petTotalStar = meta.petTotalStar;
+        item.petBornStar = meta.petBornStar;
+        item.petStarUp = meta.petStarUp;
+    }
 }
 
 function processMarketPageData(data, normalizedKeyword, exact = false) {
@@ -2834,9 +3157,18 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
                     const trans = pet.Trans || 0;
                     const slot = pet.Slot || 6;
                     
-                    let petTags = `<span class="pet-lv">Lv${petLv}</span>`;
-                    petTags += `<span class="pet-trans">${trans}改</span>`;
-                    petTags += `<span class="pet-slot">${slot}技</span>`;
+                    const allocPoint = pet.AllocPoint ?? pet.allocPoint;
+                    const petAllocPoint = pet.PetAllocPoint ?? pet.petAllocPoint ?? 0;
+                    let petAllocBase = null;
+                    let petAllocStar = null;
+                    let petAllocTotal = null;
+                    if (allocPoint != null && Number(allocPoint) > 0) {
+                        petAllocBase = decodePetAllocPoint(allocPoint);
+                        petAllocStar = decodePetAllocPoint(petAllocPoint);
+                        petAllocTotal = petAllocBase.map((v, i) => v + petAllocStar[i]);
+                    }
+                    const petTags = buildPetTags(pet.Name, petLv, trans, slot, petAllocBase, petAllocStar);
+                    const petMeta = computePetGradeMeta(pet.Name, petAllocBase, petAllocStar);
                     
                     items.push({
                         item: pet.Name,
@@ -2859,7 +3191,18 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
                         shopName: stall.name,
                         count: 1,
                         isPet: true,
-                        petLv: petLv
+                        petLv: petLv,
+                        petTrans: trans,
+                        petSlot: slot,
+                        petAllocBase,
+                        petAllocStar,
+                        petAllocTotal,
+                        petStarUp: petMeta.petStarUp,
+                        petBornStar: petMeta.petBornStar,
+                        petTotalStar: petMeta.petTotalStar,
+                        petGradeDrop: petMeta.petGradeDrop,
+                        petFullGrade: petMeta.petFullGrade,
+                        petMaxStar: petMeta.petMaxStar
                     });
                 }
             });
@@ -3070,6 +3413,8 @@ function applyFilters() {
     // 排序
     filtered = sortItems(filtered);
     
+    refreshPetAllocTagsOnItems(filtered);
+
     // 更新統計
     updateStats(filtered);
     
@@ -3095,6 +3440,17 @@ function compareSortField(a, b, field, order) {
 }
 
 function getStatSortValue(item, statKey) {
+    if (statKey === 'petFull') {
+        if (!item.isPet || item.petGradeDrop == null) return statSortOrder === 'desc' ? -1 : Infinity;
+        return item.petGradeDrop === 0 ? 100 : Math.max(0, 100 - item.petGradeDrop);
+    }
+    if (statKey === 'petMaxStar') {
+        if (!item.isPet || item.petTotalStar == null || item.petTotalStar === item.petBornStar) {
+            return statSortOrder === 'desc' ? -1 : Infinity;
+        }
+        if (item.petTotalStar >= PET_MAX_STAR) return 100;
+        return item.petTotalStar;
+    }
     const v = item.statMods?.[statKey];
     if (v == null) return statSortOrder === 'desc' ? -1 : Infinity;
     return v;
