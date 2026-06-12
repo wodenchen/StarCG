@@ -1701,6 +1701,24 @@
 <script src="equipment_max_stats.js"></script>
 <script>
 /* ========================================
+   裝備頂值（helper 放 HTML，避免外部 js 未部署時搜尋失敗）
+======================================== */
+function getEquipmentMaxProfile(itemName, itemId) {
+    if (typeof EQUIPMENT_MAX_STATS === 'undefined') return null;
+    const p = EQUIPMENT_MAX_STATS[itemName];
+    if (!p) return null;
+    if (p.byItemId && itemId != null && itemId in p.byItemId) return p.byItemId[itemId];
+    if (p.byItemId) return null;
+    return p;
+}
+
+function getVariableStatKeys(itemName, itemId) {
+    const profile = getEquipmentMaxProfile(itemName, itemId);
+    if (profile === null) return null;
+    return Object.keys(profile);
+}
+
+/* ========================================
    全域變數
 ======================================== */
 // ★★★ 部署後把這行換成你自己的 Cloudflare Worker 網址（結尾保留 /?u=） ★★★
