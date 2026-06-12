@@ -442,8 +442,15 @@
             margin-bottom: 20px;
         }
 
+        /* 市場結果：僅水平捲動，垂直跟隨主頁 */
+        #marketSection.table-container {
+            overflow-x: auto;
+            overflow-y: clip;
+        }
+
         .table-scroll {
             overflow-x: auto;
+            overflow-y: clip;
         }
 
         table {
@@ -594,10 +601,91 @@
             background: linear-gradient(135deg, #faf6ee, #f3ebdc);
         }
 
+        .stat-tag-hint {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1px solid #d8cbb8;
+            background: #fffbf5;
+            color: #8b7355;
+            font-size: 0.78rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: help;
+            flex-shrink: 0;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 1px 2px rgba(74, 63, 53, 0.06);
+            transition: border-color 0.15s, color 0.15s;
+        }
+
+        .stat-tag-hint:hover,
+        .stat-tag-hint:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .stat-tag-hint::after {
+            content: attr(data-tip);
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: max-content;
+            max-width: 220px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #4a3f35;
+            color: #fffbf5;
+            font-size: 0.78rem;
+            font-weight: 500;
+            line-height: 1.45;
+            text-align: left;
+            white-space: normal;
+            box-shadow: 0 4px 12px rgba(74, 63, 53, 0.22);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.15s, visibility 0.15s;
+            z-index: 20;
+        }
+
+        .stat-tag-hint:hover::after,
+        .stat-tag-hint:focus::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
         td {
             padding: 14px 12px;
             border-bottom: 1px solid var(--border);
             font-size: 1rem;
+        }
+
+        .item-name-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.5;
+        }
+
+        .item-name-row > strong {
+            flex-shrink: 0;
+        }
+
+        .item-tag-group {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .item-tag-group > * {
+            margin-left: 0 !important;
         }
 
         /* 固定第一欄（物品名稱） */
@@ -608,6 +696,7 @@
             background: var(--bg-card);
             z-index: 2;
             border-right: 2px solid var(--border);
+            overflow: visible;
         }
 
         th:first-child {
@@ -708,6 +797,64 @@
         .soul-stat.st-spirit { background: #27ae60; }
         .soul-stat.st-hit { background: #e74c3c; }
         .soul-stat.st-counter { background: #d68910; }
+        .soul-stat.st-mdef { background: #5b6abf; }
+        .soul-stat.st-hp { background: #c75050; }
+        .soul-stat.st-mp { background: #9068b0; }
+
+        /* 頂值 / 破頂標籤（hover 顯示明細，比照 stat-tag-hint） */
+        .stat-peak-tag,
+        .stat-break-tag,
+        .stat-peak-mix-tag {
+            position: relative;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-left: 6px;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: help;
+        }
+        .stat-peak-tag {
+            background: linear-gradient(135deg, #d4a024, #b8860b);
+            box-shadow: 0 1px 4px rgba(212, 160, 36, 0.45);
+        }
+        .stat-break-tag {
+            background: linear-gradient(135deg, #c75050, #922b21);
+            box-shadow: 0 1px 4px rgba(199, 80, 80, 0.45);
+        }
+        .stat-peak-mix-tag {
+            background: linear-gradient(135deg, #d4a024 0%, #c75050 100%);
+            box-shadow: 0 1px 4px rgba(180, 100, 50, 0.45);
+        }
+        .stat-peak-tag:hover,
+        .stat-break-tag:hover,
+        .stat-peak-mix-tag:hover {
+            filter: brightness(1.08);
+        }
+
+        .peak-floating-tip {
+            position: fixed;
+            z-index: 10000;
+            width: max-content;
+            max-width: 220px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #4a3f35;
+            color: #fffbf5;
+            font-size: 0.78rem;
+            font-weight: 500;
+            line-height: 1.45;
+            text-align: left;
+            white-space: pre-line;
+            box-shadow: 0 4px 12px rgba(74, 63, 53, 0.22);
+            pointer-events: none;
+        }
+
+        .peak-floating-tip[hidden] {
+            display: none;
+        }
 
         /* 重來的種子 BP 標籤 */
         .bp-plus {
@@ -940,12 +1087,19 @@
             }
 
             /* 表格水平滾動 */
-            .table-container {
+            .table-container:not(#marketSection) {
                 overflow: hidden;
+            }
+
+            #marketSection.table-container {
+                overflow-x: auto;
+                overflow-y: clip;
+                -webkit-overflow-scrolling: touch;
             }
 
             .table-scroll {
                 overflow-x: auto;
+                overflow-y: clip;
                 -webkit-overflow-scrolling: touch;
             }
 
@@ -1451,36 +1605,35 @@
 
     <!-- Market Table -->
     <div class="table-container" id="marketSection" style="display: none;">
-        <div class="table-scroll">
-            <table id="marketTable">
-                <thead>
-                    <tr>
-                        <th class="th-with-stat-sort">
-                            <div class="th-item-header">
-                                <span class="th-sortable" data-sort="item">物品名稱</span>
-                                <span class="stat-sort-group">
-                                    <span class="stat-sort-wrap">
-                                        <select id="statSortFilter" class="stat-sort-select" title="依加成屬性排序">
-                                            <option value="" selected>屬性排序</option>
-                                        </select>
-                                    </span>
-                                    <button type="button" id="statSortOrderBtn" class="stat-sort-order-btn" title="切換排序方向（高→低 / 低→高）" disabled>▼</button>
+        <table id="marketTable">
+            <thead>
+                <tr>
+                    <th class="th-with-stat-sort">
+                        <div class="th-item-header">
+                            <span class="th-sortable" data-sort="item">物品名稱</span>
+                            <span class="stat-sort-group">
+                                <span class="stat-sort-wrap">
+                                    <select id="statSortFilter" class="stat-sort-select" title="依加成屬性排序">
+                                        <option value="" selected>屬性排序</option>
+                                    </select>
                                 </span>
-                            </div>
-                        </th>
-                        <th data-sort="price">價格 <span class="sort-icon active">▲</span></th>
-                        <th>分流/地點</th>
-                        <th>攤位名稱</th>
-                        <th data-sort="durability">耐久</th>
-                        <th data-sort="attack">攻擊</th>
-                        <th data-sort="defence">防禦</th>
-                        <th data-sort="agility">敏捷</th>
-                        <th>數量</th>
-                    </tr>
-                </thead>
-                <tbody id="marketBody"></tbody>
-            </table>
-        </div>
+                                <button type="button" id="statSortOrderBtn" class="stat-sort-order-btn" title="切換排序方向（高→低 / 低→高）" disabled>▼</button>
+                                <span class="stat-tag-hint" data-tip="僅顯示浮動屬性；固定數值不列標籤" tabindex="0" role="note" aria-label="僅顯示浮動屬性；固定數值不列標籤">ⓘ</span>
+                            </span>
+                        </div>
+                    </th>
+                    <th data-sort="price">價格 <span class="sort-icon active">▲</span></th>
+                    <th>分流/地點</th>
+                    <th>攤位名稱</th>
+                    <th data-sort="durability">耐久</th>
+                    <th data-sort="attack">攻擊</th>
+                    <th data-sort="defence">防禦</th>
+                    <th data-sort="agility">敏捷</th>
+                    <th>數量</th>
+                </tr>
+            </thead>
+            <tbody id="marketBody"></tbody>
+        </table>
     </div>
 
     <!-- History Section -->
@@ -1530,6 +1683,8 @@
     </div>
 </div>
 
+<div id="peakTip" class="peak-floating-tip" role="tooltip" hidden></div>
+
 <!-- 攤位地圖 Modal -->
 <div class="map-modal" id="mapModal">
     <div class="map-dialog">
@@ -1543,6 +1698,7 @@
     </div>
 </div>
 
+<script src="equipment_max_stats.js"></script>
 <script>
 /* ========================================
    全域變數
@@ -1642,6 +1798,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     initStatSortFilter();
     initMapModal();
+    initPeakFloatingTip();
     initQuickTags();
     initBounty();
 });
@@ -1686,13 +1843,74 @@ function initQuickTags() {
     });
 }
 
+let peakTipAnchor = null;
+
+function positionPeakFloatingTip(tag) {
+    const tip = document.getElementById('peakTip');
+    const rect = tag.getBoundingClientRect();
+    const gap = 6;
+    const margin = 8;
+    let top = rect.top - tip.offsetHeight - gap;
+    if (top < margin) top = rect.bottom + gap;
+    let left = rect.left + rect.width / 2 - tip.offsetWidth / 2;
+    left = Math.max(margin, Math.min(left, window.innerWidth - tip.offsetWidth - margin));
+    top = Math.max(margin, Math.min(top, window.innerHeight - tip.offsetHeight - margin));
+    tip.style.left = `${left}px`;
+    tip.style.top = `${top}px`;
+}
+
+function showPeakFloatingTip(tag) {
+    const tip = document.getElementById('peakTip');
+    const text = tag.dataset.tip;
+    if (!text) return;
+    peakTipAnchor = tag;
+    tip.textContent = text;
+    tip.hidden = false;
+    positionPeakFloatingTip(tag);
+}
+
+function hidePeakFloatingTip() {
+    document.getElementById('peakTip').hidden = true;
+    peakTipAnchor = null;
+}
+
+function initPeakFloatingTip() {
+    const body = document.getElementById('marketBody');
+    const peakSelector = '.stat-peak-tag, .stat-break-tag, .stat-peak-mix-tag';
+
+    body.addEventListener('mouseover', e => {
+        const tag = e.target.closest(peakSelector);
+        if (tag) showPeakFloatingTip(tag);
+    });
+    body.addEventListener('mouseout', e => {
+        const tag = e.target.closest(peakSelector);
+        if (!tag) return;
+        if (e.relatedTarget && tag.contains(e.relatedTarget)) return;
+        hidePeakFloatingTip();
+    });
+    body.addEventListener('focusin', e => {
+        const tag = e.target.closest(peakSelector);
+        if (tag) showPeakFloatingTip(tag);
+    });
+    body.addEventListener('focusout', e => {
+        const tag = e.target.closest(peakSelector);
+        if (tag && !tag.contains(e.relatedTarget)) hidePeakFloatingTip();
+    });
+
+    const reposition = () => {
+        if (peakTipAnchor) positionPeakFloatingTip(peakTipAnchor);
+    };
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition);
+}
+
 function initMapModal() {
     document.getElementById('mapModalClose').addEventListener('click', closeMapModal);
     document.getElementById('mapModal').addEventListener('click', e => {
         if (e.target.id === 'mapModal') closeMapModal();
     });
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') { closeMapModal(); closeBountyModal(); }
+        if (e.key === 'Escape') { closeMapModal(); closeBountyModal(); hidePeakFloatingTip(); }
     });
     // 地點欄位點擊（事件委派）
     document.getElementById('marketBody').addEventListener('click', e => {
@@ -1915,20 +2133,74 @@ const MARKET_STAT_TAG_DEFS = [
     ['ITEM_ADM', '魔攻', 'st-madm'],
     ['ITEM_MODIFYMAGIC', '精神', 'st-spirit'],
     ['ITEM_MODIFYHITRATE', '命中', 'st-hit'],
-    ['ITEM_MODIFYCOUNTER', '反擊', 'st-counter']
+    ['ITEM_MODIFYCOUNTER', '反擊', 'st-counter'],
+    ['ITEM_RSS', '魔抗', 'st-mdef'],
+    ['ITEM_MODIFYHP', '生命', 'st-hp'],
+    ['ITEM_MODIFYFORCEPOINT', '魔力', 'st-mp']
 ];
 const MARKET_SOUL_COLORS = {
-    1007001: { label: '藍', cls: 'soul-blue', extra: [] },
-    1007002: { label: '紅', cls: 'soul-red', extra: [['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'], ['ITEM_MODIFYRECOVERY', '回復', 'st-recov']] },
-    1007003: { label: '黃', cls: 'soul-yellow', extra: [['ITEM_ADM', '魔攻', 'st-madm'], ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid']] }
+    1007001: { label: '藍', cls: 'soul-blue' },
+    1007002: { label: '紅', cls: 'soul-red' },
+    1007003: { label: '黃', cls: 'soul-yellow' }
 };
-function buildStatMods(rawItem) {
+
+function resolveTagDefs(itemName, itemId) {
+    const keys = getVariableStatKeys(itemName, itemId);
+    if (keys === null) return MARKET_STAT_TAG_DEFS;
+    if (keys.length === 0) return [];
+    const keySet = new Set(keys);
+    return MARKET_STAT_TAG_DEFS.filter(([k]) => keySet.has(k));
+}
+
+function buildStatMods(rawItem, itemName, itemId) {
     const mods = {};
-    MARKET_STAT_TAG_DEFS.forEach(([key]) => {
+    resolveTagDefs(itemName, itemId).forEach(([key]) => {
         const v = rawItem[key] || 0;
         if (v !== 0) mods[key] = v;
     });
     return mods;
+}
+
+function compareMaxStats(rawItem, itemName, itemId) {
+    const profile = getEquipmentMaxProfile(itemName, itemId);
+    const top = [];
+    const over = [];
+    if (!profile) return { top, over };
+    Object.entries(profile).forEach(([key, maxVal]) => {
+        const actual = Number(rawItem[key]) || 0;
+        const label = (typeof EQUIPMENT_STAT_LABELS !== 'undefined' && EQUIPMENT_STAT_LABELS[key]) || key;
+        if (actual === maxVal) top.push({ key, label, actual, max: maxVal });
+        else if (actual > maxVal) over.push({ key, label, actual, max: maxVal });
+    });
+    return { top, over };
+}
+
+function formatPeakTipLines(list, kind) {
+    const prefix = kind === 'over' ? '破頂 ' : '頂 ';
+    return list.map(d => (
+        `${prefix}${d.label} ${kind === 'over' ? `${d.actual}>${d.max}` : `${d.actual}=${d.max}`}`
+    ));
+}
+
+function buildPeakTipText(top, over) {
+    return [...formatPeakTipLines(top, 'top'), ...formatPeakTipLines(over, 'over')].join('\n');
+}
+
+function buildPeakTagHtml(cls, label, tip) {
+    return `<span class="${cls}" tabindex="0" role="note" data-tip="${escapeAttr(tip)}" aria-label="${escapeAttr(tip)}">${label}</span>`;
+}
+
+function buildPeakTags(rawItem, itemName, itemId) {
+    const { top, over } = compareMaxStats(rawItem, itemName, itemId);
+    if (top.length === 0 && over.length === 0) return { peakTag: '' };
+    const tip = buildPeakTipText(top, over);
+    if (top.length > 0 && over.length > 0) {
+        return { peakTag: buildPeakTagHtml('stat-peak-mix-tag', '頂·破頂', tip) };
+    }
+    if (top.length > 0) {
+        return { peakTag: buildPeakTagHtml('stat-peak-tag', '頂', tip) };
+    }
+    return { peakTag: buildPeakTagHtml('stat-break-tag', '破頂', tip) };
 }
 
 function marketNameMatches(normalizedName, normalizedKeyword, exact) {
@@ -1939,10 +2211,11 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
     const items = [];
     const itemsMap = data.itemsByCd || {};
     const petsMap = data.petsByCd || {};
+    const formatStatValue = v => (v > 0 ? `+${v}` : String(v));
     const buildStatTags = (item, defs) => defs
         .map(([k, lbl, sc]) => [item[k] || 0, lbl, sc])
         .filter(([v]) => v !== 0)
-        .map(([v, lbl, sc]) => `<span class="soul-stat ${sc}">${lbl}+${v}</span>`)
+        .map(([v, lbl, sc]) => `<span class="soul-stat ${sc}">${lbl}${formatStatValue(v)}</span>`)
         .join(' ');
 
     (data.stalls || []).forEach(stall => {
@@ -1991,18 +2264,18 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
                     let colorTag = '';
                     let statTag = '';
                     let soulColor = '';
+                    const tagDefs = resolveTagDefs(displayName, item.ITEM_ID);
                     if (MARKET_SOUL_COLORS[item.ITEM_ID]) {
                         const c = MARKET_SOUL_COLORS[item.ITEM_ID];
                         soulColor = c.label;
                         colorTag = `<span class="soul-tag ${c.cls}">${c.label}</span>`;
-                        const ex = buildStatTags(item, c.extra);
-                        if (ex) colorTag += ' ' + ex;
                     }
-
-                    if (!soulColor) {
-                        const tags = buildStatTags(item, MARKET_STAT_TAG_DEFS);
+                    if (tagDefs.length > 0) {
+                        const tags = buildStatTags(item, tagDefs);
                         if (tags) statTag = tags;
                     }
+
+                    const { peakTag } = buildPeakTags(item, displayName, item.ITEM_ID);
                     
                     items.push({
                         item: displayName,
@@ -2011,7 +2284,8 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
                         seedTag: seedTag,
                         colorTag: colorTag,
                         statTag: statTag,
-                        statMods: buildStatMods(item),
+                        peakTag: peakTag,
+                        statMods: buildStatMods(item, displayName, item.ITEM_ID),
                         soulColor: soulColor,
                         isSeed: seedPlusStats.length > 0 || seedMinusStats.length > 0,
                         seedPlusStats: seedPlusStats,
@@ -2373,7 +2647,7 @@ function renderMarketTable(items) {
             merged[uniqueKey] = { ...item };
         } else {
             // 一般物品：同攤位+同物品+同價格+同數值+同BP配點才合併
-            const key = `${item.location}-${item.item}-${item.price}-${item.server}-${item.durability}-${item.attack}-${item.defence}-${item.agility}-${item.seedTag || ''}-${item.colorTag || ''}-${item.statTag || ''}`;
+            const key = `${item.location}-${item.item}-${item.price}-${item.server}-${item.durability}-${item.attack}-${item.defence}-${item.agility}-${item.seedTag || ''}-${item.colorTag || ''}-${item.statTag || ''}-${item.peakTag || ''}`;
             if (!merged[key]) {
                 merged[key] = { ...item };
             } else {
@@ -2399,7 +2673,7 @@ function renderMarketTable(items) {
         
         return `
         <tr>
-            <td><strong>${escapeHtml(item.item)}</strong> ${item.colorTag || ''}${item.statTag || ''}${item.gradeTag || ''}${item.seedTag || ''}${item.transTag || ''}</td>
+            <td><div class="item-name-row"><strong>${escapeHtml(item.item)}</strong><span class="item-tag-group">${item.peakTag || ''}${item.colorTag || ''}${item.statTag || ''}${item.gradeTag || ''}${item.seedTag || ''}${item.transTag || ''}</span></div></td>
             <td>
                 <span class="price ${item.pricetype === 0 ? 'coin' : 'crystal'}">
                     ${item.pricetype === 0 ? '💰' : '💎'} ${item.price.toLocaleString()}
@@ -2830,7 +3104,7 @@ const BOUNTY_EQUIPMENT = {
     // ---- 防具 ----
     '盔': [['1A','硬皮頭盔'],['1B','銅制頭盔'],['2A','鐵板布盔'],['2B','銅鐵皮盔'],['3A','金屬護額'],['3B','鐵制頭盔'],['4A','霸葛頭盔'],['4B','角飾頭盔'],['5A','開放式頭盔'],['5B','葛理克頭盔'],['5C','聖騎士之盔'],['6A','巴比克頭盔'],['6B','利刃頭盔'],['7A','騎士頭盔'],['7B','鋼製頭盔'],['8A','博流蓋爾頭盔'],['8B','鉚釘頭盔'],['8C','鋼製頭盔+'],['9A','羽毛頭盔'],['9B','龍盔'],['10A','白金頭盔'],['10B','聖龍頭盔'],['11A','正義頭盔'],['11B','靈力頭盔']],
     '帽': [['1A','麻布帽'],['1B','硬帽'],['2A','輕帽'],['2B','皮帽'],['3A','硬皮帽'],['3B','可愛的帽子'],['4A','時髦帽子'],['4B','鴨舌帽'],['5A','藍徽章之帽'],['5B','高級帽子'],['5C','劍客帽'],['6A','裝飾着花的帽子'],['6B','青銅帽子'],['7A','淑女帽'],['7B','可愛的扁帽子'],['8A','軍帽'],['8B','時髦避暑帽'],['8C','可愛的扁帽子+'],['9A','羽毛帽'],['9B','魔術師之帽'],['10A','黃昏之帽'],['10B','妖精之帽'],['11A','貝斯神帽'],['11B','神官帽']],
-    '鎧': [['1A','軟皮甲'],['1B','護心甲'],['2A','青銅鎧甲'],['2B','輕型鎧甲'],['3A','輕型鎖鏈甲'],['3B','環甲'],['4A','鋼鐵鎧甲'],['4B','金屬皮甲'],['5A','長型金屬鎧甲'],['5B','索狀鎧甲'],['5C','劍齒鎧甲'],['6A','重鐵板甲'],['6B','鐵板半身甲'],['7A','實戰鎧甲'],['7B','黃金鎧甲'],['8A','重金屬鎧甲'],['8B','野獸之鎧'],['8C','輕短鎧甲+'],['9A','帝王之鎧'],['9B','亡靈鎧甲'],['10A','漆黑之鎧'],['10B','騎士鎧甲'],['11A','紅繩威鎧'],['11B','守護鎧甲']],
+    '鎧': [['1A','軟皮甲'],['1B','護心甲'],['2A','青銅鎧甲'],['2B','輕型鎧甲'],['3A','輕型鎖鏈甲'],['3B','環甲'],['4A','鋼鐵鎧甲'],['4B','金屬皮甲'],['5A','長型金屬鎧甲'],['5B','索狀鎧甲'],['5C','劍齒鎧甲'],['6A','重鐵板甲'],['6B','鐵板半身甲'],['7A','實戰鎧甲'],['7B','黃金鎧甲'],['8A','重金屬鎧甲'],['8B','野獸之鎧'],['8C','實戰鎧甲+'],['9A','帝王之鎧'],['9B','亡靈鎧甲'],['10A','漆黑之鎧'],['10B','騎士鎧甲'],['11A','紅繩威鎧'],['11B','守護鎧甲']],
     '衣': [['1A','旅人之服'],['1B','保護衣'],['2A','羽毛裝'],['2B','皮裝'],['3A','硬皮服'],['3B','鎖鏈裝'],['4A','布甲'],['4B','櫬甲'],['5A','環服'],['5B','士兵護衣'],['5C','功夫裝'],['6A','長索錐衣'],['6B','索錐上衣'],['7A','骨衣'],['7B','超級衣服'],['8A','疾風之衣'],['8B','步兵戰衣'],['8C','獸骨之衣+'],['9A','勇者之衣'],['9B','女神之衣'],['10A','不死鳥之服'],['10B','靈魂之服'],['11A','海洋之服'],['11B','幻想之服']],
     '袍': [['1A','羽毛袍'],['1B','輕皮袍'],['2A','網袍'],['2B','風袍'],['3A','硬皮袍'],['3B','環袍'],['4A','烏鴉之袍'],['4B','月亮之袍'],['4C','狐皮披風'],['5A','東方法衣'],['5B','聖堂之袍'],['5C','治愈之袍'],['6A','聖者之袍'],['6B','戰斗長袍'],['7A','冠軍之袍'],['7B','時之袍'],['8A','死神之袍'],['8B','勇者之袍'],['8C','潔淨之袍+'],['9A','黑暗之袍'],['9B','聖袍'],['10A','靈魂之袍'],['10B','奇蹟之袍'],['11A','共嗚之袍'],['11B','和平之袍']],
     '靴': [['1A','軟皮靴'],['1B','皮靴'],['2A','硬皮靴'],['2B','長靴'],['3A','厚底靴'],['3B','編織的靴子'],['4A','鎖鏈長靴'],['4B','鎖鏈靴'],['5A','蜥蜴靴'],['5B','蜥蜴長靴'],['5C','防護靴'],['6A','鋼靴'],['6B','鋼制長靴'],['7A','水晶靴'],['7B','銀靴'],['8A','流水之靴'],['8B','芙蕾雅之靴'],['8C','標準長靴+'],['9A','鑽石靴'],['9B','鑽石長靴'],['10A','秘密之靴'],['10B','龍之靴'],['11A','幸運靴'],['11B','試力鞋']],
@@ -3055,6 +3329,15 @@ function initBounty() {
         closeBountyModal();
         quickSearch(item.dataset.name, true);
     });
+}
+
+function escapeAttr(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 function escapeHtml(str) {
