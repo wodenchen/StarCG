@@ -116,6 +116,8 @@
             margin-top: 12px;
             padding-top: 12px;
             border-top: 1px solid var(--border);
+            flex-wrap: nowrap;
+            gap: 10px;
         }
 
         .search-row.filter-row .form-group {
@@ -128,9 +130,10 @@
         }
         .search-row.filter-row select,
         .search-row.filter-row .exchange-rate-group input,
-        .search-row.filter-row #bountyBtn {
-            height: 38px;
-            padding: 6px 10px;
+        .search-row.filter-row #bountyBtn,
+        .search-row.filter-row #procurementBtn {
+            height: 42px;
+            padding: 7px 10px;
             font-size: 0.95rem;
             box-sizing: border-box;
         }
@@ -166,19 +169,26 @@
             width: 50px;
             min-width: 50px;
             max-width: 50px;
+            height: 42px;
             padding: 6px 0;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             text-align: center;
             text-align-last: center;
         }
 
+        .bounty-group {
+            flex-direction: row !important;
+            align-items: flex-end;
+            gap: 8px;
+            flex-shrink: 0;
+        }
         .bounty-group #bountyBtn {
             width: auto;
-            min-width: 108px;
-            min-height: 46px;
-            height: auto;
-            padding: 10px 16px;
-            font-size: 1.05rem;
+            min-width: 104px;
+            min-height: 42px;
+            height: 42px;
+            padding: 7px 14px;
+            font-size: 0.95rem;
             font-weight: 700;
             background: linear-gradient(135deg, #c49a6c, #9a7348);
             border: 2px solid #7a5a38;
@@ -190,32 +200,53 @@
             box-shadow: 0 4px 10px rgba(139, 107, 74, 0.45);
         }
 
-        .checkbox-group {
+        .filter-chips {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 7px;
             background: var(--bg-dark);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 10px 16px;
+            padding: 5px 7px;
             align-self: flex-end;
+            flex-shrink: 0;
         }
-
-        .checkbox-group label {
-            display: flex;
+        .filter-chip {
+            position: relative;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            height: 42px;
+            padding: 0 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-secondary);
             cursor: pointer;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            font-weight: 500;
             white-space: nowrap;
+            user-select: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
         }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
+        .filter-chip input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+        .filter-chip:hover {
+            border-color: #c49a6c;
+            background: #fffaf3;
+            color: var(--text-primary);
+        }
+        .filter-chip:has(input:checked) {
+            border-color: #9a7348;
+            background: linear-gradient(135deg, #fff8ef, #f5ebe0);
+            box-shadow: inset 0 0 0 1px #d4b896;
+            color: #5c3d1e;
         }
 
         .form-group {
@@ -359,8 +390,9 @@
             border: 1px dashed var(--accent-red);
             color: var(--accent-red);
             border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 0.9rem;
+            padding: 9px 18px;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -1065,10 +1097,12 @@
                 width: 100%;
             }
 
-            .checkbox-group {
+            .search-row.filter-row {
+                flex-wrap: wrap;
+            }
+            .filter-chips {
                 width: 100%;
                 flex-wrap: wrap;
-                gap: 14px;
             }
 
             .stats-grid {
@@ -1454,6 +1488,380 @@
             color: var(--text-secondary);
             margin-right: 4px;
         }
+
+        /* 採購排程 */
+        .bounty-group #procurementBtn {
+            width: auto;
+            min-width: 104px;
+            min-height: 42px;
+            height: 42px;
+            padding: 7px 14px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #5a9a5a, #3d7a3d);
+            border: 2px solid #2d6a2d;
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(58, 122, 58, 0.35);
+        }
+        .bounty-group #procurementBtn:hover {
+            background: linear-gradient(135deg, #6aaa6a, #4d8a4d);
+        }
+        .procurement-body {
+            padding: 16px 18px 20px;
+            overflow-y: auto;
+            max-height: calc(90vh - 60px);
+        }
+        .procurement-hint {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .procurement-item-rows,
+        .procurement-pet-rows {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 12px;
+            margin-bottom: 16px;
+        }
+        .procurement-item-row,
+        .procurement-pet-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+        .procurement-item-row input[type="text"],
+        .procurement-pet-row select {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: #fff;
+        }
+        .procurement-item-row input[type="number"],
+        .procurement-pet-row input[type="number"] {
+            width: 52px;
+            flex-shrink: 0;
+            padding: 8px 4px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .procurement-section-title {
+            font-weight: 600;
+            font-size: 0.92rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .procurement-footer {
+            display: grid;
+            grid-template-columns: 128px 1fr auto;
+            gap: 16px 20px;
+            align-items: stretch;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        .procurement-settings {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+        }
+        .procurement-footer .form-group {
+            margin: 0;
+        }
+        .procurement-footer label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .procurement-footer select {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            background: #fff;
+        }
+        .procurement-start-section {
+            min-width: 0;
+        }
+        .procurement-start-presets {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .procurement-start-preset {
+            width: 100%;
+            min-width: 0;
+            padding: 7px 6px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.84rem;
+            font-weight: 600;
+            line-height: 1.35;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+        }
+        .procurement-start-preset .coord {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .procurement-start-preset:hover {
+            border-color: #c49a6c;
+            background: #fffaf3;
+        }
+        .procurement-start-preset.active {
+            border-color: #9a7348;
+            background: linear-gradient(135deg, #fff8ef, #f5ebe0);
+            box-shadow: inset 0 0 0 1px #d4b896;
+            color: #5c3d1e;
+        }
+        .procurement-start-preset.active .coord {
+            color: #7a5a38;
+        }
+        .procurement-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-self: stretch;
+            justify-content: flex-end;
+        }
+        @media (max-width: 760px) {
+            .procurement-footer {
+                grid-template-columns: 1fr;
+                align-items: stretch;
+            }
+            .procurement-actions {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+        }
+        .procurement-actions button {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+        #procurementClearBtn {
+            background: var(--bg-dark);
+            border: 1px solid var(--border) !important;
+            color: var(--text-secondary);
+        }
+        #procurementRunBtn {
+            background: linear-gradient(135deg, #5a9a5a, #3d7a3d);
+            color: #fff;
+            flex: 1;
+            min-width: 200px;
+        }
+        #procurementPickBtn {
+            background: linear-gradient(135deg, #c49a6c, #9a7348);
+            color: #fff;
+            border: 2px solid #7a5a38 !important;
+        }
+        .procurement-pick-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .bounty-pick-banner {
+            display: none;
+            padding: 10px 18px;
+            background: #e8f5e9;
+            border-bottom: 1px solid #b8ddb9;
+            color: #2d6a2d;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+        .bounty-pick-banner.show { display: block; }
+        .bounty-item.bounty-item-picked {
+            border-color: #5a9a5a;
+            background: #e8f5e9;
+            color: #2d6a2d;
+            font-weight: 600;
+            box-shadow: inset 0 0 0 1px #b8ddb9;
+        }
+        .bounty-item.bounty-item-picked::after {
+            content: '✓';
+            margin-left: 6px;
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+        .procurement-picked-summary,
+        .bounty-pick-summary {
+            display: none;
+            margin: 12px 0 16px;
+            padding: 10px 12px;
+            background: #f0faf0;
+            border: 1px solid #b8ddb9;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            color: #2d6a2d;
+            line-height: 1.5;
+        }
+        .procurement-picked-summary.show,
+        .bounty-pick-summary.show { display: block; }
+        .bounty-pick-footer {
+            display: none;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 18px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card-hover);
+        }
+        .bounty-pick-footer.show { display: flex; }
+        .bounty-pick-footer .bounty-pick-summary {
+            flex: 1;
+            margin: 0;
+        }
+        #bountyPickClearBtn {
+            flex-shrink: 0;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid #d8cbb8;
+            background: #fffbf5;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        #bountyPickClearBtn:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            background: #fff5f5;
+        }
+        .procurement-picked-summary strong,
+        .bounty-pick-summary strong { color: #1b5e20; }
+        .procurement-check-item.skipped {
+            background: #fff5f5;
+            margin: 0 -8px;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .procurement-skipped-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--accent-red);
+            margin: 10px 0 6px;
+        }
+        #procurementSection {
+            margin-bottom: 20px;
+        }
+        .procurement-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .procurement-summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+        }
+        .procurement-summary-card .label {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+        .procurement-summary-card .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .procurement-summary-card .value.red { color: var(--accent-red); }
+        .procurement-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .procurement-layout { grid-template-columns: 1fr; }
+            .procurement-item-rows,
+            .procurement-pet-rows { grid-template-columns: 1fr; }
+        }
+        .procurement-checklist {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+        }
+        .procurement-checklist h4 {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+        .procurement-check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.88rem;
+        }
+        .procurement-check-item:last-child { border-bottom: none; }
+        .procurement-check-item .status-ok { color: var(--accent-green); font-weight: 700; }
+        .procurement-check-item .status-fail { color: var(--accent-red); font-weight: 700; }
+        .procurement-check-item .detail {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 2px;
+        }
+        .procurement-route-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card-hover);
+        }
+        .procurement-route-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        #procurementMapBtn {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-blue);
+            background: #eef6fc;
+            color: var(--accent-blue);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #procurementMapBtn:hover { background: #dceef8; }
+        .route-order-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .route-items-list {
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .route-items-list .route-item-line {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -1492,8 +1900,8 @@
         <!-- 第二行：篩選 -->
         <div class="search-row filter-row">
             <div class="form-group bounty-group">
-                <label>📋 快捷清單</label>
-                <button id="bountyBtn" type="button">📋 開啟清單</button>
+                <button id="bountyBtn" type="button">📋 快捷清單</button>
+                <button id="procurementBtn" type="button">🛒 懸賞採購清單</button>
             </div>
             <div class="form-group">
                 <label>💰 幣別</label>
@@ -1546,22 +1954,22 @@
                 <label class="exchange-rate-label">💱 匯率 (幣:晶)<span class="exchange-rate-hint" id="exchangeRateHint"></span></label>
                 <input type="number" id="exchangeRate" value="260" min="1">
             </div>
-            <div class="checkbox-group">
-                <label>
+            <div class="filter-chips">
+                <label class="filter-chip" title="只留耐久全滿裝備">
                     <input type="checkbox" id="durabilityFullFilter">
-                    🛡️ 耐久滿
+                    <span>🛡️ 耐久滿</span>
                 </label>
-                <label>
+                <label class="filter-chip" title="名稱需完全符合">
                     <input type="checkbox" id="exactSearchFilter">
-                    🎯 精確搜尋
+                    <span>🎯 精確搜尋</span>
                 </label>
-                <label>
+                <label class="filter-chip" title="只顯示寵物">
                     <input type="checkbox" id="petOnlyFilter">
-                    🐾 只搜尋寵物
+                    <span>🐾 只搜寵物</span>
                 </label>
-                <label>
+                <label class="filter-chip" title="只顯示 1 等寶寶">
                     <input type="checkbox" id="babyOnlyFilter">
-                    🍼 1等寶寶
+                    <span>🍼 1等寶寶</span>
                 </label>
             </div>
         </div>
@@ -1593,6 +2001,7 @@
     <!-- Tabs -->
     <div class="tabs" id="tabsContainer" style="display: none;">
         <div class="tab active" data-tab="market">🏪 市場攤位</div>
+        <div class="tab" data-tab="procurement" id="procurementTab" style="display:none;">🛒 採購路線</div>
         <div class="tab" data-tab="history36">📜 36H歷史</div>
         <div class="tab" data-tab="history72">📜 72H歷史</div>
     </div>
@@ -1636,6 +2045,36 @@
         </table>
     </div>
 
+    <!-- Procurement Route Section -->
+    <div id="procurementSection" style="display: none;">
+        <div class="procurement-summary" id="procurementSummary"></div>
+        <div class="procurement-layout">
+            <div class="procurement-checklist">
+                <h4>📋 採購清單狀態</h4>
+                <div id="procurementChecklist"></div>
+            </div>
+            <div class="table-container">
+                <div class="procurement-route-header">
+                    <h3 id="procurementRouteTitle">🗺️ 建議採購路線</h3>
+                    <button type="button" id="procurementMapBtn">🗺️ 查看路線地圖</button>
+                </div>
+                <table id="procurementRouteTable">
+                    <thead>
+                        <tr>
+                            <th>順序</th>
+                            <th>分流</th>
+                            <th>座標</th>
+                            <th>攤位</th>
+                            <th>採購項目</th>
+                            <th>段距離</th>
+                        </tr>
+                    </thead>
+                    <tbody id="procurementRouteBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- History Section -->
     <div id="historySection" style="display: none;">
         <div class="history-summary" id="historySummary"></div>
@@ -1671,15 +2110,69 @@
     </div>
 </div>
 
+<!-- 採購清單 Modal -->
+<div class="map-modal" id="procurementModal">
+    <div class="map-dialog" style="width: 920px; max-width: 95vw;">
+        <div class="map-dialog-header">
+            <h3>🛒 懸賞採購清單</h3>
+            <button class="map-dialog-close" id="procurementModalClose" title="關閉">✕</button>
+        </div>
+        <div class="procurement-body">
+            <p class="procurement-hint">填寫物品名稱與數量，或從快捷清單點選加入</p>
+            <div class="procurement-pick-row">
+                <button type="button" id="procurementPickBtn">📋 從快捷清單點選</button>
+            </div>
+            <div class="procurement-section-title">📦 採購物品</div>
+            <div class="procurement-item-rows" id="procurementItemRows"></div>
+            <div id="procurementPickedSummary" class="procurement-picked-summary"></div>
+            <div class="procurement-section-title">🐾 懸賞寵物（選填）</div>
+            <div class="procurement-pet-rows" id="procurementPetRows"></div>
+            <div class="procurement-footer">
+                <div class="procurement-settings">
+                    <div class="form-group">
+                        <label>採購策略</label>
+                        <select id="procurementStrategy">
+                            <option value="shortest" selected>最短路徑</option>
+                            <option value="cheapest">最便宜</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>伺服器</label>
+                        <select id="procurementServer">
+                            <option value="all" selected>全部</option>
+                            <option value="1">S1</option>
+                            <option value="2">S2</option>
+                            <option value="3">S3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="procurement-start-section">
+                    <label>起點傳送石</label>
+                    <div class="procurement-start-presets" id="procurementStartPresets"></div>
+                </div>
+                <div class="procurement-actions">
+                    <button type="button" id="procurementClearBtn">🗑️ 清除全部</button>
+                    <button type="button" id="procurementRunBtn">✅ 執行採購搜尋</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- 常用清單 Modal -->
 <div class="map-modal" id="bountyModal">
     <div class="map-dialog" style="width: 900px;">
         <div class="map-dialog-header">
-            <h3>📋 快捷清單快速查詢</h3>
+            <h3 id="bountyModalTitle">📋 快捷清單快速查詢</h3>
             <button class="map-dialog-close" id="bountyModalClose" title="關閉">✕</button>
         </div>
+        <div class="bounty-pick-banner" id="bountyPickBanner">點選加入採購清單 · <strong>再點一次同色項目可取消</strong> · 完成後關閉視窗</div>
         <div class="bounty-tabs" id="commonTabs"></div>
         <div class="bounty-body" id="commonBody"></div>
+        <div class="bounty-pick-footer" id="bountyPickFooter">
+            <div id="bountyPickSummary" class="bounty-pick-summary"></div>
+            <button type="button" id="bountyPickClearBtn">🗑️ 清空已選</button>
+        </div>
     </div>
 </div>
 
@@ -1819,6 +2312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPeakFloatingTip();
     initQuickTags();
     initBounty();
+    initProcurement();
 });
 
 function updateStatSortStyle() {
@@ -1928,7 +2422,9 @@ function initMapModal() {
         if (e.target.id === 'mapModal') closeMapModal();
     });
     document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') { closeMapModal(); closeBountyModal(); hidePeakFloatingTip(); }
+        if (e.key === 'Escape') {
+            closeMapModal(); closeBountyModal(); closeProcurementModal(); hidePeakFloatingTip();
+        }
     });
     // 地點欄位點擊（事件委派）
     document.getElementById('marketBody').addEventListener('click', e => {
@@ -2973,6 +3469,7 @@ async function switchTab(tab) {
 
     const onHistory = isHistoryTab(tab);
     document.getElementById('marketSection').style.display = tab === 'market' ? 'block' : 'none';
+    document.getElementById('procurementSection').style.display = tab === 'procurement' ? 'block' : 'none';
     document.getElementById('historySection').style.display = onHistory ? 'block' : 'none';
     document.getElementById('statsGrid').style.display = tab === 'market' ? 'grid' : 'none';
     document.getElementById('emptyState').style.display = 'none';
@@ -2995,6 +3492,7 @@ function showLoading(show, message) {
 function hideAll() {
     document.getElementById('emptyState').style.display = 'none';
     document.getElementById('marketSection').style.display = 'none';
+    document.getElementById('procurementSection').style.display = 'none';
     document.getElementById('historySection').style.display = 'none';
     document.getElementById('statsGrid').style.display = 'none';
 }
@@ -3018,12 +3516,17 @@ const MAP_IMAGE_SOURCES = [
 ];
 let mapSrcIndex = 0;
 let mapPending = null;
+let procurementMapPending = null;
 const mapImg = new Image();
 
 mapImg.onload = () => {
-    if (mapPending) {
-        const { x, y } = mapPending;
-        drawMapMarker(x, y);
+    if (mapPending && mapPending.x != null) {
+        drawMapMarker(mapPending.x, mapPending.y);
+        mapPending = null;
+    }
+    if (procurementMapPending) {
+        drawProcurementRoute(procurementMapPending.route, procurementMapPending.start);
+        procurementMapPending = null;
     }
 };
 mapImg.onerror = () => {
@@ -3106,6 +3609,548 @@ function closeMapModal() {
     document.getElementById('mapModal').classList.remove('open');
 }
 
+let procurementData = null;
+const PROCUREMENT_GRID_SIZE = 12;
+const PROCUREMENT_PET_ROWS = 6;
+const PROCUREMENT_START_PRESETS = [
+    { label: '東醫傳送石', x: 223, y: 78 },
+    { label: '銀行傳送石', x: 242, y: 100 },
+    { label: '西醫傳送石', x: 63, y: 79 },
+    { label: '陶歐傳送石', x: 72, y: 123 },
+    { label: '水池傳送石', x: 141, y: 148 },
+    { label: '寵店傳送石', x: 162, y: 130 }
+];
+let bountyPickMode = false;
+let bountyPickEntries = [];
+const PROCUREMENT_ITEM_DELAY_MS = 450;
+
+function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}
+
+function collectProcurementRequests() {
+    const requests = [];
+    document.querySelectorAll('#procurementItemRows .procurement-item-row').forEach(row => {
+        const name = row.querySelector('.procurement-item-name')?.value.trim();
+        const qty = Math.max(1, parseInt(row.querySelector('.procurement-item-qty')?.value, 10) || 1);
+        if (name) requests.push({ name, qty, isPet: false });
+    });
+    document.querySelectorAll('#procurementPetRows .procurement-pet-row').forEach(row => {
+        const name = row.querySelector('select')?.value;
+        const qty = Math.max(1, parseInt(row.querySelector('input[type="number"]')?.value, 10) || 1);
+        if (name) requests.push({ name, qty, isPet: true });
+    });
+    return requests;
+}
+
+function getSelectedProcurementStart() {
+    const active = document.querySelector('.procurement-start-preset.active');
+    if (active) {
+        return {
+            startX: parseInt(active.dataset.x, 10),
+            startY: parseInt(active.dataset.y, 10),
+            startLabel: active.dataset.label || ''
+        };
+    }
+    const def = PROCUREMENT_START_PRESETS[0];
+    return { startX: def.x, startY: def.y, startLabel: def.label };
+}
+
+function getProcurementOptions() {
+    const start = getSelectedProcurementStart();
+    return {
+        strategy: document.getElementById('procurementStrategy').value,
+        server: document.getElementById('procurementServer').value,
+        exact: true,
+        ...start
+    };
+}
+
+function describeProcurementSkip(r) {
+    if (r.error) return `查詢失敗：${r.error}`;
+    if ((r.total || 0) === 0) return '市場無此物品，已跳過路線規劃';
+    if (r.noMapCount > 0 && r.noMapCount === r.total) return '有攤販售但皆非法蘭城座標，已跳過';
+    if (r.qtyShortCount > 0) return `有攤販售但數量不足（需 ${r.request.qty}），已跳過`;
+    if (r.filteredCount > 0) return '有攤販售但不符合篩選條件（分流等），已跳過';
+    return '攤位無符合條件的販售，已跳過路線規劃';
+}
+
+function analyzeProcurementMiss(items, req, options) {
+    const nk = normalizeStr(req.name);
+    let list = [...items];
+    if (options.exact) list = list.filter(i => normalizeStr(i.item) === nk);
+    else list = list.filter(i => normalizeStr(i.item).includes(nk));
+    const total = list.length;
+    if (!total) return { total: 0 };
+    if (options.server !== 'all') list = list.filter(i => String(i.server) === options.server);
+    if (!list.length) return { total, filteredCount: total };
+    const noMapCount = list.filter(i => !i.hasMap || i.mapX == null).length;
+    const mapped = list.filter(i => i.hasMap && i.mapX != null);
+    if (!mapped.length) return { total, noMapCount: list.length };
+    if (req.isPet) {
+        const pets = mapped.filter(i => i.isPet);
+        if (!pets.length) return { total, filteredCount: mapped.length };
+        if (pets.length < req.qty) return { total, qtyShortCount: pets.length };
+        return { total };
+    }
+    const stack = mapped.filter(i => !i.isPet && i.count >= req.qty);
+    if (!stack.length) {
+        const partial = mapped.filter(i => !i.isPet);
+        return { total, qtyShortCount: partial.length || mapped.length };
+    }
+    return { total };
+}
+
+function pickProcurementListings(items, req, options) {
+    let list = [...items];
+    const nk = normalizeStr(req.name);
+    if (options.exact) list = list.filter(i => normalizeStr(i.item) === nk);
+    else list = list.filter(i => normalizeStr(i.item).includes(nk));
+    if (options.server !== 'all') list = list.filter(i => String(i.server) === options.server);
+    list = list.filter(i => i.hasMap && i.mapX != null && i.mapY != null);
+
+    if (req.isPet) {
+        list = list.filter(i => i.isPet).sort((a, b) => a.price - b.price);
+        const picked = [];
+        const seen = new Set();
+        for (const item of list) {
+            const key = `${item.server}-${item.location}-${item.shopName}-${item.price}-${item.item}`;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            picked.push({ ...item, _procQty: 1, _procName: req.name });
+            if (picked.length >= req.qty) break;
+        }
+        return picked;
+    }
+
+    list = list.filter(i => !i.isPet && i.count >= req.qty).sort((a, b) => a.price - b.price);
+    if (!list.length) return [];
+    return [{ ...list[0], _procQty: req.qty, _procName: req.name }];
+}
+
+function mergeProcurementStops(listings) {
+    const map = new Map();
+    listings.forEach(item => {
+        const key = `${item.server}-${item.mapX}-${item.mapY}-${item.location}`;
+        if (!map.has(key)) {
+            map.set(key, {
+                x: item.mapX,
+                y: item.mapY,
+                server: item.server,
+                location: item.location,
+                shopName: item.shopName,
+                items: []
+            });
+        }
+        const priceIcon = item.pricetype === 0 ? '💰' : '💎';
+        map.get(key).items.push({
+            name: item._procName || item.item,
+            qty: item._procQty || item.count,
+            price: item.price,
+            priceLabel: `${priceIcon}${item.price.toLocaleString()}`
+        });
+    });
+    return [...map.values()];
+}
+
+function manhattanDist(x1, y1, x2, y2) {
+    return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+}
+
+function stopTotalPrice(stop) {
+    return stop.items.reduce((sum, it) => sum + it.price * (it.qty || 1), 0);
+}
+
+function computeProcurementRoute(stops, start, strategy = 'shortest') {
+    if (strategy === 'cheapest') {
+        const sorted = [...stops].sort((a, b) => stopTotalPrice(a) - stopTotalPrice(b));
+        let cur = { x: start.x, y: start.y };
+        let totalDist = 0;
+        sorted.forEach(stop => {
+            stop.segmentDist = manhattanDist(cur.x, cur.y, stop.x, stop.y);
+            totalDist += stop.segmentDist;
+            cur = { x: stop.x, y: stop.y };
+        });
+        return { route: sorted, totalDist };
+    }
+    const remaining = stops.map(s => ({ ...s }));
+    const route = [];
+    let cur = { x: start.x, y: start.y };
+    let totalDist = 0;
+    while (remaining.length) {
+        let bestIdx = 0;
+        let bestDist = Infinity;
+        remaining.forEach((stop, i) => {
+            const d = manhattanDist(cur.x, cur.y, stop.x, stop.y);
+            if (d < bestDist) { bestDist = d; bestIdx = i; }
+        });
+        const next = remaining.splice(bestIdx, 1)[0];
+        next.segmentDist = bestDist;
+        totalDist += bestDist;
+        route.push(next);
+        cur = { x: next.x, y: next.y };
+    }
+    return { route, totalDist };
+}
+
+async function runProcurementSearch() {
+    const requests = collectProcurementRequests();
+    if (!requests.length) return alert('請至少輸入一項採購需求');
+
+    const options = getProcurementOptions();
+    closeProcurementModal();
+    showLoading(true, '準備採購搜尋…');
+    hideAll();
+
+    const itemResults = [];
+    const allListings = [];
+
+    try {
+        for (let i = 0; i < requests.length; i++) {
+            const req = requests[i];
+            showLoading(true, `採購搜尋 ${i + 1}/${requests.length}：${req.name}…`);
+            try {
+                const items = await fetchMarketData(req.name, { exact: options.exact });
+                const picked = pickProcurementListings(items, req, options);
+                if (picked.length > 0) {
+                    itemResults.push({ request: req, ok: true, listings: picked, total: items.length });
+                    allListings.push(...picked);
+                } else {
+                    const miss = analyzeProcurementMiss(items, req, options);
+                    itemResults.push({ request: req, ok: false, listings: [], total: items.length, ...miss });
+                }
+            } catch (err) {
+                itemResults.push({ request: req, ok: false, listings: [], error: err.message });
+            }
+            if (i < requests.length - 1) await sleep(PROCUREMENT_ITEM_DELAY_MS);
+        }
+
+        const stops = mergeProcurementStops(allListings);
+        const start = { x: options.startX, y: options.startY };
+        const { route, totalDist } = computeProcurementRoute(stops, start, options.strategy);
+        const totalCost = allListings.reduce((s, it) => s + it.price * (it._procQty || 1), 0);
+        const skippedCount = itemResults.filter(r => !r.ok).length;
+
+        procurementData = {
+            options,
+            itemResults,
+            route,
+            totalDist,
+            totalCost,
+            stopCount: route.length,
+            foundCount: itemResults.filter(r => r.ok).length,
+            skippedCount,
+            requestCount: requests.length
+        };
+
+        document.getElementById('tabsContainer').style.display = 'flex';
+        document.getElementById('procurementTab').style.display = '';
+        renderProcurementResults();
+        switchTab('procurement');
+    } catch (err) {
+        console.error(err);
+        alert('採購搜尋失敗：' + (err.message || '請稍後再試'));
+        showEmpty('採購搜尋失敗');
+    } finally {
+        showLoading(false);
+    }
+}
+
+function renderProcurementResults() {
+    if (!procurementData) return;
+    const { itemResults, route, totalDist, totalCost, foundCount, skippedCount, requestCount, stopCount, options } = procurementData;
+    const strategyLabel = options.strategy === 'cheapest' ? '最便宜' : '最短路徑';
+
+    document.getElementById('procurementRouteTitle').textContent =
+        options.strategy === 'cheapest' ? '🛒 採購路線（最便宜優先）' : '🗺️ 採購路線（最短路徑）';
+
+    document.getElementById('procurementSummary').innerHTML = `
+        <div class="procurement-summary-card"><div class="label">採購項目</div><div class="value blue">${requestCount}</div></div>
+        <div class="procurement-summary-card"><div class="label">找到</div><div class="value green">${foundCount}</div></div>
+        <div class="procurement-summary-card"><div class="label">已跳過</div><div class="value red">${skippedCount}</div></div>
+        <div class="procurement-summary-card"><div class="label">攤位站數</div><div class="value gold">${stopCount}</div></div>
+        <div class="procurement-summary-card"><div class="label">預估總價</div><div class="value" style="font-size:1rem;">${totalCost.toLocaleString()}</div></div>
+        <div class="procurement-summary-card"><div class="label">路線距離</div><div class="value">${totalDist}</div></div>
+        <div class="procurement-summary-card"><div class="label">策略</div><div class="value" style="font-size:1rem;">${strategyLabel}</div></div>
+    `;
+
+    const foundHtml = itemResults.filter(r => r.ok).map(r => {
+        const stallNames = [...new Set(r.listings.map(l => l.shopName))].join('、');
+        return `<div class="procurement-check-item"><span class="status-ok">✓</span><div><div>${escapeHtml(r.request.name)} ×${r.request.qty}</div><div class="detail">已列入路線 · ${escapeHtml(stallNames)}</div></div></div>`;
+    }).join('');
+    const skippedHtml = itemResults.filter(r => !r.ok).map(r =>
+        `<div class="procurement-check-item skipped"><span class="status-fail">✗</span><div><div>${escapeHtml(r.request.name)} ×${r.request.qty}</div><div class="detail">${escapeHtml(describeProcurementSkip(r))}</div></div></div>`
+    ).join('');
+    document.getElementById('procurementChecklist').innerHTML =
+        (foundHtml || '<div class="detail" style="padding:8px 0;">尚無可採購項目</div>') +
+        (skippedHtml ? `<div class="procurement-skipped-title">已跳過（不列入路線）</div>${skippedHtml}` : '');
+
+    if (!route.length) {
+        document.getElementById('procurementRouteBody').innerHTML =
+            '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-secondary);">無法規劃路線（沒有符合的法蘭城攤位）</td></tr>';
+        return;
+    }
+
+    const priceHeader = options.strategy === 'cheapest' ? '小計' : '段距離';
+    document.querySelector('#procurementRouteTable thead tr').innerHTML = `
+        <th>順序</th><th>分流</th><th>座標</th><th>攤位</th><th>採購項目</th><th>${priceHeader}</th>`;
+    document.getElementById('procurementRouteBody').innerHTML = route.map((stop, i) => {
+        const itemsHtml = stop.items.map(it =>
+            `<span class="route-item-line">${escapeHtml(it.name)} ×${it.qty}（${it.priceLabel}）</span>`
+        ).join('');
+        const coordLink = `<span class="location-link" data-x="${stop.x}" data-y="${stop.y}" title="點擊查看地圖">[東${stop.x} 南${stop.y}]</span>`;
+        const lastCol = options.strategy === 'cheapest'
+            ? stopTotalPrice(stop).toLocaleString()
+            : stop.segmentDist;
+        return `<tr>
+            <td><span class="route-order-badge">${i + 1}</span></td>
+            <td><span class="server-badge s${stop.server}">S${stop.server}</span></td>
+            <td>${coordLink}</td>
+            <td>${escapeHtml(stop.shopName)}</td>
+            <td><div class="route-items-list">${itemsHtml}</div></td>
+            <td>${lastCol}</td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('procurementRouteBody').querySelectorAll('.location-link').forEach(link => {
+        link.addEventListener('click', () => showMapModal(link.dataset.x, link.dataset.y));
+    });
+}
+
+function drawProcurementRoute(route, start) {
+    const canvas = document.getElementById('mapCanvas');
+    if (!canvas || !mapImg.complete || !mapImg.naturalWidth) return;
+
+    const ctx = canvas.getContext('2d');
+    if (canvas.width !== mapImg.width || canvas.height !== mapImg.height) {
+        canvas.width = mapImg.width;
+        canvas.height = mapImg.height;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(mapImg, 0, 0);
+
+    const points = [{ x: start.x, y: start.y, label: '起' }, ...route.map((s, i) => ({ x: s.x, y: s.y, label: String(i + 1) }))];
+    const pixels = points.map(p => ({ ...gameToPixel(p.x, p.y), label: p.label, gx: p.x, gy: p.y }));
+
+    ctx.strokeStyle = 'rgba(212, 160, 36, 0.85)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    pixels.forEach((p, i) => {
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    pixels.forEach((p, i) => {
+        const isStart = i === 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, isStart ? 10 : 9, 0, Math.PI * 2);
+        ctx.fillStyle = isStart ? '#27ae60' : '#c75050';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${isStart ? 13 : 12}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.label, p.x, p.y);
+    });
+}
+
+function showProcurementMapModal() {
+    if (!procurementData?.route?.length) return alert('尚無可顯示的路線');
+    const { route, options } = procurementData;
+    const strat = procurementData.options.strategy === 'cheapest' ? '最便宜' : '最短路徑';
+    const startHint = options.startLabel
+        ? `${options.startLabel}(${options.startX},${options.startY})`
+        : `起點(${options.startX},${options.startY})`;
+    document.getElementById('mapModalTitle').textContent =
+        `採購路線 · ${strat} · ${startHint}（${route.length} 站 · 距離 ${procurementData.totalDist}）`;
+    document.getElementById('mapModal').classList.add('open');
+
+    const start = { x: options.startX, y: options.startY };
+    if (mapImg.complete && mapImg.naturalWidth) {
+        drawProcurementRoute(route, start);
+    } else {
+        procurementMapPending = { route, start };
+    }
+}
+
+function openProcurementModal() {
+    document.getElementById('procurementModal').classList.add('open');
+}
+function closeProcurementModal() {
+    document.getElementById('procurementModal').classList.remove('open');
+}
+
+function clearProcurementForm() {
+    document.querySelectorAll('#procurementItemRows .procurement-item-row').forEach(row => {
+        row.querySelector('.procurement-item-name').value = '';
+        row.querySelector('.procurement-item-qty').value = '1';
+    });
+    document.querySelectorAll('#procurementPetRows .procurement-pet-row').forEach(row => {
+        row.querySelector('select').value = '';
+        row.querySelector('input[type="number"]').value = '1';
+    });
+    document.querySelectorAll('.bounty-item-picked').forEach(el => el.classList.remove('bounty-item-picked'));
+    bountyPickEntries = [];
+    updateProcurementPickedSummary();
+}
+
+function updateProcurementPickedSummary() {
+    const requests = collectProcurementRequests();
+    const text = requests.map(r => `${r.name}×${r.qty}`).join('、');
+    const html = text ? `<strong>已點選／已填：</strong>${escapeHtml(text)}` : '';
+    ['procurementPickedSummary', 'bountyPickSummary'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (text) {
+            el.innerHTML = html;
+            el.classList.add('show');
+        } else {
+            el.innerHTML = '';
+            el.classList.remove('show');
+        }
+    });
+}
+
+function buildProcurementPetOptions() {
+    const pets = (typeof BOUNTY_PETS !== 'undefined' && BOUNTY_PETS['全部']) || [];
+    const opts = ['<option value="">選擇寵物</option>'];
+    pets.forEach(([, name]) => {
+        opts.push(`<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`);
+    });
+    return opts.join('');
+}
+
+function initProcurement() {
+    document.getElementById('procurementStartPresets').innerHTML = PROCUREMENT_START_PRESETS.map((p, i) =>
+        `<button type="button" class="procurement-start-preset${i === 0 ? ' active' : ''}" data-x="${p.x}" data-y="${p.y}" data-label="${escapeAttr(p.label)}">${escapeHtml(p.label)}<span class="coord">(${p.x}, ${p.y})</span></button>`
+    ).join('');
+    document.getElementById('procurementStartPresets').addEventListener('click', e => {
+        const btn = e.target.closest('.procurement-start-preset');
+        if (!btn) return;
+        document.querySelectorAll('.procurement-start-preset').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    });
+
+    document.getElementById('procurementItemRows').innerHTML = Array.from({ length: PROCUREMENT_GRID_SIZE }, () =>
+        `<div class="procurement-item-row">
+            <input type="text" class="procurement-item-name" placeholder="物品名稱">
+            <input type="number" class="procurement-item-qty" value="1" min="1" max="999" title="數量">
+        </div>`
+    ).join('');
+    document.getElementById('procurementItemRows').addEventListener('input', updateProcurementPickedSummary);
+    document.getElementById('procurementPetRows').addEventListener('input', updateProcurementPickedSummary);
+    document.getElementById('procurementPetRows').addEventListener('change', updateProcurementPickedSummary);
+
+    const petOpts = buildProcurementPetOptions();
+    document.getElementById('procurementPetRows').innerHTML = Array.from({ length: PROCUREMENT_PET_ROWS }, () =>
+        `<div class="procurement-pet-row"><select>${petOpts}</select><input type="number" value="1" min="1" max="20" title="數量"></div>`
+    ).join('');
+
+    document.getElementById('procurementBtn').addEventListener('click', openProcurementModal);
+    document.getElementById('procurementModalClose').addEventListener('click', closeProcurementModal);
+    document.getElementById('procurementModal').addEventListener('click', e => {
+        if (e.target.id === 'procurementModal') closeProcurementModal();
+    });
+    document.getElementById('procurementClearBtn').addEventListener('click', clearProcurementForm);
+    document.getElementById('procurementRunBtn').addEventListener('click', runProcurementSearch);
+    document.getElementById('procurementMapBtn').addEventListener('click', showProcurementMapModal);
+    document.getElementById('procurementPickBtn').addEventListener('click', openBountyPickMode);
+}
+
+function findProcurementItemRow(name) {
+    return [...document.querySelectorAll('#procurementItemRows .procurement-item-row')]
+        .find(r => r.querySelector('.procurement-item-name').value.trim() === name);
+}
+
+function clearProcurementItemRow(row) {
+    row.querySelector('.procurement-item-name').value = '';
+    row.querySelector('.procurement-item-qty').value = '1';
+}
+
+function addToProcurementSlot(name, qty = 1, bountyEl = null) {
+    const existing = findProcurementItemRow(name);
+    if (existing) {
+        const qtyInput = existing.querySelector('.procurement-item-qty');
+        qtyInput.value = Math.max(1, parseInt(qtyInput.value, 10) + qty);
+        existing.classList.add('highlight');
+        setTimeout(() => existing.classList.remove('highlight'), 1200);
+    } else {
+        const rows = [...document.querySelectorAll('#procurementItemRows .procurement-item-row')];
+        const empty = rows.find(r => !r.querySelector('.procurement-item-name').value.trim());
+        const target = empty || rows[rows.length - 1];
+        target.querySelector('.procurement-item-name').value = name;
+        target.querySelector('.procurement-item-qty').value = qty;
+        target.classList.add('highlight');
+        setTimeout(() => target.classList.remove('highlight'), 1200);
+    }
+    if (bountyEl) {
+        bountyEl.classList.add('bounty-item-picked');
+        bountyPickEntries.push({ name, el: bountyEl });
+    }
+    updateProcurementPickedSummary();
+    if (!document.getElementById('procurementModal').classList.contains('open')) {
+        openProcurementModal();
+    }
+}
+
+function removeFromProcurementSlot(name, bountyEl = null) {
+    if (bountyEl) {
+        bountyEl.classList.remove('bounty-item-picked');
+        bountyPickEntries = bountyPickEntries.filter(e => e.el !== bountyEl);
+    }
+    const itemRow = findProcurementItemRow(name);
+    if (itemRow) {
+        const qtyInput = itemRow.querySelector('.procurement-item-qty');
+        const cur = parseInt(qtyInput.value, 10) || 1;
+        if (cur > 1) qtyInput.value = cur - 1;
+        else clearProcurementItemRow(itemRow);
+    }
+    document.querySelectorAll('#procurementPetRows .procurement-pet-row').forEach(row => {
+        const sel = row.querySelector('select');
+        if (sel.value === name) {
+            sel.value = '';
+            row.querySelector('input[type="number"]').value = '1';
+        }
+    });
+    updateProcurementPickedSummary();
+}
+
+function toggleProcurementPick(name, bountyEl) {
+    if (bountyEl?.classList.contains('bounty-item-picked')) {
+        removeFromProcurementSlot(name, bountyEl);
+    } else {
+        addToProcurementSlot(name, 1, bountyEl);
+    }
+}
+
+function clearBountyPicks() {
+    [...bountyPickEntries].forEach(({ name, el }) => removeFromProcurementSlot(name, el));
+    bountyPickEntries = [];
+    updateProcurementPickedSummary();
+}
+
+function openBountyPickMode() {
+    bountyPickMode = true;
+    document.getElementById('bountyModalTitle').textContent = '📋 點選加入採購清單';
+    document.getElementById('bountyPickBanner').classList.add('show');
+    document.getElementById('bountyPickFooter').classList.add('show');
+    updateProcurementPickedSummary();
+    document.getElementById('bountyModal').classList.add('open');
+}
+
+function resetBountyPickMode() {
+    bountyPickMode = false;
+    document.getElementById('bountyModalTitle').textContent = '📋 快捷清單快速查詢';
+    document.getElementById('bountyPickBanner').classList.remove('show');
+    document.getElementById('bountyPickFooter').classList.remove('show');
+}
+
 /* ========================================
    懸賞清單（資料來自 StarCG-Market-Assistant）
 ======================================== */
@@ -3156,7 +4201,8 @@ const BOUNTY_PET_NAMES = Object.values(BOUNTY_PET_RARITY).flat().map(([, name]) 
 // 飾品 / 藥水 / 料理（待補，格式：{ 子分類: [[等級或null, 名稱], ...] }）
 const COMMON_ACCESSORIES = {
     '飾品': ['索爾護腕','頓納護腕','英靈之誓','水晶鏈墜','屈原的戒指','狂怒繃帶','「年」的頸圈','受詛咒的姜餅人','洗禮的護符','真·戰符'],
-    '特殊': ['魔幣箱（100萬）','魔幣箱（50萬）','魔幣箱（10萬）','特技突破石','貓頭鷹頭盔','偷襲密卷','聖魔石','再生靈藥','寵物再生藥劑','改名卡','魔族的水晶','誓言之證','宇治金時','風龍蜥的甲殼','鋼騎之礦','德特家的布','火焰之魂','曼陀羅草的皮','妖草的血','火的水晶碎片','風的水晶碎片','水的水晶碎片','地的水晶碎片'],
+    '特殊': ['魔幣箱（100萬）','魔幣箱（50萬）','魔幣箱（10萬）','特技突破石','貓頭鷹頭盔','偷襲密卷','再生靈藥','寵物再生藥劑','改名卡','魔族的水晶','誓言之證','風龍蜥的甲殼','鋼騎之礦','德特家的布','火焰之魂','曼陀羅草的皮','妖草的血','火的水晶碎片','風的水晶碎片','水的水晶碎片','地的水晶碎片'],
+    '任務道具': ['聖魔石','宇治金時','永久冰石','白熊肉排','火元素之證','水元素之證','風元素之證','地元素之證','星鰻飯糰'],
     '寵書(普)': ['乾坤一擊[普]','高級必殺[普]','必殺之心[普]','命中之眼[普]','魔力之源[普]','閃避奧義[普]','烈焰之力[普]','狂風之力[普]','寒冰之力[普]','巨石之力[普]','魔法抵御[普]','閃避要訣[普]','野蠻沖擊[普]','反擊之力[普]'],
     '寵書(良)': ['乾坤一擊[良]','高級必殺[良]','必殺之心[良]','命中之眼[良]','魔力之源[良]','閃避奧義[良]','烈焰之力[良]','狂風之力[良]','寒冰之力[良]','巨石之力[良]','魔法抵御[良]','閃避要訣[良]','野蠻沖擊[良]','反擊之力[良]'],
     '寵書(優)': ['乾坤一擊[優]','高級必殺[優]','必殺之心[優]','命中之眼[優]','魔力之源[優]','閃避奧義[優]','烈焰之力[優]','狂風之力[優]','寒冰之力[優]','巨石之力[優]','魔法抵御[優]','閃避要訣[優]','野蠻沖擊[優]','反擊之力[優]'],
@@ -3193,7 +4239,7 @@ const MATERIAL_MINE = [
     ['Lv5','金條'],
     ['Lv6','白金條'],
     ['Lv7','幻之鋼條'],
-    ['Lv8','幻之銀條'],['Lv8','藍龍之鱗'],['Lv8','永久冰石'],['Lv8','達馬斯礦條'],
+    ['Lv8','幻之銀條'],['Lv8','藍龍之鱗'],['Lv8','達馬斯礦條'],
     ['Lv9','勒格耐席鉧條'],['Lv9','謝爾哈特礦條'],
     ['Lv10','喜馬拉斯礦條'],['Lv10','奧利哈鋼條']
 ];
@@ -3209,7 +4255,7 @@ const MATERIAL_WOOD = [
     ['Lv9','絲柏'],['Lv9','苗香'],
     ['Lv10','樺'],['Lv10','七葉樹']
 ];
-const MATERIAL_NO_BAG = new Set(['永久冰石']);
+const MATERIAL_NO_BAG = new Set([]);
 const materialBag = items => items
     .filter(([, name]) => !MATERIAL_NO_BAG.has(name))
     .map(([lv, name]) => [lv, '一袋' + name]);
@@ -3277,20 +4323,25 @@ function renderItems(arr) {
 }
 
 function renderGroups(groups) {
-    const cats = Object.keys(groups).filter(c => groups[c] && groups[c].length);
+    const cats = Object.keys(groups);
     if (cats.length === 0) {
         return '<div style="color:var(--text-secondary);padding:30px;text-align:center;">尚未設定項目（提供清單給我即可加入）</div>';
     }
     // 無子分類（單一空 key）→ 直接顯示項目，不用左側選單
     if (cats.length === 1 && cats[0] === '') {
-        return `<div class="bounty-grid">${renderItems(groups[''])}</div>`;
+        return groups['']?.length
+            ? `<div class="bounty-grid">${renderItems(groups[''])}</div>`
+            : '<div style="color:var(--text-secondary);padding:30px;text-align:center;">尚未設定項目（提供清單給我即可加入）</div>';
     }
     const subTabs = cats.map((c, i) =>
         `<div class="sub-tab${i === 0 ? ' active' : ''}" data-sub="${i}">${escapeHtml(c)}</div>`
     ).join('');
-    const subPanels = cats.map((c, i) =>
-        `<div class="sub-panel" data-sub="${i}" style="display:${i === 0 ? 'block' : 'none'}"><div class="bounty-grid">${renderItems(groups[c])}</div></div>`
-    ).join('');
+    const subPanels = cats.map((c, i) => {
+        const body = groups[c]?.length
+            ? `<div class="bounty-grid">${renderItems(groups[c])}</div>`
+            : '<div style="color:var(--text-secondary);padding:30px;text-align:center;">尚未設定項目（提供清單給我即可加入）</div>';
+        return `<div class="sub-panel" data-sub="${i}" style="display:${i === 0 ? 'block' : 'none'}">${body}</div>`;
+    }).join('');
     return `<div class="sub-layout"><div class="sub-tabs">${subTabs}</div><div class="sub-content">${subPanels}</div></div>`;
 }
 
@@ -3304,16 +4355,19 @@ function renderBounty() {
 }
 
 function openBountyModal() {
+    resetBountyPickMode();
     document.getElementById('bountyModal').classList.add('open');
 }
 function closeBountyModal() {
     document.getElementById('bountyModal').classList.remove('open');
+    resetBountyPickMode();
 }
 
 function initBounty() {
     renderBounty();
     document.getElementById('bountyBtn').addEventListener('click', openBountyModal);
     document.getElementById('bountyModalClose').addEventListener('click', closeBountyModal);
+    document.getElementById('bountyPickClearBtn').addEventListener('click', clearBountyPicks);
     document.getElementById('bountyModal').addEventListener('click', e => {
         if (e.target.id === 'bountyModal') closeBountyModal();
     });
@@ -3340,10 +4394,14 @@ function initBounty() {
             p.style.display = p.dataset.sub === idx ? 'block' : 'none';
         });
     });
-    // 點項目 → 帶入搜尋
+    // 點項目：採購選取模式 → 加入清單；一般模式 → 帶入搜尋
     document.getElementById('bountyModal').addEventListener('click', e => {
         const item = e.target.closest('.bounty-item');
         if (!item) return;
+        if (bountyPickMode || e.shiftKey) {
+            toggleProcurementPick(item.dataset.name, item);
+            return;
+        }
         closeBountyModal();
         quickSearch(item.dataset.name, true);
     });
