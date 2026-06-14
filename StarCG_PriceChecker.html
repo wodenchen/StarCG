@@ -701,22 +701,41 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 8px;
-            line-height: 1.5;
+            gap: 4px 6px;
+            line-height: 1.4;
         }
 
         .item-name-row > strong {
             flex-shrink: 0;
         }
 
-        .item-tag-group {
+        /* 名稱同行：英靈色、頂/破頂、改造圖、寵物 Lv/改/技/滿檔/滿星 */
+        .item-tag-head {
             display: inline-flex;
-            flex-wrap: wrap;
             align-items: center;
             gap: 4px;
+            flex-shrink: 0;
         }
 
-        .item-tag-group > * {
+        .item-tag-head:empty {
+            display: none;
+        }
+
+        /* 次行：英靈屬性、種子 BP 等較長標籤 */
+        .item-tag-extra {
+            display: flex;
+            flex-wrap: wrap;
+            flex: 1 1 100%;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .item-tag-extra:empty {
+            display: none;
+        }
+
+        .item-tag-head > *,
+        .item-tag-extra > * {
             margin-left: 0 !important;
         }
 
@@ -729,6 +748,7 @@
             z-index: 2;
             border-right: 2px solid var(--border);
             overflow: visible;
+            min-width: 280px;
         }
 
         th:first-child {
@@ -803,7 +823,7 @@
             padding: 2px 10px;
             border-radius: 10px;
             font-size: 0.8rem;
-            font-weight: 700;
+            font-weight: 500;
             margin-left: 8px;
             display: inline-block;
             vertical-align: middle;
@@ -814,13 +834,14 @@
         .soul-stat {
             background: #34495e;
             color: #fff;
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-size: 0.78rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
             font-weight: 500;
             margin-left: 4px;
             display: inline-block;
             vertical-align: middle;
+            white-space: nowrap;
         }
         .soul-stat.st-crit { background: #e67e22; }
         .soul-stat.st-recov { background: #16a085; }
@@ -839,14 +860,15 @@
         .stat-peak-mix-tag {
             position: relative;
             color: #fff;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.78rem;
+            padding: 2px 7px;
+            border-radius: 9px;
+            font-size: 0.75rem;
             font-weight: 700;
             margin-left: 6px;
             display: inline-block;
             vertical-align: middle;
             cursor: help;
+            white-space: nowrap;
         }
         .stat-peak-tag {
             background: linear-gradient(135deg, #d4a024, #b8860b);
@@ -3543,7 +3565,7 @@ function renderMarketTable(items) {
         
         return `
         <tr>
-            <td><div class="item-name-row"><strong>${escapeHtml(item.item)}</strong><span class="item-tag-group">${item.peakTag || ''}${item.colorTag || ''}${item.statTag || ''}${item.gradeTag || ''}${item.seedTag || ''}${item.transTag || ''}</span></div></td>
+            <td><div class="item-name-row"><strong>${escapeHtml(item.item)}</strong><span class="item-tag-head">${item.colorTag || ''}${item.peakTag || ''}${item.gradeTag || ''}${item.transTag || ''}</span><span class="item-tag-extra">${item.statTag || ''}${item.seedTag || ''}</span></div></td>
             <td>
                 <span class="price ${item.pricetype === 0 ? 'coin' : 'crystal'}">
                     ${item.pricetype === 0 ? '💰' : '💎'} ${item.price.toLocaleString()}
