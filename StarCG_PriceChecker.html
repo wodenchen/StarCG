@@ -1300,6 +1300,22 @@
             padding: 0 6px;
         }
 
+        .history-group-details {
+            margin-bottom: 16px;
+        }
+
+        .history-group-details summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            user-select: none;
+        }
+
+        .history-group-details[open] summary {
+            margin-bottom: 10px;
+        }
+
         .history-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -2750,6 +2766,30 @@
         </div>
         <div class="history-feed" id="historyFeed"></div>
         <div class="history-pagination" id="historyPagination"></div>
+
+        <details class="history-group-details" id="historyGroupDetails" style="display: none;">
+            <summary>📊 品項統計</summary>
+            <div class="table-container">
+                <div class="table-scroll">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>物品名稱</th>
+                                <th>💰 最低</th>
+                                <th>💰 中位</th>
+                                <th>💰 最高</th>
+                                <th>💎 最低</th>
+                                <th>💎 中位</th>
+                                <th>💎 最高</th>
+                                <th>成交數</th>
+                                <th>走勢</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </details>
     </div>
 
     <!-- Empty State -->
@@ -4377,6 +4417,12 @@ function initHistoryFilters() {
     });
 
     document.getElementById('historyChartToggleBtn')?.addEventListener('click', toggleHistoryChart);
+
+    document.getElementById('historyBody')?.addEventListener('click', e => {
+        const btn = e.target.closest('.history-group-chart-btn');
+        if (!btn) return;
+        toggleHistoryGroupChart(parseInt(btn.dataset.index, 10), btn.dataset.name);
+    });
 }
 
 function renderHistoryFilterPills(containerId, segs, activeValue, onPick) {
@@ -4794,6 +4840,72 @@ function renderHistoryFeed(logs) {
     }
 }
 
+function renderHistoryGroupTable(logs) {
+    const grouped = {};
+    logs.forEach(log => {
+        if (!grouped[log.item]) grouped[log.item] = { coins: [], crystals: [] };
+        if (log.pricetype === 0) grouped[log.item].coins.push(log.price);
+        else grouped[log.item].crystals.push(log.price);
+    });
+
+    const stats = Object.entries(grouped).map(([item, data]) => ({
+        item,
+        minCoin: data.coins.length ? Math.min(...data.coins) : 0,
+        medCoin: data.coins.length ? calcMedian(data.coins) : 0,
+        maxCoin: data.coins.length ? Math.max(...data.coins) : 0,
+        minCrystal: data.crystals.length ? Math.min(...data.crystals) : 0,
+        medCrystal: data.crystals.length ? calcMedian(data.crystals) : 0,
+        maxCrystal: data.crystals.length ? Math.max(...data.crystals) : 0,
+        total: data.coins.length + data.crystals.length
+    })).sort((a, b) => b.total - a.total || a.item.localeCompare(b.item, 'zh-Hant'));
+
+    const detailsEl = document.getElementById('historyGroupDetails');
+    const tbody = document.getElementById('historyBody');
+    if (!detailsEl || !tbody) return;
+
+    if (stats.length <= 1) {
+        detailsEl.style.display = 'none';
+        detailsEl.open = false;
+        tbody.innerHTML = '';
+        return;
+    }
+
+    detailsEl.style.display = '';
+    tbody.innerHTML = stats.map((row, index) => `
+        <tr>
+            <td><strong>${escapeHtml(row.item)}</strong></td>
+            <td style="color:var(--accent-green)">${row.minCoin ? row.minCoin.toLocaleString() : '-'}</td>
+            <td style="color:var(--accent-gold)">${row.medCoin ? row.medCoin.toLocaleString() : '-'}</td>
+            <td style="color:var(--accent-red)">${row.maxCoin ? row.maxCoin.toLocaleString() : '-'}</td>
+            <td style="color:var(--accent-green)">${row.minCrystal ? row.minCrystal.toLocaleString() : '-'}</td>
+            <td style="color:var(--accent-gold)">${row.medCrystal ? row.medCrystal.toLocaleString() : '-'}</td>
+            <td style="color:var(--accent-red)">${row.maxCrystal ? row.maxCrystal.toLocaleString() : '-'}</td>
+            <td>${row.total}</td>
+            <td><button type="button" class="secondary history-group-chart-btn" style="padding:6px 12px;font-size:0.8rem;" data-index="${index}" data-name="${escapeAttr(row.item)}">📈</button></td>
+        </tr>
+        <tr id="historyGroupChartRow${index}" class="chart-row" style="display:none;">
+            <td colspan="9" style="padding:0; background:var(--bg-dark);">
+                <div class="inline-chart-container">
+                    <div class="chart-title">📈 ${escapeHtml(row.item)} 價格走勢</div>
+                    <div class="inline-chart-wrapper">
+                        <canvas id="historyGroupChart${index}"></canvas>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function toggleHistoryGroupChart(index, itemName) {
+    togglePriceChart(
+        `history-group-${index}`,
+        `historyGroupChartRow${index}`,
+        `historyGroupChart${index}`,
+        itemName,
+        getFilteredHistoryLogs()
+    );
+}
+
 function renderHistoryData() {
     const logs = getFilteredHistoryLogs();
     const hintEl = document.getElementById('historyExactHint');
@@ -4804,6 +4916,7 @@ function renderHistoryData() {
     }
     renderHistorySummaryBar(logs);
     renderHistoryFeed(logs);
+    renderHistoryGroupTable(logs);
     updateHistoryChartUi(logs);
     document.getElementById('historySection').style.display = 'block';
 }
