@@ -1316,6 +1316,17 @@
             margin-bottom: 10px;
         }
 
+        .history-section-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .history-feed-list-header {
+            margin-top: 4px;
+            margin-bottom: 10px;
+        }
+
         .history-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -2750,7 +2761,7 @@
         <div class="history-stats-grid" id="historySummary"></div>
 
         <div class="history-feed-header">
-            <span id="historyFeedCount">成交紀錄</span>
+            <span class="history-section-label">價格概覽</span>
             <div class="history-feed-header-actions">
                 <span id="historyExactHint" style="font-size:0.82rem;color:var(--text-secondary);"></span>
                 <button type="button" class="secondary" id="historyChartToggleBtn" disabled>📈 走勢圖</button>
@@ -2764,8 +2775,6 @@
                 </div>
             </div>
         </div>
-        <div class="history-feed" id="historyFeed"></div>
-        <div class="history-pagination" id="historyPagination"></div>
 
         <details class="history-group-details" id="historyGroupDetails" style="display: none;">
             <summary>📊 品項統計</summary>
@@ -2790,6 +2799,12 @@
                 </div>
             </div>
         </details>
+
+        <div class="history-feed-header history-feed-list-header">
+            <span id="historyFeedCount">成交紀錄</span>
+        </div>
+        <div class="history-feed" id="historyFeed"></div>
+        <div class="history-pagination" id="historyPagination"></div>
     </div>
 
     <!-- Empty State -->
