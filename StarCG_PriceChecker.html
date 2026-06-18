@@ -1324,20 +1324,51 @@
             }
 
             #marketTable {
-                min-width: 720px;
+                min-width: 680px;
+            }
+
+            #marketTable th:first-child,
+            #marketTable td:first-child {
+                min-width: 132px;
+                width: 132px;
+                max-width: 132px;
+                white-space: normal;
+            }
+
+            #marketTable th:nth-child(2),
+            #marketTable td:nth-child(2) {
+                min-width: 76px;
+                width: 76px;
+            }
+
+            #marketTable th:nth-child(3),
+            #marketTable td:nth-child(3) {
+                min-width: 88px;
+                width: 88px;
+                white-space: normal;
+                word-break: break-word;
             }
 
             #marketTable .th-item-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 4px;
+                width: 100%;
+            }
+
+            #marketTable .stat-sort-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 3px;
+                width: 100%;
             }
 
             #marketTable .stat-sort-select {
                 min-width: 0;
-                max-width: 100%;
-                font-size: 0.78rem;
-                padding: 4px 24px 4px 8px;
+                width: 100%;
+                max-width: 120px;
+                font-size: 0.76rem;
+                padding: 4px 22px 4px 8px;
             }
 
             #marketTable .stat-sort-order-btn {
@@ -1345,18 +1376,27 @@
                 font-size: 0.75rem;
             }
 
+            #marketTable .stat-tag-hint {
+                display: none;
+            }
+
             #marketTable th {
-                padding: 8px 6px;
+                padding: 8px 5px;
                 font-size: 0.82rem;
             }
 
             #marketTable td {
-                padding: 8px 6px;
+                padding: 8px 5px;
                 font-size: 0.85rem;
             }
 
+            #marketTable .item-name-row {
+                gap: 3px 4px;
+            }
+
             #marketTable .item-name-row > strong {
-                font-size: 0.88rem;
+                font-size: 0.86rem;
+                word-break: break-all;
             }
         }
 
