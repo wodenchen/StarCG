@@ -2736,7 +2736,7 @@
         <div class="history-feed-header">
             <span id="historyFeedCount">成交紀錄</span>
             <div class="history-feed-header-actions">
-                <span id="historyExactHint" style="font-size:0.82rem;color:var(--accent-green);">🎯 僅顯示同名成交</span>
+                <span id="historyExactHint" style="font-size:0.82rem;color:var(--text-secondary);"></span>
                 <button type="button" class="secondary" id="historyChartToggleBtn" disabled>📈 走勢圖</button>
             </div>
         </div>
@@ -2902,6 +2902,10 @@ const API_MARKET_BASE = 'https://member.starcg.net/market.php';
 const API_HISTORY_BASE = 'https://member.starcg.net/marketrecord.php';
 const MAX_PAGES = 20;
 const MARKET_PAGE_CONCURRENCY = 4;
+const HISTORY_PAGE_CONCURRENCY = 6;
+const HISTORY_FETCH_INITIAL_PAGES = 6;
+const HISTORY_FETCH_BATCH_PAGES = 18;
+const HISTORY_SESSION_TTL_MS = 3 * 60 * 1000;
 
 // 嘗試 fetch，失敗則換下一個 proxy
 async function fetchWithProxy(targetUrl) {
@@ -2947,7 +2951,6 @@ let historyDisplayPage = 1;
 let historyLastFetchedPage = 0;
 let historyApiExhausted = false;
 const HISTORY_FEED_PAGE_SIZE = 30;
-const HISTORY_FETCH_BATCH_PAGES = 20;
 let historyChartOpen = false;
 let historyChartUserDismissed = false;
 let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || [];
@@ -3155,7 +3158,13 @@ function initEventListeners() {
         applyFilters();
     });
     
-    document.getElementById('exactSearchFilter').addEventListener('change', applyFilters);
+    document.getElementById('exactSearchFilter').addEventListener('change', () => {
+        applyFilters();
+        if (isHistoryTab(currentTab)) {
+            historyDisplayPage = 1;
+            renderHistoryData();
+        }
+    });
     document.getElementById('babyOnlyFilter').addEventListener('change', applyFilters);
     document.getElementById('durabilityFullFilter').addEventListener('change', applyFilters);
     
@@ -3336,12 +3345,21 @@ async function searchMarket() {
 // 標準化字串：全形括號轉半形、統一空格等
 function normalizeStr(str) {
     return String(str ?? '')
+        .normalize('NFKC')
         .trim()
         .replace(/（/g, '(')
         .replace(/）/g, ')')
         .replace(/【/g, '[')
         .replace(/】/g, ']')
-        .replace(/　/g, ' ');
+        .replace(/　/g, ' ')
+        .replace(/药/g, '藥');
+}
+
+/** search 參數：encodeURIComponent 不編碼 ()，部分 CORS proxy 會截斷 → 強制 %28 %29 */
+function encodeSearchParam(keyword) {
+    return encodeURIComponent(String(keyword ?? ''))
+        .replace(/\(/g, '%28')
+        .replace(/\)/g, '%29');
 }
 
 const PET_STAT_SORT_DEFS = [
@@ -3881,7 +3899,7 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
 }
 
 async function fetchMarketPage(keyword, page, normalizedKeyword, exact = false) {
-    const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=${exact ? 1 : 0}&page=${page}&search=${encodeURIComponent(keyword)}`;
+    const targetUrl = `${API_MARKET_BASE}?ajax=1&type=all&server=all&exact=${exact ? 1 : 0}&page=${page}&search=${encodeSearchParam(keyword)}`;
     const text = await fetchWithProxy(targetUrl);
     const data = parseJsonResponse(text, '市場資料');
     return {
@@ -3986,7 +4004,7 @@ async function fetchTrackedHistory(keyword, type = 'all', maxPages = TRACKED_HIS
     let page = 1;
 
     while (page <= maxPages) {
-        const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=${encodeURIComponent(type)}&page=${page}&search=${encodeURIComponent(keyword)}`;
+        const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=${encodeURIComponent(type)}&page=${page}&search=${encodeSearchParam(keyword)}`;
         const text = await fetchWithProxy(targetUrl);
         const data = parseJsonResponse(text, '追蹤歷史成交');
 
@@ -4232,6 +4250,34 @@ function getHistoryCacheKey(keyword) {
     return keyword;
 }
 
+function getHistorySessionStorageKey(keyword) {
+    return `starcg_hist_v1_${keyword}`;
+}
+
+function loadHistorySessionCache(keyword) {
+    try {
+        const raw = sessionStorage.getItem(getHistorySessionStorageKey(keyword));
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed?.ts || Date.now() - parsed.ts > HISTORY_SESSION_TTL_MS) return null;
+        if (!Array.isArray(parsed.logs)) return null;
+        return parsed;
+    } catch {
+        return null;
+    }
+}
+
+function saveHistorySessionCache(keyword) {
+    try {
+        sessionStorage.setItem(getHistorySessionStorageKey(keyword), JSON.stringify({
+            logs: allHistoryLogs,
+            lastFetchedPage: historyLastFetchedPage,
+            exhausted: historyApiExhausted,
+            ts: Date.now()
+        }));
+    } catch { /* quota / private mode */ }
+}
+
 function filterByHistoryDisplayRange(logs) {
     const days = HISTORY_RANGE_DAYS[historyRange];
     if (!days) return logs;
@@ -4242,14 +4288,35 @@ function filterByHistoryDisplayRange(logs) {
     });
 }
 
-function getHistoryExactMatchedLogs(logs) {
-    const keyword = document.getElementById('searchInput').value.trim();
+function isHistoryExactSearch() {
+    return document.getElementById('exactSearchFilter')?.checked ?? false;
+}
+
+/** 依市場「精確搜尋」checkbox：勾選＝同名，未勾＝品名包含關鍵字 */
+function getHistoryKeywordMatchedLogs(logs) {
+    const keyword = (lastSearchKeyword || document.getElementById('searchInput').value).trim();
     if (!keyword) return logs;
     const nk = normalizeStr(keyword);
-    return logs.filter(l => normalizeStr(l.item) === nk);
+    const exact = isHistoryExactSearch();
+    return logs.filter(l => marketNameMatches(normalizeStr(l.item), nk, exact));
 }
 
 function parseHistoryLogEntry(log) {
+    const apiItemName = String(log.item_name || '').trim();
+    const apiQty = Math.max(1, parseInt(log.qty, 10) || 1);
+    if (apiItemName) {
+        const unitPrice = log.unit_price != null
+            ? Math.ceil(Number(log.unit_price))
+            : Math.ceil(Math.ceil(log.price / (log.pricetype === 1 ? 0.94 : 0.9)) / apiQty);
+        return {
+            item: apiItemName,
+            price: unitPrice,
+            pricetype: log.pricetype,
+            time: log.time_text,
+            quantity: apiQty
+        };
+    }
+
     const buff = String(log.buff || '').trim();
     const qtyMatch = buff.match(/購買(\d+)個[：:]\s*/);
     const quantity = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
@@ -4332,7 +4399,7 @@ function applyHistoryFiltersLocal() {
 }
 
 function getFilteredHistoryLogs() {
-    let logs = getHistoryExactMatchedLogs(allHistoryLogs);
+    let logs = getHistoryKeywordMatchedLogs(allHistoryLogs);
     logs = filterByHistoryDisplayRange(logs);
 
     if (historyCurrency !== 'all') {
@@ -4344,16 +4411,25 @@ function getFilteredHistoryLogs() {
 
 function getHistoryEmptyMessage() {
     const keyword = document.getElementById('searchInput').value.trim();
-    const exactPool = filterByHistoryDisplayRange(getHistoryExactMatchedLogs(allHistoryLogs));
-    const exactAll = getHistoryExactMatchedLogs(allHistoryLogs);
+    const exact = isHistoryExactSearch();
+    const matchedAll = getHistoryKeywordMatchedLogs(allHistoryLogs);
+    const matchedPool = filterByHistoryDisplayRange(matchedAll);
 
     if (allHistoryLogs.length === 0) return '無法取得成交資料，請稍後再試';
-    if (exactAll.length === 0) {
-        return `「${escapeHtml(keyword)}」無同名成交（資料池 ${allHistoryLogs.length} 筆，已排除相似品項）`;
+    if (matchedAll.length === 0) {
+        const samples = [...new Set(allHistoryLogs.map(l => l.item).filter(Boolean))].slice(0, 4);
+        const sampleHint = samples.length
+            ? `<br><span style="font-size:0.9em;opacity:0.85">資料池品名示例：${samples.map(s => escapeHtml(s)).join('、')}…</span>`
+            : '';
+        if (exact) {
+            return `「${escapeHtml(keyword)}」無同名成交（資料池 ${allHistoryLogs.length} 筆）${sampleHint}<br><span style="font-size:0.9em;opacity:0.85">可取消勾選「精確搜尋」改看關鍵字相符的成交</span>`;
+        }
+        return `「${escapeHtml(keyword)}」無符合關鍵字的成交（資料池 ${allHistoryLogs.length} 筆）${sampleHint}`;
     }
-    if (exactPool.length === 0) {
+    if (matchedPool.length === 0) {
         const label = HISTORY_RANGE_SEGS.find(([v]) => v === historyRange)?.[1] || historyRange;
-        return `近 ${label} 無同名成交（30 天內共 ${exactAll.length} 筆），可改選 7 天或 30 天`;
+        const modeLabel = exact ? '同名' : '符合關鍵字';
+        return `近 ${label} 無${modeLabel}成交（30 天內共 ${matchedAll.length} 筆），可改選 7 天或 30 天`;
     }
     if (historyCurrency !== 'all') {
         const unit = historyCurrency === '0' ? '魔幣' : '魔晶';
@@ -4459,20 +4535,57 @@ async function loadHistoryTab(force = false) {
         return true;
     }
 
+    if (!force) {
+        const sessionCached = loadHistorySessionCache(keyword);
+        if (sessionCached) {
+            allHistoryLogs = sessionCached.logs;
+            historyLastFetchedPage = sessionCached.lastFetchedPage || 0;
+            historyApiExhausted = !!sessionCached.exhausted;
+            lastHistoryKeyword = keyword;
+            historyCacheKey = cacheKey;
+            historyDisplayPage = 1;
+            historyChartUserDismissed = false;
+            addTag(keyword);
+            document.getElementById('tabsContainer').style.display = 'flex';
+            renderHistoryData();
+            return allHistoryLogs.length > 0;
+        }
+    }
+
     showLoading(true, '載入歷史成交…');
     document.getElementById('historySection').style.display = 'none';
     document.getElementById('emptyState').style.display = 'none';
 
+    let historyShown = false;
     try {
-        allHistoryLogs = await fetchHistoryData(keyword, { append: false });
+        allHistoryLogs = await fetchHistoryData(keyword, {
+            append: false,
+            maxPages: HISTORY_FETCH_INITIAL_PAGES,
+            onProgress(page, totalPages, count) {
+                showLoading(true, `載入歷史第 ${page}/${totalPages} 頁…（${count} 筆）`);
+            },
+            onPartial(logsSoFar) {
+                allHistoryLogs = logsSoFar;
+                if (!historyShown && allHistoryLogs.length > 0) {
+                    historyShown = true;
+                    addTag(keyword);
+                    document.getElementById('tabsContainer').style.display = 'flex';
+                    document.getElementById('historySection').style.display = 'block';
+                }
+                if (historyShown) renderHistoryData();
+            }
+        });
         lastHistoryKeyword = keyword;
         historyCacheKey = cacheKey;
         historyDisplayPage = 1;
         historyChartUserDismissed = false;
+        saveHistorySessionCache(keyword);
 
         if (allHistoryLogs.length > 0) {
-            addTag(keyword);
-            document.getElementById('tabsContainer').style.display = 'flex';
+            if (!historyShown) {
+                addTag(keyword);
+                document.getElementById('tabsContainer').style.display = 'flex';
+            }
             renderHistoryData();
             return true;
         }
@@ -4499,6 +4612,7 @@ async function loadMoreHistory() {
         if (allHistoryLogs.length === before) {
             historyApiExhausted = true;
         }
+        saveHistorySessionCache(keyword);
         renderHistoryData();
     } catch (err) {
         console.error(err);
@@ -4508,45 +4622,66 @@ async function loadMoreHistory() {
     }
 }
 
-async function fetchHistoryData(keyword, { append = false, maxPages = HISTORY_FETCH_BATCH_PAGES } = {}) {
+async function fetchHistoryPage(keyword, page) {
+    const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=all&page=${page}&search=${encodeSearchParam(keyword)}`;
+    const text = await fetchWithProxy(targetUrl);
+    const data = parseJsonResponse(text, '歷史成交');
+    return { page, logs: data.logs || [] };
+}
+
+async function fetchHistoryData(keyword, { append = false, maxPages = HISTORY_FETCH_BATCH_PAGES, onProgress, onPartial } = {}) {
     const logs = append ? [...allHistoryLogs] : [];
     if (!append) {
         historyLastFetchedPage = 0;
         historyApiExhausted = false;
     }
 
-    let page = append ? historyLastFetchedPage + 1 : 1;
-    const endPage = page + maxPages - 1;
+    const startPage = append ? historyLastFetchedPage + 1 : 1;
+    const endPage = Math.min(startPage + maxPages - 1, 100);
     const poolMaxMs = HISTORY_RANGE_DAYS['30d'] * 24 * 60 * 60 * 1000;
     const now = Date.now();
 
-    while (page <= endPage && page <= 100) {
-        // ajax 端點僅支援 type/page/search；range/currency/sort 由 client 處理
-        const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=all&page=${page}&search=${encodeURIComponent(keyword)}`;
-        const text = await fetchWithProxy(targetUrl);
-        const data = parseJsonResponse(text, '歷史成交');
-
-        if (!data.logs || data.logs.length === 0) {
-            historyApiExhausted = true;
-            break;
+    for (let batchStart = startPage; batchStart <= endPage; batchStart += HISTORY_PAGE_CONCURRENCY) {
+        const pageNums = [];
+        for (let p = batchStart; p < batchStart + HISTORY_PAGE_CONCURRENCY && p <= endPage; p++) {
+            pageNums.push(p);
         }
+
+        const pages = await Promise.all(pageNums.map(p => fetchHistoryPage(keyword, p)));
+        pages.sort((a, b) => a.page - b.page);
 
         let stopByAge = false;
-        for (const log of data.logs) {
-            const logTime = parseHistoryLogTime(log.time_text);
-            if (logTime != null && now - logTime > poolMaxMs) {
-                stopByAge = true;
+        let hitEmpty = false;
+
+        for (const pg of pages) {
+            if (!pg.logs.length) {
+                hitEmpty = true;
                 continue;
             }
-            logs.push(parseHistoryLogEntry(log));
+
+            historyLastFetchedPage = Math.max(historyLastFetchedPage, pg.page);
+
+            for (const log of pg.logs) {
+                const logTime = parseHistoryLogTime(log.time_text);
+                if (logTime != null && now - logTime > poolMaxMs) {
+                    stopByAge = true;
+                    continue;
+                }
+                logs.push(parseHistoryLogEntry(log));
+            }
         }
 
-        historyLastFetchedPage = page;
-        if (stopByAge) {
+        onPartial?.(logs);
+        onProgress?.(
+            Math.min(batchStart + HISTORY_PAGE_CONCURRENCY - 1, endPage),
+            endPage,
+            logs.length
+        );
+
+        if (stopByAge || hitEmpty) {
             historyApiExhausted = true;
             break;
         }
-        page++;
     }
 
     return logs;
@@ -4601,9 +4736,10 @@ function renderHistorySummaryBar(logs) {
         avgBar.style.display = 'block';
         avgBar.innerHTML = `ℹ️ 均單價：${refParts.join('　·　')}　·　每筆「便宜 / 貴 X%」與<strong>同幣別</strong>均價比較`;
     } else if (allHistoryLogs.length > 0) {
-        const exactAll = getHistoryExactMatchedLogs(allHistoryLogs);
+        const matchedAll = getHistoryKeywordMatchedLogs(allHistoryLogs);
+        const modeLabel = isHistoryExactSearch() ? '同名' : '符合關鍵字';
         avgBar.style.display = 'block';
-        avgBar.innerHTML = `ℹ️ 資料池 ${allHistoryLogs.length} 筆，同名 ${exactAll.length} 筆；目前篩選條件下無統計，可調整時間或貨幣`;
+        avgBar.innerHTML = `ℹ️ 資料池 ${allHistoryLogs.length} 筆，${modeLabel} ${matchedAll.length} 筆；目前篩選條件下無統計，可調整時間或貨幣`;
     } else {
         avgBar.style.display = 'none';
     }
@@ -4660,6 +4796,12 @@ function renderHistoryFeed(logs) {
 
 function renderHistoryData() {
     const logs = getFilteredHistoryLogs();
+    const hintEl = document.getElementById('historyExactHint');
+    if (hintEl) {
+        hintEl.textContent = isHistoryExactSearch()
+            ? '🎯 精確搜尋：僅同名成交'
+            : '🔍 模糊搜尋：品名包含關鍵字';
+    }
     renderHistorySummaryBar(logs);
     renderHistoryFeed(logs);
     updateHistoryChartUi(logs);
