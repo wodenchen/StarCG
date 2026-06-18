@@ -1317,38 +1317,14 @@
                 width: 100%;
             }
 
+            #marketSection.table-container {
+                overflow-x: auto;
+                overflow-y: clip;
+                -webkit-overflow-scrolling: touch;
+            }
+
             #marketTable {
-                min-width: 0;
-                width: 100%;
-                table-layout: fixed;
-            }
-
-            #marketTable th:first-child,
-            #marketTable td:first-child {
-                position: static;
-                min-width: 0;
-                border-right: none;
-            }
-
-            /* 窄螢幕只留：名稱 / 價格 / 地點 */
-            #marketTable th:nth-child(n+4),
-            #marketTable td:nth-child(n+4) {
-                display: none;
-            }
-
-            #marketTable th:nth-child(1),
-            #marketTable td:nth-child(1) {
-                width: 42%;
-            }
-
-            #marketTable th:nth-child(2),
-            #marketTable td:nth-child(2) {
-                width: 24%;
-            }
-
-            #marketTable th:nth-child(3),
-            #marketTable td:nth-child(3) {
-                width: 34%;
+                min-width: 720px;
             }
 
             #marketTable .th-item-header {
@@ -1369,12 +1345,7 @@
                 font-size: 0.75rem;
             }
 
-            #marketTable .stat-tag-hint {
-                display: none;
-            }
-
             #marketTable th {
-                white-space: normal;
                 padding: 8px 6px;
                 font-size: 0.82rem;
             }
@@ -1382,15 +1353,10 @@
             #marketTable td {
                 padding: 8px 6px;
                 font-size: 0.85rem;
-                word-break: break-word;
             }
 
             #marketTable .item-name-row > strong {
                 font-size: 0.88rem;
-            }
-
-            #marketSection.table-container {
-                overflow-x: hidden;
             }
         }
 
