@@ -113,11 +113,21 @@
         }
 
         .search-row.filter-row {
-            margin-top: 12px;
-            padding-top: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
             border-top: 1px solid var(--border);
-            flex-wrap: nowrap;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            width: 100%;
+            align-items: flex-end;
+        }
+
+        @media (min-width: 900px) {
+            .search-row.filter-row {
+                display: grid;
+                grid-template-columns: auto auto auto auto auto auto;
+                gap: 12px 16px;
+            }
         }
 
         .search-row.filter-row .form-group {
@@ -127,21 +137,28 @@
             text-align: center;
             width: 100%;
             white-space: nowrap;
+            font-size: 0.95rem;
         }
         .search-row.filter-row select,
         .search-row.filter-row .exchange-rate-group input,
         .search-row.filter-row #bountyBtn,
-        .search-row.filter-row #procurementBtn {
+        .search-row.filter-row #procurementBtn,
+        .search-row.filter-row #trackedBtn {
             height: 42px;
-            padding: 7px 10px;
+            padding: 8px 12px;
             font-size: 0.95rem;
             box-sizing: border-box;
         }
+        #trackedBtn.active-view {
+            background: linear-gradient(135deg, #d4a024, #b8860b);
+            color: #fff;
+            border-color: #b8860b;
+        }
         .search-row.filter-row .form-group:not(.seed-group) select {
-            width: 88px;
+            width: 80px;
         }
         .search-row.filter-row .exchange-rate-group input {
-            width: 108px;
+            width: 80px;
             text-align: center;
         }
         .exchange-rate-label {
@@ -152,7 +169,7 @@
             line-height: 1.2;
         }
         .exchange-rate-label .exchange-rate-hint {
-            font-size: 0.68rem;
+            font-size: 0.78rem;
             font-weight: 400;
             color: var(--text-secondary);
             opacity: 0.9;
@@ -170,8 +187,8 @@
             min-width: 50px;
             max-width: 50px;
             height: 42px;
-            padding: 6px 0;
-            font-size: 0.88rem;
+            padding: 4px 0;
+            font-size: 0.92rem;
             text-align: center;
             text-align-last: center;
         }
@@ -184,10 +201,10 @@
         }
         .bounty-group #bountyBtn {
             width: auto;
-            min-width: 104px;
+            min-width: 0;
             min-height: 42px;
             height: 42px;
-            padding: 7px 14px;
+            padding: 8px 14px;
             font-size: 0.95rem;
             font-weight: 700;
             background: linear-gradient(135deg, #c49a6c, #9a7348);
@@ -203,25 +220,30 @@
         .filter-chips {
             display: flex;
             align-items: center;
-            gap: 7px;
+            flex-wrap: wrap;
+            gap: 8px;
             background: var(--bg-dark);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 5px 7px;
+            padding: 6px 10px;
             align-self: flex-end;
-            flex-shrink: 0;
+            flex: 0 0 auto;
+            width: fit-content;
+            min-height: 42px;
+            justify-content: flex-start;
+            justify-self: start;
         }
         .filter-chip {
             position: relative;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            height: 42px;
+            height: 40px;
             padding: 0 12px;
             border: 2px solid var(--border);
             border-radius: 8px;
             background: var(--bg-card);
-            font-size: 0.88rem;
+            font-size: 0.92rem;
             font-weight: 600;
             color: var(--text-secondary);
             cursor: pointer;
@@ -402,12 +424,17 @@
             color: #fff;
         }
 
+        /* 結果區頭部：stats + 類型/單位 pill */
+        .market-results-head {
+            margin-bottom: 16px;
+        }
+
         /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
 
         .stat-card {
@@ -444,14 +471,17 @@
             background: var(--bg-card);
             padding: 4px;
             border-radius: var(--radius);
-            width: fit-content;
+            width: 100%;
         }
 
         .tab {
-            padding: 10px 20px;
+            flex: 1;
+            text-align: center;
+            padding: 12px 20px;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1rem;
             color: var(--text-secondary);
             transition: all 0.2s;
         }
@@ -1107,6 +1137,121 @@
             font-weight: 600;
         }
 
+        /* 追蹤清單 */
+        .tracked-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .tracked-toolbar button {
+            padding: 8px 14px;
+            font-size: 0.9rem;
+        }
+        .tracked-hint {
+            flex: 1 1 240px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+        .tracked-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-secondary);
+        }
+        .tracked-empty .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .track-btn {
+            flex-shrink: 0;
+            border: 1px solid #d4c4a8;
+            background: #fff8ec;
+            color: #b8860b;
+            cursor: pointer;
+            font-size: 0.82rem;
+            line-height: 1.2;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 700;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .track-btn:hover {
+            background: #ffefd5;
+            border-color: var(--accent-gold);
+            color: #9a7209;
+        }
+        .track-btn.tracked {
+            background: linear-gradient(135deg, #d4a024, #b8860b);
+            color: #fff;
+            border-color: #b8860b;
+        }
+        .tracked-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .tracked-actions button {
+            padding: 4px 10px;
+            font-size: 0.78rem;
+        }
+        .tracked-updated-fresh { color: var(--accent-green); font-weight: 600; }
+        .tracked-updated-warn { color: #d68910; font-weight: 600; }
+        .tracked-updated-stale { color: var(--accent-red); font-weight: 600; }
+
+        /* 結果區：商品類型 / 交易單位 pill */
+        .market-segment-bar {
+            display: none;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            margin-top: 14px;
+            margin-bottom: 0;
+            align-items: flex-end;
+            width: 100%;
+        }
+        .segment-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1 1 280px;
+            min-width: 0;
+        }
+        .segment-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .segment-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .segment-pill {
+            border: 2px solid #c49a6c;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            white-space: nowrap;
+        }
+        .segment-pill:hover {
+            background: #fff8ef;
+        }
+        .segment-pill.active {
+            background: linear-gradient(135deg, #c49a6c, #9a7348);
+            border-color: #7a5a38;
+            color: #fff;
+        }
+        .segment-pill:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
         /* Responsive - 平板 */
         @media (max-width: 768px) {
             .container {
@@ -1539,10 +1684,10 @@
         /* 採購排程 */
         .bounty-group #procurementBtn {
             width: auto;
-            min-width: 104px;
+            min-width: 0;
             min-height: 42px;
             height: 42px;
-            padding: 7px 14px;
+            padding: 8px 14px;
             font-size: 0.95rem;
             font-weight: 700;
             background: linear-gradient(135deg, #5a9a5a, #3d7a3d);
@@ -1950,17 +2095,10 @@
             <div class="form-group bounty-group">
                 <button id="bountyBtn" type="button">📋 快捷清單</button>
                 <button id="procurementBtn" type="button">🛒 懸賞採購清單</button>
+                <button id="trackedBtn" type="button">⭐ 追蹤清單 <span id="trackedCountBadge"></span></button>
             </div>
             <div class="form-group">
-                <label>💰 幣別</label>
-                <select id="currencyFilter">
-                    <option value="all" selected>全部</option>
-                    <option value="0">魔幣 💰</option>
-                    <option value="1">魔晶 💎</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>📜 改造圖</label>
+                <label title="改造圖">📜 改造圖</label>
                 <select id="gradeFilter">
                     <option value="all" selected>全部</option>
                     <option value="普通">普通</option>
@@ -2011,10 +2149,6 @@
                     <input type="checkbox" id="exactSearchFilter">
                     <span>🎯 精確搜尋</span>
                 </label>
-                <label class="filter-chip" title="只顯示寵物">
-                    <input type="checkbox" id="petOnlyFilter">
-                    <span>🐾 只搜寵物</span>
-                </label>
                 <label class="filter-chip" title="只顯示 1 等寶寶">
                     <input type="checkbox" id="babyOnlyFilter">
                     <span>🍼 1等寶寶</span>
@@ -2026,23 +2160,36 @@
         <div class="quick-tags" id="quickTags"></div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid" id="statsGrid" style="display: none;">
-        <div class="stat-card">
-            <div class="label">📦 在售數量</div>
-            <div class="value blue" id="statCount">0</div>
+    <!-- 結果區頭部：Stats + 類型/單位 pill -->
+    <div class="market-results-head" id="marketResultsHead">
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card">
+                <div class="label">📦 在售數量</div>
+                <div class="value blue" id="statCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">💰 最低價</div>
+                <div class="value green" id="statMinPrice">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">📊 中位價</div>
+                <div class="value gold" id="statAvgPrice">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">📈 最高價</div>
+                <div class="value red" id="statMaxPrice">-</div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="label">💰 最低價</div>
-            <div class="value green" id="statMinPrice">-</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">📊 中位價</div>
-            <div class="value gold" id="statAvgPrice">-</div>
-        </div>
-        <div class="stat-card">
-            <div class="label">📈 最高價</div>
-            <div class="value red" id="statMaxPrice">-</div>
+
+        <div class="market-segment-bar" id="marketSegmentBar">
+            <div class="segment-group">
+                <span class="segment-label">商品類型</span>
+                <div class="segment-pills" id="itemTypeSegments"></div>
+            </div>
+            <div class="segment-group">
+                <span class="segment-label">交易單位</span>
+                <div class="segment-pills" id="priceUnitSegments"></div>
+            </div>
         </div>
     </div>
 
@@ -2091,6 +2238,38 @@
             </thead>
             <tbody id="marketBody"></tbody>
         </table>
+    </div>
+
+    <!-- Tracked Section -->
+    <div id="trackedSection" style="display: none;">
+        <div class="tracked-toolbar">
+            <button type="button" id="trackedRefreshAllBtn">🔄 更新全部成交價</button>
+            <p class="tracked-hint">⚠️ 歷史成交價可能受名稱相似物品影響（例如「壽喜鍋」會混入「一箱壽喜鍋」）。更新時各抓最近 3 頁、72 小時內成交。</p>
+        </div>
+        <div class="table-container">
+            <table id="trackedTable">
+                <thead>
+                    <tr>
+                        <th>類型</th>
+                        <th>名稱</th>
+                        <th>💰 最低</th>
+                        <th>💰 平均</th>
+                        <th>💎 最低</th>
+                        <th>💎 平均</th>
+                        <th>成交筆數</th>
+                        <th>上次更新</th>
+                        <th>走勢</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="trackedBody"></tbody>
+            </table>
+        </div>
+        <div class="tracked-empty" id="trackedEmpty" style="display: none;">
+            <div class="icon">⭐</div>
+            <div>尚無追蹤項目</div>
+            <div style="margin-top:8px;font-size:0.85rem;">在市場搜尋結果點 ⭐ 即可加入</div>
+        </div>
     </div>
 
     <!-- Procurement Route Section -->
@@ -2341,9 +2520,20 @@ let lastHistoryHours = 0;
 let historyHours = 36;
 let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || [];
 let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || [];
+let trackedItems = (() => {
+    try {
+        const raw = JSON.parse(localStorage.getItem('starcg_trackedItems') || '[]');
+        return Array.isArray(raw) ? raw : [];
+    } catch {
+        return [];
+    }
+})();
+const trackedUpdating = new Set();
 let currentSort = { field: 'price', order: 'asc' };
 let statSortOrder = 'desc';
 let currentTab = 'market';
+let marketItemType = 'all';
+let marketPriceUnit = 'all';
 const chartInstances = {};
 
 /* ========================================
@@ -2362,6 +2552,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initQuickTags();
     initBounty();
     initProcurement();
+    initTracked();
+    initMarketSegments();
+    updateTrackedCountBadge();
 });
 
 function updateStatSortStyle() {
@@ -2499,15 +2692,23 @@ function updateExchangeRateHint() {
 
 function initEventListeners() {
     // 搜尋按鈕
-    document.getElementById('searchBtn').addEventListener('click', searchMarket);
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        marketItemType = 'all';
+        marketPriceUnit = 'all';
+        searchMarket();
+    });
     
     // Enter 鍵搜尋
     document.getElementById('searchInput').addEventListener('keypress', e => {
-        if (e.key === 'Enter') searchMarket();
+        if (e.key === 'Enter') {
+            marketItemType = 'all';
+            marketPriceUnit = 'all';
+            searchMarket();
+        }
     });
     
     // 篩選器變更
-    ['currencyFilter', 'seedPlusFilter', 'seedMinusFilter', 'soulColorFilter', 'gradeFilter'].forEach(id => {
+    ['seedPlusFilter', 'seedMinusFilter', 'soulColorFilter', 'gradeFilter'].forEach(id => {
         document.getElementById(id).addEventListener('change', applyFilters);
     });
     document.getElementById('statSortFilter').addEventListener('change', () => {
@@ -2521,8 +2722,6 @@ function initEventListeners() {
         applyFilters();
     });
     
-    // 只搜尋寵物 checkbox
-    document.getElementById('petOnlyFilter').addEventListener('change', applyFilters);
     document.getElementById('exactSearchFilter').addEventListener('change', applyFilters);
     document.getElementById('babyOnlyFilter').addEventListener('change', applyFilters);
     document.getElementById('durabilityFullFilter').addEventListener('change', applyFilters);
@@ -2575,9 +2774,8 @@ function renderQuickTags() {
 
 function quickSearch(tag, exact = false) {
     document.getElementById('searchInput').value = tag;
-    // 是寵物才勾「只搜尋寵物」，否則自動取消
-    document.getElementById('petOnlyFilter').checked = BOUNTY_PET_NAMES.includes(tag);
-    // 常用清單來的項目預設精確搜尋
+    marketItemType = BOUNTY_PET_NAMES.includes(tag) ? 'pet' : 'all';
+    marketPriceUnit = 'all';
     document.getElementById('exactSearchFilter').checked = exact;
     searchMarket();
 }
@@ -3286,6 +3484,298 @@ function tabToHistoryHours(tab) {
 }
 
 /* ========================================
+   追蹤清單
+======================================== */
+const TRACKED_HISTORY_HOURS = 72;
+const TRACKED_HISTORY_PAGES = 3;
+
+function saveTrackedItems() {
+    localStorage.setItem('starcg_trackedItems', JSON.stringify(trackedItems));
+    updateTrackedCountBadge();
+}
+
+function updateTrackedCountBadge() {
+    const badge = document.getElementById('trackedCountBadge');
+    if (!badge) return;
+    badge.textContent = trackedItems.length > 0 ? `(${trackedItems.length})` : '';
+}
+
+function isTracked(name) {
+    return trackedItems.some(i => i.name === name);
+}
+
+function findTrackedIndex(name) {
+    return trackedItems.findIndex(i => i.name === name);
+}
+
+function calculateTrackedStats(logs) {
+    const coins = logs.filter(l => l.pricetype === 0).map(l => l.price);
+    const crystals = logs.filter(l => l.pricetype === 1).map(l => l.price);
+    const avg = arr => (arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : null);
+    return {
+        minCoin: coins.length ? Math.min(...coins) : null,
+        avgCoin: avg(coins),
+        minCrystal: crystals.length ? Math.min(...crystals) : null,
+        avgCrystal: avg(crystals),
+        historyCount: logs.length
+    };
+}
+
+function formatTrackedPrice(value) {
+    return value != null ? value.toLocaleString() : '-';
+}
+
+function getTrackedUpdatedMeta(lastUpdated) {
+    if (!lastUpdated) return { text: '-', cls: '' };
+    const diffMins = Math.floor((Date.now() - lastUpdated) / 60000);
+    if (diffMins < 60) return { text: '1 小時內', cls: 'tracked-updated-fresh' };
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return { text: `${diffHours} 小時前`, cls: 'tracked-updated-warn' };
+    return { text: '超過 1 天', cls: 'tracked-updated-stale' };
+}
+
+async function fetchTrackedHistory(keyword, type = 'all', maxPages = TRACKED_HISTORY_PAGES, hours = TRACKED_HISTORY_HOURS) {
+    const logs = [];
+    const timeRange = hours * 60 * 60 * 1000;
+    const now = Date.now();
+    let page = 1;
+
+    while (page <= maxPages) {
+        const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=${encodeURIComponent(type)}&page=${page}&search=${encodeURIComponent(keyword)}`;
+        const text = await fetchWithProxy(targetUrl);
+        const data = parseJsonResponse(text, '追蹤歷史成交');
+
+        if (!data.logs || data.logs.length === 0) break;
+
+        let stop = false;
+        for (const log of data.logs) {
+            const logTime = new Date(log.time_text).getTime();
+            if (now - logTime > timeRange) {
+                stop = true;
+                break;
+            }
+
+            const qtyMatch = log.buff.match(/購買(\d+)個[：:]/);
+            const quantity = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
+            const parts = log.buff.split(/[：:]/);
+            const itemName = parts.length > 1 ? parts[1] : parts[0];
+            const originalTotalPrice = Math.ceil(log.price / (log.pricetype === 1 ? 0.94 : 0.9));
+            const unitPrice = Math.ceil(originalTotalPrice / quantity);
+
+            logs.push({
+                item: itemName,
+                price: unitPrice,
+                pricetype: log.pricetype,
+                time: log.time_text,
+                quantity
+            });
+        }
+
+        if (stop) break;
+        page++;
+    }
+
+    return logs;
+}
+
+async function refreshTrackedItem(name) {
+    const index = findTrackedIndex(name);
+    if (index === -1) return false;
+
+    const item = trackedItems[index];
+    trackedUpdating.add(name);
+    renderTrackedTable();
+
+    try {
+        const historyType = item.type === 'pet' ? 'pet' : 'item';
+        const logs = await fetchTrackedHistory(item.name, historyType);
+        const stats = calculateTrackedStats(logs);
+        trackedItems[index] = {
+            ...item,
+            ...stats,
+            historyLogs: logs,
+            lastUpdated: Date.now()
+        };
+        saveTrackedItems();
+        return true;
+    } catch (err) {
+        console.error('[追蹤] 更新失敗', item.name, err);
+        return false;
+    } finally {
+        trackedUpdating.delete(name);
+        renderTrackedTable();
+        refreshMarketTrackButtons();
+    }
+}
+
+async function refreshAllTracked() {
+    if (trackedItems.length === 0) return;
+    const btn = document.getElementById('trackedRefreshAllBtn');
+    if (btn) btn.disabled = true;
+    showLoading(true, '更新追蹤項目成交價…');
+    try {
+        for (const item of [...trackedItems]) {
+            await refreshTrackedItem(item.name);
+        }
+    } finally {
+        showLoading(false);
+        if (btn) btn.disabled = false;
+    }
+}
+
+function addTracked(name, type) {
+    if (!name || isTracked(name)) return false;
+    trackedItems.unshift({
+        name,
+        type: type === 'pet' ? 'pet' : 'item',
+        addedAt: Date.now(),
+        minCoin: null,
+        avgCoin: null,
+        minCrystal: null,
+        avgCrystal: null,
+        historyCount: 0,
+        historyLogs: [],
+        lastUpdated: null
+    });
+    saveTrackedItems();
+    refreshTrackedItem(name);
+    return true;
+}
+
+function removeTracked(name) {
+    const index = findTrackedIndex(name);
+    if (index === -1) return false;
+    trackedItems.splice(index, 1);
+    saveTrackedItems();
+    renderTrackedTable();
+    refreshMarketTrackButtons();
+    return true;
+}
+
+function toggleTracked(name, type) {
+    if (isTracked(name)) removeTracked(name);
+    else addTracked(name, type);
+}
+
+function refreshMarketTrackButtons() {
+    document.querySelectorAll('#marketBody .track-btn').forEach(btn => {
+        const tracked = isTracked(btn.dataset.trackName);
+        btn.classList.toggle('tracked', tracked);
+        btn.title = tracked ? '取消追蹤' : '加入追蹤清單';
+        btn.textContent = tracked ? '★' : '☆';
+    });
+}
+
+function clearTrackedCharts() {
+    Object.keys(chartInstances).forEach(key => {
+        if (!key.startsWith('tracked-')) return;
+        chartInstances[key].destroy();
+        delete chartInstances[key];
+    });
+}
+
+function renderTrackedTable() {
+    const tbody = document.getElementById('trackedBody');
+    const emptyEl = document.getElementById('trackedEmpty');
+    const tableWrap = document.querySelector('#trackedSection .table-container');
+    if (!tbody) return;
+
+    clearTrackedCharts();
+
+    if (trackedItems.length === 0) {
+        tbody.innerHTML = '';
+        if (tableWrap) tableWrap.style.display = 'none';
+        if (emptyEl) emptyEl.style.display = 'block';
+        return;
+    }
+
+    if (tableWrap) tableWrap.style.display = 'block';
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    tbody.innerHTML = trackedItems.map((item, index) => {
+        const updated = getTrackedUpdatedMeta(item.lastUpdated);
+        const updating = trackedUpdating.has(item.name);
+        const typeLabel = item.type === 'pet' ? '寵物' : '道具';
+        const hasChart = (item.historyLogs?.length || 0) > 0;
+        return `
+        <tr data-track-name="${escapeAttr(item.name)}">
+            <td>${typeLabel}</td>
+            <td><strong>${escapeHtml(item.name)}</strong></td>
+            <td style="color:var(--accent-green)">${formatTrackedPrice(item.minCoin)}</td>
+            <td style="color:var(--accent-gold)">${formatTrackedPrice(item.avgCoin)}</td>
+            <td style="color:var(--accent-green)">${formatTrackedPrice(item.minCrystal)}</td>
+            <td style="color:var(--accent-gold)">${formatTrackedPrice(item.avgCrystal)}</td>
+            <td>${item.historyCount ?? 0}</td>
+            <td class="${updated.cls}">${updating ? '更新中…' : updated.text}</td>
+            <td><button type="button" class="secondary tracked-chart-btn" style="padding:6px 12px;font-size:0.8rem;" data-index="${index}" data-name="${escapeAttr(item.name)}" ${hasChart ? '' : 'disabled title="請先更新成交價"'}">📈</button></td>
+            <td>
+                <div class="tracked-actions">
+                    <button type="button" class="secondary tracked-refresh-btn" data-name="${escapeAttr(item.name)}" ${updating ? 'disabled' : ''}>更新</button>
+                    <button type="button" class="secondary tracked-search-btn" data-name="${escapeAttr(item.name)}">搜尋</button>
+                    <button type="button" class="secondary tracked-remove-btn" data-name="${escapeAttr(item.name)}">刪除</button>
+                </div>
+            </td>
+        </tr>
+        <tr id="trackedChartRow${index}" class="chart-row" style="display:none;">
+            <td colspan="10" style="padding:0; background:var(--bg-dark);">
+                <div class="inline-chart-container">
+                    <div class="chart-title">📈 ${escapeHtml(item.name)} 價格走勢（72H）</div>
+                    <div class="inline-chart-wrapper">
+                        <canvas id="trackedChart${index}"></canvas>
+                    </div>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function openTrackedView() {
+    document.getElementById('tabsContainer').style.display = 'flex';
+    switchTab('tracked');
+}
+
+function initTracked() {
+    document.getElementById('trackedBtn')?.addEventListener('click', openTrackedView);
+    document.getElementById('trackedRefreshAllBtn')?.addEventListener('click', refreshAllTracked);
+
+    document.getElementById('trackedBody')?.addEventListener('click', e => {
+        const refreshBtn = e.target.closest('.tracked-refresh-btn');
+        if (refreshBtn) {
+            refreshTrackedItem(refreshBtn.dataset.name);
+            return;
+        }
+        const searchBtn = e.target.closest('.tracked-search-btn');
+        if (searchBtn) {
+            document.getElementById('searchInput').value = searchBtn.dataset.name;
+            searchMarket();
+            return;
+        }
+        const chartBtn = e.target.closest('.tracked-chart-btn');
+        if (chartBtn) {
+            toggleTrackedChart(parseInt(chartBtn.dataset.index, 10), chartBtn.dataset.name);
+            return;
+        }
+        const removeBtn = e.target.closest('.tracked-remove-btn');
+        if (removeBtn) removeTracked(removeBtn.dataset.name);
+    });
+
+    document.getElementById('marketBody')?.addEventListener('click', e => {
+        const trackBtn = e.target.closest('.track-btn');
+        if (!trackBtn) return;
+        e.stopPropagation();
+        toggleTracked(trackBtn.dataset.trackName, trackBtn.dataset.trackType);
+        trackBtn.classList.toggle('tracked', isTracked(trackBtn.dataset.trackName));
+        trackBtn.title = isTracked(trackBtn.dataset.trackName) ? '取消追蹤' : '加入追蹤清單';
+        trackBtn.textContent = isTracked(trackBtn.dataset.trackName) ? '★' : '☆';
+    });
+}
+
+function buildTrackBtnHtml(name, type) {
+    const tracked = isTracked(name);
+    return `<button type="button" class="track-btn${tracked ? ' tracked' : ''}" data-track-name="${escapeAttr(name)}" data-track-type="${type}" title="${tracked ? '取消追蹤' : '加入追蹤清單'}">${tracked ? '★' : '☆'}</button>`;
+}
+
+/* ========================================
    歷史成交（36H / 72H）
 ======================================== */
 async function loadHistoryTab() {
@@ -3373,10 +3863,33 @@ async function fetchHistoryData(keyword, hours = 36) {
 /* ========================================
    篩選與排序
 ======================================== */
-function applyFilters() {
-    updateStatSortStyle();
-    const currency = document.getElementById('currencyFilter').value;
-    const petOnly = document.getElementById('petOnlyFilter').checked;
+const MARKET_ITEM_TYPE_SEGS = [
+    ['all', '全部'],
+    ['item', '僅道具'],
+    ['pet', '僅寵物']
+];
+const MARKET_PRICE_UNIT_SEGS = [
+    ['all', '全部'],
+    ['0', '魔幣'],
+    ['1', '魔晶']
+];
+
+function initMarketSegments() {
+    document.getElementById('itemTypeSegments')?.addEventListener('click', e => {
+        const btn = e.target.closest('.segment-pill');
+        if (!btn || btn.disabled) return;
+        marketItemType = btn.dataset.value;
+        applyFilters();
+    });
+    document.getElementById('priceUnitSegments')?.addEventListener('click', e => {
+        const btn = e.target.closest('.segment-pill');
+        if (!btn || btn.disabled) return;
+        marketPriceUnit = btn.dataset.value;
+        applyFilters();
+    });
+}
+
+function getMarketPanelFiltered() {
     const seedPlus = document.getElementById('seedPlusFilter').value;
     const seedMinus = document.getElementById('seedMinusFilter').value;
     const soulColor = document.getElementById('soulColorFilter').value;
@@ -3384,41 +3897,25 @@ function applyFilters() {
     const exactSearch = document.getElementById('exactSearchFilter').checked;
     const babyOnly = document.getElementById('babyOnlyFilter').checked;
     const durabilityFull = document.getElementById('durabilityFullFilter').checked;
-    
+
     let filtered = [...allMarketItems];
-    
-    // 耐久滿：只留耐久全滿的（寵物不受影響）
+
     if (durabilityFull) {
         filtered = filtered.filter(i => i.isPet || i.durCurrent === i.durMax);
     }
-    
-    // 精確搜尋：名稱需完全等於搜尋字詞
     if (exactSearch) {
         const nk = normalizeStr(lastSearchKeyword);
         filtered = filtered.filter(i => normalizeStr(i.item) === nk);
     }
-    
-    // 1等寶寶：只留 1 等寵物
     if (babyOnly) {
         filtered = filtered.filter(i => i.isPet && i.petLv === 1);
     }
-    
-    // 英靈之誓顏色篩選（只保留指定顏色）
     if (soulColor !== 'all') {
         filtered = filtered.filter(i => i.soulColor === soulColor);
     }
-    
-    // 改造圖等級篩選（只保留指定等級）
     if (grade !== 'all') {
         filtered = filtered.filter(i => i.grade === grade);
     }
-    
-    // 只搜尋寵物
-    if (petOnly) {
-        filtered = filtered.filter(i => i.isPet === true);
-    }
-    
-    // 種子 +/- 配點篩選（只要任一條件啟用，就只保留符合的種子）
     if (seedPlus !== 'all' || seedMinus !== 'all') {
         filtered = filtered.filter(i =>
             i.isSeed &&
@@ -3426,21 +3923,66 @@ function applyFilters() {
             (seedMinus === 'all' || (i.seedMinusStats || []).includes(seedMinus))
         );
     }
-    
-    // 幣種篩選
-    if (currency !== 'all') {
-        filtered = filtered.filter(i => i.pricetype.toString() === currency);
-    }
-    
-    // 排序
-    filtered = sortItems(filtered);
-    
-    refreshPetAllocTagsOnItems(filtered);
+    return filtered;
+}
 
-    // 更新統計
+function filterByMarketItemType(items, type = marketItemType) {
+    if (type === 'item') return items.filter(i => !i.isPet);
+    if (type === 'pet') return items.filter(i => i.isPet);
+    return items;
+}
+
+function filterByMarketPriceUnit(items, unit = marketPriceUnit) {
+    if (unit === 'all') return items;
+    return items.filter(i => i.pricetype.toString() === unit);
+}
+
+function renderMarketSegmentBar(baseItems) {
+    const bar = document.getElementById('marketSegmentBar');
+    const typeEl = document.getElementById('itemTypeSegments');
+    const unitEl = document.getElementById('priceUnitSegments');
+    if (!bar || !typeEl || !unitEl) return;
+
+    const showBar = currentTab === 'market' && allMarketItems.length > 0;
+    bar.style.display = showBar ? 'flex' : 'none';
+    if (!showBar) return;
+
+    const typeCounts = {
+        all: baseItems.length,
+        item: baseItems.filter(i => !i.isPet).length,
+        pet: baseItems.filter(i => i.isPet).length
+    };
+    const afterType = filterByMarketItemType(baseItems);
+    const unitCounts = {
+        all: afterType.length,
+        '0': afterType.filter(i => i.pricetype === 0).length,
+        '1': afterType.filter(i => i.pricetype === 1).length
+    };
+
+    typeEl.innerHTML = MARKET_ITEM_TYPE_SEGS.map(([value, label]) => {
+        const count = typeCounts[value] ?? 0;
+        const active = marketItemType === value ? ' active' : '';
+        return `<button type="button" class="segment-pill${active}" data-value="${value}">${label}(${count})</button>`;
+    }).join('');
+
+    unitEl.innerHTML = MARKET_PRICE_UNIT_SEGS.map(([value, label]) => {
+        const count = unitCounts[value] ?? 0;
+        const active = marketPriceUnit === value ? ' active' : '';
+        return `<button type="button" class="segment-pill${active}" data-value="${value}">${label}(${count})</button>`;
+    }).join('');
+}
+
+function applyFilters() {
+    updateStatSortStyle();
+    const baseItems = getMarketPanelFiltered();
+    renderMarketSegmentBar(baseItems);
+
+    let filtered = filterByMarketItemType(baseItems);
+    filtered = filterByMarketPriceUnit(filtered);
+
+    filtered = sortItems(filtered);
+    refreshPetAllocTagsOnItems(filtered);
     updateStats(filtered);
-    
-    // 渲染表格
     renderMarketTable(filtered);
 }
 
@@ -3565,7 +4107,7 @@ function renderMarketTable(items) {
         
         return `
         <tr>
-            <td><div class="item-name-row"><strong>${escapeHtml(item.item)}</strong><span class="item-tag-head">${item.colorTag || ''}${item.peakTag || ''}${item.gradeTag || ''}${item.transTag || ''}</span><span class="item-tag-extra">${item.statTag || ''}${item.seedTag || ''}</span></div></td>
+            <td><div class="item-name-row"><strong>${escapeHtml(item.item)}</strong>${buildTrackBtnHtml(item.item, item.isPet ? 'pet' : 'item')}<span class="item-tag-head">${item.colorTag || ''}${item.peakTag || ''}${item.gradeTag || ''}${item.transTag || ''}</span><span class="item-tag-extra">${item.statTag || ''}${item.seedTag || ''}</span></div></td>
             <td>
                 <span class="price ${item.pricetype === 0 ? 'coin' : 'crystal'}">
                     ${item.pricetype === 0 ? '💰' : '💎'} ${item.price.toLocaleString()}
@@ -3648,26 +4190,51 @@ function renderHistoryData() {
 }
 
 function toggleChart(index, itemName) {
-    const chartRow = document.getElementById(`chartRow${index}`);
-    const isVisible = chartRow.style.display !== 'none';
-    
-    if (isVisible) {
+    togglePriceChart(`history-${index}`, `chartRow${index}`, `chart${index}`, itemName, allHistoryLogs);
+}
+
+function toggleTrackedChart(index, itemName) {
+    const item = trackedItems[index];
+    togglePriceChart(`tracked-${index}`, `trackedChartRow${index}`, `trackedChart${index}`, itemName, item?.historyLogs || []);
+}
+
+function togglePriceChart(chartKey, rowId, canvasId, itemName, logs) {
+    const chartRow = document.getElementById(rowId);
+    if (!chartRow) return;
+
+    if (chartRow.style.display !== 'none') {
         chartRow.style.display = 'none';
         return;
     }
-    
+
+    if (!logs?.length) {
+        alert('尚無成交資料，請先按「更新」');
+        return;
+    }
+
     chartRow.style.display = '';
-    
-    // 如果已經畫過就不重畫
-    if (chartInstances[index]) return;
-    
-    // 篩選該物品的資料並簡化
-    const itemLogs = allHistoryLogs.filter(l => l.item === itemName);
+    renderPriceChart(chartKey, canvasId, itemName, logs);
+}
+
+function renderPriceChart(chartKey, canvasId, itemName, logs) {
+    if (chartInstances[chartKey]) {
+        chartInstances[chartKey].destroy();
+        delete chartInstances[chartKey];
+    }
+
+    const itemLogs = logs.filter(l => normalizeStr(l.item) === normalizeStr(itemName));
+    if (itemLogs.length === 0) {
+        alert('沒有與名稱完全相符的成交紀錄');
+        return;
+    }
+
     const coinData = simplifyData(itemLogs.filter(l => l.pricetype === 0).sort((a, b) => new Date(a.time) - new Date(b.time)));
     const crystalData = simplifyData(itemLogs.filter(l => l.pricetype === 1).sort((a, b) => new Date(a.time) - new Date(b.time)));
-    
-    const ctx = document.getElementById(`chart${index}`).getContext('2d');
-    
+
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
     const datasets = [];
     if (coinData.length > 0) {
         datasets.push({
@@ -3693,8 +4260,8 @@ function toggleChart(index, itemName) {
             fill: true
         });
     }
-    
-    chartInstances[index] = new Chart(ctx, {
+
+    chartInstances[chartKey] = new Chart(ctx, {
         type: 'line',
         data: { datasets },
         options: {
@@ -3714,7 +4281,7 @@ function toggleChart(index, itemName) {
             scales: {
                 x: {
                     type: 'category',
-                    ticks: { 
+                    ticks: {
                         color: '#8b7355',
                         maxTicksLimit: 8,
                         maxRotation: 45,
@@ -3758,7 +4325,7 @@ function simplifyData(data) {
 
 
 function updateStats(items) {
-    const currency = document.getElementById('currencyFilter').value;
+    const currency = marketPriceUnit;
     const rate = parseInt(document.getElementById('exchangeRate').value) || 260;
     
     if (currency === 'all') {
@@ -3843,14 +4410,23 @@ async function switchTab(tab) {
 
     currentTab = tab;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+    const activeTab = document.querySelector(`.tab[data-tab="${tab}"]`);
+    if (activeTab) activeTab.classList.add('active');
 
     const onHistory = isHistoryTab(tab);
     document.getElementById('marketSection').style.display = tab === 'market' ? 'block' : 'none';
     document.getElementById('procurementSection').style.display = tab === 'procurement' ? 'block' : 'none';
+    document.getElementById('trackedSection').style.display = tab === 'tracked' ? 'block' : 'none';
     document.getElementById('historySection').style.display = onHistory ? 'block' : 'none';
     document.getElementById('statsGrid').style.display = tab === 'market' ? 'grid' : 'none';
     document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('trackedBtn')?.classList.toggle('active-view', tab === 'tracked');
+    renderMarketSegmentBar(getMarketPanelFiltered());
+
+    if (tab === 'tracked') {
+        renderTrackedTable();
+        return;
+    }
 
     if (onHistory) {
         const ok = await loadHistoryTab();
@@ -3871,8 +4447,11 @@ function hideAll() {
     document.getElementById('emptyState').style.display = 'none';
     document.getElementById('marketSection').style.display = 'none';
     document.getElementById('procurementSection').style.display = 'none';
+    document.getElementById('trackedSection').style.display = 'none';
     document.getElementById('historySection').style.display = 'none';
     document.getElementById('statsGrid').style.display = 'none';
+    const bar = document.getElementById('marketSegmentBar');
+    if (bar) bar.style.display = 'none';
 }
 
 function showEmpty(msg) {
@@ -4547,7 +5126,7 @@ const BOUNTY_EQUIPMENT = {
     '帽': [['1A','麻布帽'],['1B','硬帽'],['2A','輕帽'],['2B','皮帽'],['3A','硬皮帽'],['3B','可愛的帽子'],['4A','時髦帽子'],['4B','鴨舌帽'],['5A','藍徽章之帽'],['5B','高級帽子'],['5C','劍客帽'],['6A','裝飾着花的帽子'],['6B','青銅帽子'],['7A','淑女帽'],['7B','可愛的扁帽子'],['8A','軍帽'],['8B','時髦避暑帽'],['8C','可愛的扁帽子+'],['9A','羽毛帽'],['9B','魔術師之帽'],['10A','黃昏之帽'],['10B','妖精之帽'],['11A','貝斯神帽'],['11B','神官帽']],
     '鎧': [['1A','軟皮甲'],['1B','護心甲'],['2A','青銅鎧甲'],['2B','輕型鎧甲'],['3A','輕型鎖鏈甲'],['3B','環甲'],['4A','鋼鐵鎧甲'],['4B','金屬皮甲'],['5A','長型金屬鎧甲'],['5B','索狀鎧甲'],['5C','劍齒鎧甲'],['6A','重鐵板甲'],['6B','鐵板半身甲'],['7A','實戰鎧甲'],['7B','黃金鎧甲'],['8A','重金屬鎧甲'],['8B','野獸之鎧'],['8C','實戰鎧甲+'],['9A','帝王之鎧'],['9B','亡靈鎧甲'],['10A','漆黑之鎧'],['10B','騎士鎧甲'],['11A','紅繩威鎧'],['11B','守護鎧甲']],
     '衣': [['1A','旅人之服'],['1B','保護衣'],['2A','羽毛裝'],['2B','皮裝'],['3A','硬皮服'],['3B','鎖鏈裝'],['4A','布甲'],['4B','櫬甲'],['5A','環服'],['5B','士兵護衣'],['5C','功夫裝'],['6A','長索錐衣'],['6B','索錐上衣'],['7A','骨衣'],['7B','超級衣服'],['8A','疾風之衣'],['8B','步兵戰衣'],['8C','獸骨之衣+'],['9A','勇者之衣'],['9B','女神之衣'],['10A','不死鳥之服'],['10B','靈魂之服'],['11A','海洋之服'],['11B','幻想之服']],
-    '袍': [['1A','羽毛袍'],['1B','輕皮袍'],['2A','網袍'],['2B','風袍'],['3A','硬皮袍'],['3B','環袍'],['4A','烏鴉之袍'],['4B','月亮之袍'],['4C','狐皮披風'],['5A','東方法衣'],['5B','聖堂之袍'],['5C','治愈之袍'],['6A','聖者之袍'],['6B','戰斗長袍'],['7A','冠軍之袍'],['7B','時之袍'],['8A','死神之袍'],['8B','勇者之袍'],['8C','潔淨之袍+'],['9A','黑暗之袍'],['9B','聖袍'],['10A','靈魂之袍'],['10B','奇蹟之袍'],['11A','共嗚之袍'],['11B','和平之袍']],
+    '袍': [['1A','羽毛袍'],['1B','輕皮袍'],['2A','網袍'],['2B','風袍'],['3A','硬皮袍'],['3B','環袍'],['4A','烏鴉之袍'],['4B','月亮之袍'],['4C','狐皮披風'],['5A','東方法衣'],['5B','聖堂之袍'],['5C','治愈之袍'],['6A','聖者之袍'],['6B','戰斗長袍'],['7A','冠軍之袍'],['7B','時之袍'],['8A','死神之袍'],['8B','勇者之袍'],['8C','潔淨之袍+'],['9A','黑暗之袍'],['9B','聖袍'],['10A','靈魂之袍'],['10B','奇蹟之袍'],['11A','共鳴之袍'],['11B','和平之袍']],
     '靴': [['1A','軟皮靴'],['1B','皮靴'],['2A','硬皮靴'],['2B','長靴'],['3A','厚底靴'],['3B','編織的靴子'],['4A','鎖鏈長靴'],['4B','鎖鏈靴'],['5A','蜥蜴靴'],['5B','蜥蜴長靴'],['5C','防護靴'],['6A','鋼靴'],['6B','鋼制長靴'],['7A','水晶靴'],['7B','銀靴'],['8A','流水之靴'],['8B','芙蕾雅之靴'],['8C','標準長靴+'],['9A','鑽石靴'],['9B','鑽石長靴'],['10A','秘密之靴'],['10B','龍之靴'],['11A','幸運靴'],['11B','試力鞋']],
     '鞋': [['1A','運動鞋'],['1B','馬車鞋'],['2A','皮鞋'],['2B','安全鞋'],['3A','光之鞋'],['3B','戰鞋'],['4A','薄板鞋'],['4B','鎖鏈鞋'],['5A','蜥蜴鞋'],['5B','維京鞋'],['5C','特製舞鞋'],['6A','戰斗鞋'],['6B','騎士鞋'],['7A','妖精鞋'],['7B','紫水晶鞋'],['8A','白金鞋'],['8B','精緻高根鞋'],['8C','妖精鞋+'],['9A','神秘之鞋'],['9B','力量之鞋'],['10A','黃金鞋'],['10B','龍之鞋'],['11A','守護之鞋'],['11B','大木屐']],
     '盾': [['1A','小圓盾'],['1B','小型盾'],['2A','板盾'],['2B','鳶盾'],['3A','漩渦重盾'],['3B','哥特盾'],['4A','士兵盾'],['4B','重盾'],['5A','蜥蜴盾'],['5B','反光之盾'],['5C','聖者之盾'],['6A','風之盾'],['6B','獅子盾'],['7A','防守之盾'],['7B','黃金之盾'],['8A','鏡之盾'],['8B','力量之盾'],['8C','防禦之盾+'],['9A','漆黑之盾'],['9B','火龍之盾'],['10A','黑暗之盾'],['10B','勇者之盾'],['11A','突猛盾'],['11B','重型防御盾']],
