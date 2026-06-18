@@ -1204,18 +1204,18 @@
         .market-segment-bar {
             display: none;
             flex-wrap: wrap;
-            gap: 16px 24px;
+            gap: 12px 28px;
             margin-top: 14px;
             margin-bottom: 0;
             align-items: flex-end;
+            justify-content: flex-start;
             width: 100%;
         }
         .segment-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            flex: 1 1 280px;
-            min-width: 0;
+            flex: 0 0 auto;
         }
         .segment-label {
             font-size: 0.95rem;
@@ -1252,6 +1252,72 @@
             cursor: not-allowed;
         }
 
+        /* Responsive - 平板以下 filter 直向排版 */
+        @media (max-width: 899px) {
+            .search-row.filter-row {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .search-row.filter-row .bounty-group {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .search-row.filter-row .bounty-group button {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .search-row.filter-row .form-group:not(.bounty-group) {
+                width: 100%;
+                align-items: flex-start;
+            }
+
+            .search-row.filter-row .form-group > label {
+                text-align: left;
+            }
+
+            .search-row.filter-row .form-group:not(.seed-group) select,
+            .search-row.filter-row .exchange-rate-group input {
+                width: 100%;
+            }
+
+            .search-row.filter-row .exchange-rate-label {
+                align-items: flex-start;
+            }
+
+            .seed-group .seed-pair {
+                justify-content: flex-start;
+                width: 100%;
+            }
+
+            .search-row.filter-row .seed-group select {
+                flex: 1;
+                width: auto;
+                min-width: 0;
+                max-width: none;
+            }
+
+            .filter-chips {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .segment-group {
+                flex: 1 1 100%;
+                width: 100%;
+            }
+        }
+
         /* Responsive - 平板 */
         @media (max-width: 768px) {
             .container {
@@ -1285,15 +1351,11 @@
                 width: 100%;
             }
 
-            .search-row button {
+            .search-row:not(.filter-row) button {
                 width: 100%;
             }
 
-            .search-row.filter-row {
-                flex-wrap: wrap;
-            }
             .filter-chips {
-                width: 100%;
                 flex-wrap: wrap;
             }
 
@@ -1365,6 +1427,19 @@
             button {
                 padding: 12px 16px;
                 font-size: 1rem;
+            }
+
+            .filter-chips {
+                padding: 8px;
+                gap: 6px;
+            }
+
+            .filter-chip {
+                flex: 1 1 calc(50% - 3px);
+                min-width: 0;
+                height: 38px;
+                padding: 0 8px;
+                font-size: 0.85rem;
             }
 
             .quick-tags {
