@@ -1096,6 +1096,210 @@
         }
 
         /* History Summary */
+        .history-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 24px;
+            margin-bottom: 14px;
+            align-items: flex-end;
+        }
+
+        .history-avg-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .history-avg-bar strong {
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .history-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .history-stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 12px;
+            text-align: center;
+        }
+
+        .history-stat-card .label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .history-stat-card .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .history-stat-card .value.blue { color: var(--accent-blue); }
+        .history-stat-card .value.green { color: var(--accent-green); }
+        .history-stat-card .value.gold { color: var(--accent-gold); }
+        .history-stat-card .value.red { color: var(--accent-red); }
+
+        .history-feed-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .history-feed-header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 10px;
+        }
+
+        .history-feed-header-actions button {
+            padding: 6px 14px;
+            font-size: 0.85rem;
+        }
+
+        .history-chart-body {
+            margin-bottom: 14px;
+        }
+
+        .history-chart-body .inline-chart-container {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+
+        .history-chart-body .inline-chart-wrapper {
+            height: 280px;
+        }
+
+        .history-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .history-feed-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px 12px;
+            align-items: start;
+        }
+
+        .history-feed-main {
+            min-width: 0;
+        }
+
+        .history-feed-name {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .history-feed-name strong {
+            font-size: 0.95rem;
+        }
+
+        .history-feed-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .history-feed-price {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .history-feed-price .price {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .history-feed-price .converted {
+            display: block;
+            margin-left: 0;
+            margin-top: 2px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .history-feed-price .qty {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .history-delta {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .history-delta.up {
+            background: #fde8e8;
+            color: var(--accent-red);
+        }
+
+        .history-delta.down {
+            background: #e8f5e9;
+            color: var(--accent-green);
+        }
+
+        .history-delta.flat {
+            background: var(--bg-dark);
+            color: var(--text-secondary);
+        }
+
+        .history-pagination {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .history-pagination button {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .history-pagination .page-info {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            padding: 0 6px;
+        }
+
         .history-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1315,6 +1519,23 @@
             .segment-group {
                 flex: 1 1 100%;
                 width: 100%;
+            }
+
+            .history-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .history-feed-card {
+                grid-template-columns: 1fr;
+            }
+
+            .history-feed-price {
+                text-align: left;
+            }
+
+            .history-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
             }
 
             #marketSection.table-container {
@@ -2388,8 +2609,7 @@
     <div class="tabs" id="tabsContainer" style="display: none;">
         <div class="tab active" data-tab="market">🏪 市場攤位</div>
         <div class="tab" data-tab="procurement" id="procurementTab" style="display:none;">🛒 採購路線</div>
-        <div class="tab" data-tab="history36">📜 36H歷史</div>
-        <div class="tab" data-tab="history72">📜 72H歷史</div>
+        <div class="tab" data-tab="history">📜 歷史成交</div>
     </div>
 
     <!-- Loading -->
@@ -2495,30 +2715,42 @@
 
     <!-- History Section -->
     <div id="historySection" style="display: none;">
-        <div class="history-summary" id="historySummary"></div>
-        
-        <div class="table-container">
-            <div class="table-scroll">
-                <table id="historyTable">
-                    <thead>
-                        <tr>
-                            <th>物品名稱</th>
-                            <th>💰 最低</th>
-                            <th>💰 中位</th>
-                            <th>💰 最高</th>
-                            <th>💎 最低</th>
-                            <th>💎 中位</th>
-                            <th>💎 最高</th>
-                            <th>成交數</th>
-                            <th>走勢</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyBody"></tbody>
-                </table>
+        <div class="history-filter-bar" id="historyFilterBar">
+            <div class="segment-group">
+                <span class="segment-label">時間範圍</span>
+                <div class="segment-pills" id="historyRangeSegments"></div>
+            </div>
+            <div class="segment-group">
+                <span class="segment-label">貨幣</span>
+                <div class="segment-pills" id="historyCurrencySegments"></div>
+            </div>
+            <div class="segment-group">
+                <span class="segment-label">排序</span>
+                <div class="segment-pills" id="historySortSegments"></div>
             </div>
         </div>
 
+        <div class="history-avg-bar" id="historyAvgBar" style="display: none;"></div>
+        <div class="history-stats-grid" id="historySummary"></div>
+
+        <div class="history-feed-header">
+            <span id="historyFeedCount">成交紀錄</span>
+            <div class="history-feed-header-actions">
+                <span id="historyExactHint" style="font-size:0.82rem;color:var(--accent-green);">🎯 僅顯示同名成交</span>
+                <button type="button" class="secondary" id="historyChartToggleBtn" disabled>📈 走勢圖</button>
+            </div>
         </div>
+        <div class="history-chart-body" id="historyChartBody" style="display:none;">
+            <div class="inline-chart-container">
+                <div class="chart-title" id="historyChartTitle">📈 價格走勢</div>
+                <div class="inline-chart-wrapper">
+                    <canvas id="historyChartCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="history-feed" id="historyFeed"></div>
+        <div class="history-pagination" id="historyPagination"></div>
+    </div>
 
     <!-- Empty State -->
     <div class="empty-state" id="emptyState">
@@ -2707,8 +2939,17 @@ let allMarketItems = [];
 let allHistoryLogs = [];
 let lastSearchKeyword = '';
 let lastHistoryKeyword = '';
-let lastHistoryHours = 0;
-let historyHours = 36;
+let historyCacheKey = '';
+let historyRange = '3d';
+let historyCurrency = 'all';
+let historySort = 'time_desc';
+let historyDisplayPage = 1;
+let historyLastFetchedPage = 0;
+let historyApiExhausted = false;
+const HISTORY_FEED_PAGE_SIZE = 30;
+const HISTORY_FETCH_BATCH_PAGES = 20;
+let historyChartOpen = false;
+let historyChartUserDismissed = false;
 let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || [];
 let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || [];
 let trackedItems = (() => {
@@ -2742,6 +2983,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPeakFloatingTip();
     initQuickTags();
     initBounty();
+    initHistoryFilters();
     initProcurement();
     initTracked();
     initMarketSegments();
@@ -2921,6 +3163,9 @@ function initEventListeners() {
     document.getElementById('exchangeRate').addEventListener('input', () => {
         updateExchangeRateHint();
         applyFilters();
+        if (isHistoryTab(currentTab)) {
+            renderHistoryData();
+        }
     });
     updateExchangeRateHint();
     
@@ -3027,10 +3272,22 @@ async function searchMarket() {
     
     allHistoryLogs = [];
     lastHistoryKeyword = '';
-    lastHistoryHours = 0;
+    historyCacheKey = '';
+    historyDisplayPage = 1;
+    historyLastFetchedPage = 0;
+    historyApiExhausted = false;
     // 銷毀所有圖表實例
     Object.values(chartInstances).forEach(chart => chart.destroy());
     Object.keys(chartInstances).forEach(key => delete chartInstances[key]);
+    historyChartOpen = false;
+    historyChartUserDismissed = false;
+    const historyChartBody = document.getElementById('historyChartBody');
+    if (historyChartBody) historyChartBody.style.display = 'none';
+    const historyChartBtn = document.getElementById('historyChartToggleBtn');
+    if (historyChartBtn) {
+        historyChartBtn.textContent = '📈 走勢圖';
+        historyChartBtn.disabled = true;
+    }
     
     const exactSearch = document.getElementById('exactSearchFilter').checked;
     let marketShown = false;
@@ -3078,7 +3335,8 @@ async function searchMarket() {
 
 // 標準化字串：全形括號轉半形、統一空格等
 function normalizeStr(str) {
-    return str
+    return String(str ?? '')
+        .trim()
         .replace(/（/g, '(')
         .replace(/）/g, ')')
         .replace(/【/g, '[')
@@ -3667,11 +3925,7 @@ async function fetchMarketData(keyword, callbacks = {}) {
 }
 
 function isHistoryTab(tab) {
-    return tab === 'history36' || tab === 'history72';
-}
-
-function tabToHistoryHours(tab) {
-    return tab === 'history72' ? 72 : 36;
+    return tab === 'history';
 }
 
 /* ========================================
@@ -3746,20 +4000,7 @@ async function fetchTrackedHistory(keyword, type = 'all', maxPages = TRACKED_HIS
                 break;
             }
 
-            const qtyMatch = log.buff.match(/購買(\d+)個[：:]/);
-            const quantity = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
-            const parts = log.buff.split(/[：:]/);
-            const itemName = parts.length > 1 ? parts[1] : parts[0];
-            const originalTotalPrice = Math.ceil(log.price / (log.pricetype === 1 ? 0.94 : 0.9));
-            const unitPrice = Math.ceil(originalTotalPrice / quantity);
-
-            logs.push({
-                item: itemName,
-                price: unitPrice,
-                pricetype: log.pricetype,
-                time: log.time_text,
-                quantity
-            });
+            logs.push(parseHistoryLogEntry(log));
         }
 
         if (stop) break;
@@ -3967,25 +4208,267 @@ function buildTrackBtnHtml(name, type) {
 }
 
 /* ========================================
-   歷史成交（36H / 72H）
+   歷史成交
 ======================================== */
-async function loadHistoryTab() {
+const HISTORY_RANGE_DAYS = { '3d': 3, '7d': 7, '30d': 30 };
+const HISTORY_RANGE_SEGS = [
+    ['3d', '3天'],
+    ['7d', '7天'],
+    ['30d', '30天']
+];
+const HISTORY_CURRENCY_SEGS = [
+    ['all', '全部'],
+    ['0', '魔幣'],
+    ['1', '魔晶']
+];
+const HISTORY_SORT_SEGS = [
+    ['time_desc', '成交時間（最新優先）'],
+    ['time_asc', '成交時間（最早優先）'],
+    ['price_desc', '單價（高→低，含匯率）'],
+    ['price_asc', '單價（低→高，含匯率）']
+];
+
+function getHistoryCacheKey(keyword) {
+    return keyword;
+}
+
+function filterByHistoryDisplayRange(logs) {
+    const days = HISTORY_RANGE_DAYS[historyRange];
+    if (!days) return logs;
+    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+    return logs.filter(l => {
+        const ts = parseHistoryLogTime(l.time);
+        return ts == null || ts >= cutoff;
+    });
+}
+
+function getHistoryExactMatchedLogs(logs) {
+    const keyword = document.getElementById('searchInput').value.trim();
+    if (!keyword) return logs;
+    const nk = normalizeStr(keyword);
+    return logs.filter(l => normalizeStr(l.item) === nk);
+}
+
+function parseHistoryLogEntry(log) {
+    const buff = String(log.buff || '').trim();
+    const qtyMatch = buff.match(/購買(\d+)個[：:]\s*/);
+    const quantity = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
+    let itemName = buff;
+    if (qtyMatch) {
+        itemName = buff.slice(qtyMatch.index + qtyMatch[0].length);
+    } else {
+        const parts = buff.split(/[：:]/);
+        itemName = parts.length > 1 ? parts.slice(1).join(':') : parts[0];
+        itemName = itemName.replace(/^購買\d*個?\s*/, '');
+    }
+    itemName = itemName.trim();
+
+    const originalTotalPrice = Math.ceil(log.price / (log.pricetype === 1 ? 0.94 : 0.9));
+    const unitPrice = Math.ceil(originalTotalPrice / quantity);
+    return {
+        item: itemName,
+        price: unitPrice,
+        pricetype: log.pricetype,
+        time: log.time_text,
+        quantity
+    };
+}
+
+function parseHistoryLogTime(timeStr) {
+    const ts = new Date(timeStr).getTime();
+    return Number.isNaN(ts) ? null : ts;
+}
+
+function initHistoryFilters() {
+    renderHistoryFilterPills('historyRangeSegments', HISTORY_RANGE_SEGS, historyRange, val => {
+        historyRange = val;
+        applyHistoryFiltersLocal();
+    });
+    renderHistoryFilterPills('historyCurrencySegments', HISTORY_CURRENCY_SEGS, historyCurrency, val => {
+        historyCurrency = val;
+        applyHistoryFiltersLocal();
+    });
+    renderHistoryFilterPills('historySortSegments', HISTORY_SORT_SEGS, historySort, val => {
+        historySort = val;
+        applyHistoryFiltersLocal();
+    });
+
+    document.getElementById('historyPagination')?.addEventListener('click', e => {
+        const btn = e.target.closest('button[data-act]');
+        if (!btn) return;
+        const filtered = getFilteredHistoryLogs();
+        const totalPages = Math.max(1, Math.ceil(filtered.length / HISTORY_FEED_PAGE_SIZE));
+        if (btn.dataset.act === 'prev' && historyDisplayPage > 1) {
+            historyDisplayPage--;
+            renderHistoryData();
+        } else if (btn.dataset.act === 'next' && historyDisplayPage < totalPages) {
+            historyDisplayPage++;
+            renderHistoryData();
+        } else if (btn.dataset.act === 'more') {
+            loadMoreHistory();
+        }
+    });
+
+    document.getElementById('historyChartToggleBtn')?.addEventListener('click', toggleHistoryChart);
+}
+
+function renderHistoryFilterPills(containerId, segs, activeValue, onPick) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = segs.map(([value, label]) =>
+        `<button type="button" class="segment-pill${activeValue === value ? ' active' : ''}" data-value="${value}">${label}</button>`
+    ).join('');
+    el.onclick = e => {
+        const btn = e.target.closest('.segment-pill');
+        if (!btn) return;
+        onPick(btn.dataset.value);
+        renderHistoryFilterPills(containerId, segs, btn.dataset.value, onPick);
+    };
+}
+
+function applyHistoryFiltersLocal() {
+    historyDisplayPage = 1;
+    if (isHistoryTab(currentTab)) renderHistoryData();
+}
+
+function getFilteredHistoryLogs() {
+    let logs = getHistoryExactMatchedLogs(allHistoryLogs);
+    logs = filterByHistoryDisplayRange(logs);
+
+    if (historyCurrency !== 'all') {
+        logs = logs.filter(l => l.pricetype.toString() === historyCurrency);
+    }
+
+    return applyHistorySort(logs);
+}
+
+function getHistoryEmptyMessage() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    const exactPool = filterByHistoryDisplayRange(getHistoryExactMatchedLogs(allHistoryLogs));
+    const exactAll = getHistoryExactMatchedLogs(allHistoryLogs);
+
+    if (allHistoryLogs.length === 0) return '無法取得成交資料，請稍後再試';
+    if (exactAll.length === 0) {
+        return `「${escapeHtml(keyword)}」無同名成交（資料池 ${allHistoryLogs.length} 筆，已排除相似品項）`;
+    }
+    if (exactPool.length === 0) {
+        const label = HISTORY_RANGE_SEGS.find(([v]) => v === historyRange)?.[1] || historyRange;
+        return `近 ${label} 無同名成交（30 天內共 ${exactAll.length} 筆），可改選 7 天或 30 天`;
+    }
+    if (historyCurrency !== 'all') {
+        const unit = historyCurrency === '0' ? '魔幣' : '魔晶';
+        return `此時間範圍內無 ${unit} 成交紀錄`;
+    }
+    return '無符合條件的成交紀錄';
+}
+
+function getHistoryExchangeRate() {
+    return parseInt(document.getElementById('exchangeRate').value, 10) || 260;
+}
+
+/** 跨幣別排序用：換算成魔晶等值；單一幣別篩選時維持原價 */
+function getHistoryComparablePrice(log) {
+    if (historyCurrency !== 'all') return log.price;
+    const rate = getHistoryExchangeRate();
+    return log.pricetype === 0 ? log.price / rate : log.price;
+}
+
+function applyHistorySort(logs) {
+    const sorted = [...logs];
+    switch (historySort) {
+        case 'time_asc':
+            sorted.sort((a, b) => new Date(a.time) - new Date(b.time));
+            break;
+        case 'price_desc':
+            sorted.sort((a, b) =>
+                getHistoryComparablePrice(b) - getHistoryComparablePrice(a)
+                || new Date(b.time) - new Date(a.time));
+            break;
+        case 'price_asc':
+            sorted.sort((a, b) =>
+                getHistoryComparablePrice(a) - getHistoryComparablePrice(b)
+                || new Date(b.time) - new Date(a.time));
+            break;
+        default:
+            sorted.sort((a, b) => new Date(b.time) - new Date(a.time));
+    }
+    return sorted;
+}
+
+function getHistoryRefPriceByType(logs, pricetype) {
+    const prices = logs.filter(l => l.pricetype === pricetype).map(l => l.price);
+    return prices.length ? calcTrimmedAvg(prices) : 0;
+}
+
+function buildHistoryDeltaTag(log, logs) {
+    const refPrice = getHistoryRefPriceByType(logs, log.pricetype);
+    if (!refPrice) return '';
+    const pct = Math.round((log.price - refPrice) / refPrice * 100);
+    if (pct >= 5) return `<span class="history-delta up">↑ 貴 ${pct}%</span>`;
+    if (pct <= -5) return `<span class="history-delta down">↓ 便宜 ${Math.abs(pct)}%</span>`;
+    return `<span class="history-delta flat">≈ 均價</span>`;
+}
+
+function buildHistoryPriceHtml(log) {
+    const icon = log.pricetype === 0 ? '💰' : '💎';
+    const unit = log.pricetype === 0 ? '魔幣' : '魔晶';
+    const qtyText = log.quantity > 1 ? `×${log.quantity}` : '';
+    const priceClass = log.pricetype === 0 ? 'coin' : 'crystal';
+    let converted = '';
+    if (historyCurrency === 'all') {
+        const rate = getHistoryExchangeRate();
+        if (log.pricetype === 0) {
+            converted = `<span class="converted">(~${Math.round(log.price / rate).toLocaleString()}💎)</span>`;
+        } else {
+            converted = `<span class="converted">(~${Math.round(log.price * rate).toLocaleString()}💰)</span>`;
+        }
+    }
+    return `
+        <span class="price ${priceClass}">${icon} ${log.price.toLocaleString()}${converted}</span>
+        <div class="qty">${unit}${qtyText ? ' ' + qtyText : ''}</div>`;
+}
+
+function formatRelativeTime(timeStr) {
+    const ts = new Date(timeStr).getTime();
+    if (Number.isNaN(ts)) return timeStr;
+    const diff = Date.now() - ts;
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return '剛剛';
+    if (mins < 60) return `${mins} 分鐘前`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours} 小時前`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days} 天前`;
+    return timeStr.slice(0, 16);
+}
+
+function calcMedian(arr) {
+    if (!arr.length) return 0;
+    const sorted = [...arr].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : Math.floor((sorted[mid - 1] + sorted[mid]) / 2);
+}
+
+async function loadHistoryTab(force = false) {
     const keyword = document.getElementById('searchInput').value.trim();
     if (!keyword) return false;
 
-    if (keyword === lastHistoryKeyword && historyHours === lastHistoryHours && allHistoryLogs.length > 0) {
+    const cacheKey = getHistoryCacheKey(keyword);
+    if (!force && cacheKey === historyCacheKey && allHistoryLogs.length > 0) {
         renderHistoryData();
         return true;
     }
 
-    showLoading(true, `載入 ${historyHours}H 歷史成交…`);
+    showLoading(true, '載入歷史成交…');
     document.getElementById('historySection').style.display = 'none';
     document.getElementById('emptyState').style.display = 'none';
 
     try {
-        allHistoryLogs = await fetchHistoryData(keyword, historyHours);
+        allHistoryLogs = await fetchHistoryData(keyword, { append: false });
         lastHistoryKeyword = keyword;
-        lastHistoryHours = historyHours;
+        historyCacheKey = cacheKey;
+        historyDisplayPage = 1;
+        historyChartUserDismissed = false;
 
         if (allHistoryLogs.length > 0) {
             addTag(keyword);
@@ -3993,7 +4476,7 @@ async function loadHistoryTab() {
             renderHistoryData();
             return true;
         }
-        showEmpty('找不到歷史成交記錄');
+        showEmpty('找不到歷史成交記錄（近 30 天）');
         return false;
     } catch (err) {
         console.error(err);
@@ -4005,50 +4488,254 @@ async function loadHistoryTab() {
     }
 }
 
-async function fetchHistoryData(keyword, hours = 36) {
-    const logs = [];
-    const TIME_RANGE = hours * 60 * 60 * 1000;
+async function loadMoreHistory() {
+    const keyword = document.getElementById('searchInput').value.trim();
+    if (!keyword || historyApiExhausted) return;
+
+    showLoading(true, '載入更多成交紀錄…');
+    try {
+        const before = allHistoryLogs.length;
+        allHistoryLogs = await fetchHistoryData(keyword, { append: true, maxPages: HISTORY_FETCH_BATCH_PAGES });
+        if (allHistoryLogs.length === before) {
+            historyApiExhausted = true;
+        }
+        renderHistoryData();
+    } catch (err) {
+        console.error(err);
+        alert('載入更多失敗，請稍後再試');
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function fetchHistoryData(keyword, { append = false, maxPages = HISTORY_FETCH_BATCH_PAGES } = {}) {
+    const logs = append ? [...allHistoryLogs] : [];
+    if (!append) {
+        historyLastFetchedPage = 0;
+        historyApiExhausted = false;
+    }
+
+    let page = append ? historyLastFetchedPage + 1 : 1;
+    const endPage = page + maxPages - 1;
+    const poolMaxMs = HISTORY_RANGE_DAYS['30d'] * 24 * 60 * 60 * 1000;
     const now = Date.now();
-    let page = 1;
-    let keepFetching = true;
-    
-    while (keepFetching && page <= 100) {
+
+    while (page <= endPage && page <= 100) {
+        // ajax 端點僅支援 type/page/search；range/currency/sort 由 client 處理
         const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=all&page=${page}&search=${encodeURIComponent(keyword)}`;
         const text = await fetchWithProxy(targetUrl);
         const data = parseJsonResponse(text, '歷史成交');
-        
-        if (!data.logs || data.logs.length === 0) break;
-        
-        for (const log of data.logs) {
-            const logTime = new Date(log.time_text).getTime();
-            if (now - logTime > TIME_RANGE) {
-                keepFetching = false;
-                break;
-            }
-            
-            // 解析物品名稱和數量（格式：「購買X個：物品名稱」或「購買X個:物品名稱」）
-            const qtyMatch = log.buff.match(/購買(\d+)個[：:]/);
-            const quantity = qtyMatch ? parseInt(qtyMatch[1]) : 1;
-            const parts = log.buff.split(/[：:]/);
-            const itemName = parts.length > 1 ? parts[1] : parts[0];
-            
-            // 還原售價（扣除手續費）並計算單價
-            const originalTotalPrice = Math.ceil(log.price / (log.pricetype === 1 ? 0.94 : 0.9));
-            const unitPrice = Math.ceil(originalTotalPrice / quantity);
-            
-            logs.push({
-                item: itemName,
-                price: unitPrice,
-                pricetype: log.pricetype,
-                time: log.time_text,
-                quantity: quantity
-            });
+
+        if (!data.logs || data.logs.length === 0) {
+            historyApiExhausted = true;
+            break;
         }
-        
+
+        let stopByAge = false;
+        for (const log of data.logs) {
+            const logTime = parseHistoryLogTime(log.time_text);
+            if (logTime != null && now - logTime > poolMaxMs) {
+                stopByAge = true;
+                continue;
+            }
+            logs.push(parseHistoryLogEntry(log));
+        }
+
+        historyLastFetchedPage = page;
+        if (stopByAge) {
+            historyApiExhausted = true;
+            break;
+        }
         page++;
     }
-    
+
     return logs;
+}
+
+function renderHistorySummaryBar(logs) {
+    const avgBar = document.getElementById('historyAvgBar');
+    const summaryEl = document.getElementById('historySummary');
+    if (!avgBar || !summaryEl) return;
+
+    const coinPrices = logs.filter(l => l.pricetype === 0).map(l => l.price);
+    const crystalPrices = logs.filter(l => l.pricetype === 1).map(l => l.price);
+    const activePrices = historyCurrency === '1' ? crystalPrices
+        : historyCurrency === '0' ? coinPrices
+            : null;
+
+    const countText = historyCurrency === 'all'
+        ? `${logs.length}（💰${coinPrices.length} / 💎${crystalPrices.length}）`
+        : String(logs.length);
+
+    let minVal = '-', medVal = '-', maxVal = '-';
+    if (activePrices?.length) {
+        minVal = Math.min(...activePrices).toLocaleString();
+        medVal = calcMedian(activePrices).toLocaleString();
+        maxVal = Math.max(...activePrices).toLocaleString();
+    } else if (historyCurrency === 'all') {
+        const coinMed = coinPrices.length ? calcMedian(coinPrices).toLocaleString() : '-';
+        const crystalMed = crystalPrices.length ? calcMedian(crystalPrices).toLocaleString() : '-';
+        medVal = `💰${coinMed}<br>💎${crystalMed}`;
+        minVal = coinPrices.length || crystalPrices.length
+            ? [coinPrices.length ? `💰${Math.min(...coinPrices).toLocaleString()}` : null, crystalPrices.length ? `💎${Math.min(...crystalPrices).toLocaleString()}` : null].filter(Boolean).join('<br>')
+            : '-';
+        maxVal = coinPrices.length || crystalPrices.length
+            ? [coinPrices.length ? `💰${Math.max(...coinPrices).toLocaleString()}` : null, crystalPrices.length ? `💎${Math.max(...crystalPrices).toLocaleString()}` : null].filter(Boolean).join('<br>')
+            : '-';
+    }
+
+    summaryEl.innerHTML = `
+        <div class="history-stat-card"><div class="label">📦 筆數</div><div class="value blue">${countText}</div></div>
+        <div class="history-stat-card"><div class="label">💰 最低</div><div class="value green">${minVal}</div></div>
+        <div class="history-stat-card"><div class="label">📊 中位</div><div class="value gold">${medVal}</div></div>
+        <div class="history-stat-card"><div class="label">📈 最高</div><div class="value red">${maxVal}</div></div>
+    `;
+
+    const coinRef = getHistoryRefPriceByType(logs, 0);
+    const crystalRef = getHistoryRefPriceByType(logs, 1);
+    const refParts = [];
+    if (historyCurrency !== '1' && coinRef > 0) refParts.push(`💰 魔幣 <strong>${coinRef.toLocaleString()}</strong>`);
+    if (historyCurrency !== '0' && crystalRef > 0) refParts.push(`💎 魔晶 <strong>${crystalRef.toLocaleString()}</strong>`);
+
+    if (refParts.length) {
+        avgBar.style.display = 'block';
+        avgBar.innerHTML = `ℹ️ 均單價：${refParts.join('　·　')}　·　每筆「便宜 / 貴 X%」與<strong>同幣別</strong>均價比較`;
+    } else if (allHistoryLogs.length > 0) {
+        const exactAll = getHistoryExactMatchedLogs(allHistoryLogs);
+        avgBar.style.display = 'block';
+        avgBar.innerHTML = `ℹ️ 資料池 ${allHistoryLogs.length} 筆，同名 ${exactAll.length} 筆；目前篩選條件下無統計，可調整時間或貨幣`;
+    } else {
+        avgBar.style.display = 'none';
+    }
+}
+
+function renderHistoryFeed(logs) {
+    const feedEl = document.getElementById('historyFeed');
+    const countEl = document.getElementById('historyFeedCount');
+    const pagEl = document.getElementById('historyPagination');
+    if (!feedEl) return;
+
+    const totalPages = Math.max(1, Math.ceil(logs.length / HISTORY_FEED_PAGE_SIZE));
+    if (historyDisplayPage > totalPages) historyDisplayPage = totalPages;
+    const start = (historyDisplayPage - 1) * HISTORY_FEED_PAGE_SIZE;
+    const pageLogs = logs.slice(start, start + HISTORY_FEED_PAGE_SIZE);
+
+    if (countEl) {
+        const rangeLabel = HISTORY_RANGE_SEGS.find(([v]) => v === historyRange)?.[1] || historyRange;
+        countEl.textContent = `成交紀錄：${logs.length} 筆（近 ${rangeLabel}）${historyLastFetchedPage ? ` · 資料池 ${historyLastFetchedPage} 頁` : ''}`;
+    }
+
+    if (pageLogs.length === 0) {
+        feedEl.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-secondary);">${getHistoryEmptyMessage()}</div>`;
+    } else {
+        feedEl.innerHTML = pageLogs.map(log => {
+            return `
+            <div class="history-feed-card">
+                <div class="history-feed-main">
+                    <div class="history-feed-name">
+                        <strong>${escapeHtml(log.item)}</strong>
+                    </div>
+                    <div class="history-feed-meta">
+                        ${buildHistoryDeltaTag(log, logs)}
+                        <span>🕐 ${formatRelativeTime(log.time)}</span>
+                        <span>${escapeHtml(log.time)}</span>
+                    </div>
+                </div>
+                <div class="history-feed-price">
+                    ${buildHistoryPriceHtml(log)}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    if (pagEl) {
+        pagEl.innerHTML = `
+            <button type="button" class="secondary" data-act="prev" ${historyDisplayPage <= 1 ? 'disabled' : ''}>◀ 上一頁</button>
+            <span class="page-info">第 ${historyDisplayPage} / ${totalPages} 頁</span>
+            <button type="button" class="secondary" data-act="next" ${historyDisplayPage >= totalPages ? 'disabled' : ''}>下一頁 ▶</button>
+            ${historyApiExhausted ? '' : '<button type="button" data-act="more">⬇ 載入更多（擴充 30 天資料池）</button>'}
+        `;
+    }
+}
+
+function renderHistoryData() {
+    const logs = getFilteredHistoryLogs();
+    renderHistorySummaryBar(logs);
+    renderHistoryFeed(logs);
+    updateHistoryChartUi(logs);
+    document.getElementById('historySection').style.display = 'block';
+}
+
+function updateHistoryChartUi(logs) {
+    const btn = document.getElementById('historyChartToggleBtn');
+    const body = document.getElementById('historyChartBody');
+
+    if (logs.length === 0) {
+        hideHistoryChart(false);
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '📈 走勢圖';
+        }
+        return;
+    }
+
+    if (!historyChartUserDismissed && !historyChartOpen) {
+        historyChartOpen = true;
+        if (body) body.style.display = 'block';
+    }
+
+    if (historyChartOpen) {
+        syncHistoryChart(logs);
+    }
+
+    if (btn) {
+        btn.disabled = false;
+        btn.textContent = historyChartOpen ? '📈 收起走勢' : '📈 走勢圖';
+    }
+}
+
+function toggleHistoryChart() {
+    if (historyChartOpen) {
+        closeHistoryChart();
+        return;
+    }
+    const logs = getFilteredHistoryLogs();
+    if (!logs.length) {
+        alert('目前篩選條件下無成交資料');
+        return;
+    }
+    historyChartUserDismissed = false;
+    historyChartOpen = true;
+    document.getElementById('historyChartBody').style.display = 'block';
+    syncHistoryChart(logs);
+    updateHistoryChartUi(logs);
+}
+
+function hideHistoryChart(markDismissed = false) {
+    historyChartOpen = false;
+    if (markDismissed) historyChartUserDismissed = true;
+    const body = document.getElementById('historyChartBody');
+    if (body) body.style.display = 'none';
+    if (chartInstances['history-main']) {
+        chartInstances['history-main'].destroy();
+        delete chartInstances['history-main'];
+    }
+}
+
+function closeHistoryChart() {
+    hideHistoryChart(true);
+    const btn = document.getElementById('historyChartToggleBtn');
+    if (btn) btn.textContent = '📈 走勢圖';
+}
+
+function syncHistoryChart(logs = getFilteredHistoryLogs()) {
+    const keyword = document.getElementById('searchInput').value.trim();
+    const rangeLabel = HISTORY_RANGE_SEGS.find(([v]) => v === historyRange)?.[1] || historyRange;
+    const titleEl = document.getElementById('historyChartTitle');
+    if (titleEl) {
+        titleEl.textContent = `📈 ${keyword} 價格走勢（近 ${rangeLabel}，${logs.length} 筆）`;
+    }
+    renderPriceChart('history-main', 'historyChartCanvas', keyword, logs);
 }
 
 /* ========================================
@@ -4323,67 +5010,6 @@ function renderMarketTable(items) {
     document.getElementById('marketSection').style.display = 'block';
 }
 
-function renderHistoryData() {
-    // 按物品分組統計
-    const grouped = {};
-    
-    allHistoryLogs.forEach(log => {
-        if (!grouped[log.item]) {
-            grouped[log.item] = { coins: [], crystals: [], total: 0 };
-        }
-        if (log.pricetype === 0) {
-            grouped[log.item].coins.push(log.price);
-        } else {
-            grouped[log.item].crystals.push(log.price);
-        }
-        grouped[log.item].total++;
-    });
-    
-    // 計算統計
-    const stats = Object.entries(grouped).map(([item, data]) => ({
-        item,
-        minCoin: data.coins.length ? Math.min(...data.coins) : 0,
-        maxCoin: data.coins.length ? Math.max(...data.coins) : 0,
-        avgCoin: data.coins.length ? calcTrimmedAvg(data.coins) : 0,
-        minCrystal: data.crystals.length ? Math.min(...data.crystals) : 0,
-        maxCrystal: data.crystals.length ? Math.max(...data.crystals) : 0,
-        avgCrystal: data.crystals.length ? calcTrimmedAvg(data.crystals) : 0,
-        total: data.total
-    }));
-    
-    // 渲染表格（每個物件後面加上圖表行）
-    const tbody = document.getElementById('historyBody');
-    tbody.innerHTML = stats.map((row, index) => `
-        <tr>
-            <td><strong>${escapeHtml(row.item)}</strong></td>
-            <td style="color:var(--accent-green)">${row.minCoin ? row.minCoin.toLocaleString() : '-'}</td>
-            <td style="color:var(--accent-gold)">${row.avgCoin ? row.avgCoin.toLocaleString() : '-'}</td>
-            <td style="color:var(--accent-red)">${row.maxCoin ? row.maxCoin.toLocaleString() : '-'}</td>
-            <td style="color:var(--accent-green)">${row.minCrystal ? row.minCrystal.toLocaleString() : '-'}</td>
-            <td style="color:var(--accent-gold)">${row.avgCrystal ? row.avgCrystal.toLocaleString() : '-'}</td>
-            <td style="color:var(--accent-red)">${row.maxCrystal ? row.maxCrystal.toLocaleString() : '-'}</td>
-            <td>${row.total}</td>
-            <td><button class="secondary" style="padding:6px 12px;font-size:0.8rem;" onclick="toggleChart(${index}, '${escapeHtml(row.item)}')">📈</button></td>
-        </tr>
-        <tr id="chartRow${index}" class="chart-row" style="display:none;">
-            <td colspan="9" style="padding:0; background:var(--bg-dark);">
-                <div class="inline-chart-container">
-                    <div class="chart-title">📈 ${escapeHtml(row.item)} 價格走勢</div>
-                    <div class="inline-chart-wrapper">
-                        <canvas id="chart${index}"></canvas>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-    
-    document.getElementById('historySection').style.display = 'block';
-}
-
-function toggleChart(index, itemName) {
-    togglePriceChart(`history-${index}`, `chartRow${index}`, `chart${index}`, itemName, allHistoryLogs);
-}
-
 function toggleTrackedChart(index, itemName) {
     const item = trackedItems[index];
     togglePriceChart(`tracked-${index}`, `trackedChartRow${index}`, `trackedChart${index}`, itemName, item?.historyLogs || []);
@@ -4593,10 +5219,6 @@ async function switchTab(tab) {
     if (isHistoryTab(tab) && !document.getElementById('searchInput').value.trim()) {
         alert('請先輸入搜尋關鍵字');
         tab = 'market';
-    }
-
-    if (isHistoryTab(tab)) {
-        historyHours = tabToHistoryHours(tab);
     }
 
     currentTab = tab;
