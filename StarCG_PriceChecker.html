@@ -2494,7 +2494,6 @@
             display: block;
         }
     </style>
-    <script src="pet_profiles_data.js"></script>
 </head>
 <body>
 
@@ -3527,8 +3526,7 @@ function sumPetStats(stats) {
 const PET_RARITY_MAX_ALLOC = { '普': 125, '銀': 127, '金': 129 };
 const PET_RARITY_BASE_ALLOC = { '普': 100, '銀': 102, '金': 104 };
 const PET_GUIDE_JSON_URL = 'https://guide.starcg.net/data/pets.json';
-const PET_LOCAL_JSON_URL = 'pets-local.json';       // 自備完整快照（覆蓋遠端同名）
-const PET_PATCH_JSON_URL = 'pet_profiles_patch.json'; // 只補遺漏／修正少數幾筆
+const PET_JSON_URLS = ['pets-local.json', 'pets.json']; // 自備完整快照，前者優先
 const PET_PROFILES = {};
 const PET_NAME_ALIASES = {}; // 市場名 → 圖鑑名
 let petProfilesLoadPromise = null;
@@ -3622,30 +3620,35 @@ function mergePetGuideEntriesFillOnly(pets, sourceLabel) {
     return n;
 }
 
+async function loadPetJsonSource(url) {
+    const data = await fetchPetJson(url, false);
+    let n = 0;
+    if (Array.isArray(data)) {
+        n += mergePetGuideEntries(data, url);
+    } else {
+        if (data.pets) n += mergePetGuideEntries(data.pets, url);
+        if (data.aliases) mergePetNameAliases(data.aliases, url);
+        if (data.overrides) mergePetProfileOverrides(data.overrides, url);
+    }
+    return n;
+}
+
 async function loadPetProfilesFromGuide() {
     if (petProfilesLoadPromise) return petProfilesLoadPromise;
     petProfilesLoadPromise = (async () => {
         let total = 0;
         let localLoaded = false;
         try {
-            if (Array.isArray(self.PET_PROFILES_RAW)) {
-                total += mergePetGuideEntries(self.PET_PROFILES_RAW, 'pet_profiles_data.js');
-                localLoaded = true;
-            }
-            try {
-                const local = await fetchPetJson(PET_LOCAL_JSON_URL, false);
-                if (Array.isArray(local)) {
-                    total += mergePetGuideEntries(local, 'pets-local.json');
-                    localLoaded = true;
-                } else {
-                    if (local.pets) {
-                        total += mergePetGuideEntries(local.pets, 'pets-local.json');
+            for (const url of PET_JSON_URLS) {
+                try {
+                    const n = await loadPetJsonSource(url);
+                    if (n > 0) {
+                        total += n;
                         localLoaded = true;
+                        break;
                     }
-                    if (local.aliases) mergePetNameAliases(local.aliases, 'pets-local.json');
-                    if (local.overrides) mergePetProfileOverrides(local.overrides, 'pets-local.json');
-                }
-            } catch (_) { /* 無本地快照則略過 */ }
+                } catch (_) { /* 嘗試下一個本地快照 */ }
+            }
             if (!localLoaded) {
                 try {
                     total += mergePetGuideEntries(await fetchPetJson(PET_GUIDE_JSON_URL, true), 'guide.starcg.net');
@@ -3660,16 +3663,6 @@ async function loadPetProfilesFromGuide() {
                     );
                 } catch (_) { /* 遠端補漏失敗不影響本地 */ }
             }
-            try {
-                const patch = await fetchPetJson(PET_PATCH_JSON_URL, false);
-                if (Array.isArray(patch)) {
-                    total += mergePetGuideEntries(patch, 'pet_profiles_patch.json');
-                } else {
-                    if (patch.pets) total += mergePetGuideEntries(patch.pets, 'pet_profiles_patch.json');
-                    if (patch.overrides) mergePetProfileOverrides(patch.overrides, 'pet_profiles_patch.json');
-                    if (patch.aliases) mergePetNameAliases(patch.aliases, 'pet_profiles_patch.json');
-                }
-            } catch (_) { /* 無 patch 則略過 */ }
             const count = Object.keys(PET_PROFILES).length;
             console.info(`[寵物圖鑑] 合計 ${count} 隻（有效合併 ${total} 筆）`);
             if (count > 0 && allMarketItems.length > 0) {
