@@ -673,14 +673,17 @@
     </div>
   </div>
 
-  <script src="pet_profiles_data.js"></script>
   <script>
     const PETS_URLS = [
-      './pets.json',
       './pets-local.json',
-      './data/pets.json',
+      './pets.json',
     ];
-    const PET_PATCH_URL = './pet_profiles_patch.json';
+    const PET_GUIDE_JSON_URL = 'https://guide.starcg.net/data/pets.json';
+    const CORS_PROXY_PREFIXES = [
+      'https://corsproxy.io/?url=',
+      'https://api.allorigins.win/raw?url=',
+      'https://api.codetabs.com/v1/proxy/?quest=',
+    ];
     const PET_IMAGE_BASE = 'https://guide.starcg.net/pet/';
     const STAT_NAMES = ['體', '力', '強', '速', '魔'];
     const BP_INITIAL_RATE = 0.2; // 官方固定：檔次→1等BP 係數
@@ -714,12 +717,7 @@
     function resolveImageId(pet) {
       if (!pet) return null;
       const fromPet = String(pet.imageId ?? '').match(/\d+/);
-      if (fromPet) return fromPet[0];
-      const raw = Array.isArray(self.PET_PROFILES_RAW)
-        ? self.PET_PROFILES_RAW.find(p => p.name === pet.name)
-        : null;
-      const fromRaw = String(raw?.imageId ?? '').match(/\d+/);
-      return fromRaw ? fromRaw[0] : null;
+      return fromPet ? fromPet[0] : null;
     }
 
     function petImageCandidates(pet) {
@@ -1197,35 +1195,27 @@
       return null;
     }
 
-    function mergePetList(base, patches) {
-      const byName = new Map();
-      let nextId = 1;
-      for (const p of base) {
-        if (!p?.name) continue;
-        byName.set(p.name, { ...p });
-        if (p.id >= nextId) nextId = p.id + 1;
+    async function fetchText(url, useProxy = false) {
+      if (!useProxy) {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
       }
-      for (const p of patches) {
-        if (!p?.name) continue;
-        const prev = byName.get(p.name);
-        const merged = { ...prev, ...p, name: p.name };
-        if (merged.id == null) merged.id = prev?.id ?? nextId++;
-        byName.set(p.name, merged);
+      let lastErr = null;
+      for (const prefix of CORS_PROXY_PREFIXES) {
+        try {
+          const res = await fetch(prefix + encodeURIComponent(url), { cache: 'no-store' });
+          const text = await res.text();
+          const trimmed = text.trim();
+          if (!res.ok || !(trimmed.startsWith('[') || trimmed.startsWith('{'))) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+          return text;
+        } catch (err) {
+          lastErr = err;
+        }
       }
-      return Array.from(byName.values()).sort((a, b) => (a.id || 0) - (b.id || 0));
-    }
-
-    async function applyPetPatch(baseList) {
-      try {
-        const res = await fetch(PET_PATCH_URL, { cache: 'no-store' });
-        if (!res.ok) return baseList;
-        const patch = await res.json();
-        const extras = normalizePetList(patch);
-        if (!extras?.length) return baseList;
-        return mergePetList(baseList, extras);
-      } catch {
-        return baseList;
-      }
+      throw lastErr || new Error('遠端載入失敗');
     }
 
     function applyPetsData(raw) {
@@ -1241,40 +1231,17 @@
 
     async function loadPetsFromFile(file) {
       const raw = JSON.parse(await file.text());
-      const list = normalizePetList(raw);
-      if (!list?.length) throw new Error('圖鑑資料格式錯誤');
-      applyPetsData(list);
+      applyPetsData(raw);
     }
 
     async function loadPets() {
-      const bar = document.getElementById('loadBar');
-
-      if (Array.isArray(self.PET_PROFILES_RAW) && self.PET_PROFILES_RAW.length) {
-        try {
-          applyPetsData(await applyPetPatch(self.PET_PROFILES_RAW));
-          return;
-        } catch (err) {
-          console.warn('pet_profiles_data.js 解析失敗', err);
-        }
-      }
-
-      if (Array.isArray(window.PETS_DATA) && window.PETS_DATA.length) {
-        try {
-          applyPetsData(await applyPetPatch(window.PETS_DATA));
-          return;
-        } catch (err) {
-          console.warn('PETS_DATA 解析失敗', err);
-        }
-      }
-
+      const remoteUrls = [...PETS_URLS, PET_GUIDE_JSON_URL];
       let lastErr = null;
-      for (const url of PETS_URLS) {
+      for (const url of remoteUrls) {
         try {
-          const res = await fetch(url, { cache: 'no-store' });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const list = normalizePetList(await res.json());
-          if (!list?.length) throw new Error('圖鑑資料格式錯誤');
-          applyPetsData(await applyPetPatch(list));
+          const useProxy = url.startsWith('http');
+          const text = await fetchText(url, useProxy);
+          applyPetsData(JSON.parse(text));
           return;
         } catch (err) {
           lastErr = err;
@@ -1282,12 +1249,13 @@
       }
 
       const isFileProtocol = location.protocol === 'file:';
+      const bar = document.getElementById('loadBar');
       bar.className = 'load-bar status err';
       bar.innerHTML = [
         `⚠️ 無法載入寵物圖鑑：${lastErr?.message || '未知錯誤'}。`,
         isFileProtocol
           ? '請勿直接雙擊開啟此頁面；改用 Live Server，或點下方按鈕手動選擇圖鑑資料。'
-          : '請點下方按鈕手動選擇圖鑑資料，或確認工具與資料放在同一資料夾。',
+          : 'GitHub Pages 請確認同目錄已上傳 <code>pets-local.json</code> 或 <code>pets.json</code>；或點下方按鈕手動選擇。',
         '<button type="button" class="secondary" id="pickPetsBtn">📂 選擇圖鑑資料</button>',
       ].join('<br>');
       document.getElementById('pickPetsBtn').addEventListener('click', () => {
