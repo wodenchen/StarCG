@@ -155,6 +155,17 @@
       background: #fff;
     }
 
+    .stat-area {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+      margin-top: 12px;
+    }
+    .stat-area .stat-scroll {
+      flex: 2;
+      min-width: 0;
+      margin-top: 0;
+    }
     .stat-scroll {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -308,8 +319,38 @@
     }
     .params-side .field { flex: none; }
 
+    .row-pet-select {
+      align-items: flex-end;
+    }
     .row-pet-select .field { flex: 1 1 200px; }
     .row-pet-select .field-btn { flex: 0 0 auto; min-width: 0; }
+    .stat-area .pet-portrait-box {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px;
+    }
+    .pet-portrait-box[hidden] { display: none !important; }
+    .stat-area .pet-portrait-box img {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: min(240px, 100%);
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .pet-portrait-placeholder {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.4;
+      padding: 8px;
+    }
 
     .compare-wrap {
       overflow-x: auto;
@@ -431,7 +472,10 @@
     }
     @media (max-width: 720px) {
       .preview { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .row-pet-select { flex-direction: column; }
+      .row-pet-select { flex-direction: column; align-items: stretch; }
+      .stat-area { flex-direction: column; }
+      .stat-area .pet-portrait-box { min-height: 140px; }
+      .stat-area .pet-portrait-box img { max-height: 180px; }
       .row-pet-select .field-btn { width: 100%; }
       .row-pet-select .field-btn button { width: 100%; }
       .btn-row button { flex: 1 1 calc(50% - 6px); min-width: 0; }
@@ -519,49 +563,54 @@
           </div>
         </div>
 
-        <div class="stat-scroll">
-        <table class="stat-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>體</th><th>力</th><th>強</th><th>速</th><th>魔</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="row-label">原始檔次</td>
-              <td><input class="base-stat" type="number" value="30"></td>
-              <td><input class="base-stat" type="number" value="35"></td>
-              <td><input class="base-stat" type="number" value="30"></td>
-              <td><input class="base-stat" type="number" value="25"></td>
-              <td><input class="base-stat" type="number" value="20"></td>
-            </tr>
-            <tr>
-              <td class="row-label">掉檔</td>
-              <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
-              <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
-              <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
-              <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
-              <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
-            </tr>
-            <tr>
-              <td class="row-label">隨機檔</td>
-              <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
-              <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
-              <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
-              <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
-              <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
-            </tr>
-            <tr>
-              <td class="row-label">配點</td>
-              <td><input class="manual-point" type="number" value="0" min="0"></td>
-              <td><input class="manual-point" type="number" value="0" min="0"></td>
-              <td><input class="manual-point" type="number" value="0" min="0"></td>
-              <td><input class="manual-point" type="number" value="0" min="0"></td>
-              <td><input class="manual-point" type="number" value="0" min="0"></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="stat-area">
+          <div class="stat-scroll">
+          <table class="stat-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>體</th><th>力</th><th>強</th><th>速</th><th>魔</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="row-label">原始檔次</td>
+                <td><input class="base-stat" type="number" value="30"></td>
+                <td><input class="base-stat" type="number" value="35"></td>
+                <td><input class="base-stat" type="number" value="30"></td>
+                <td><input class="base-stat" type="number" value="25"></td>
+                <td><input class="base-stat" type="number" value="20"></td>
+              </tr>
+              <tr>
+                <td class="row-label">掉檔</td>
+                <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
+                <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
+                <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
+                <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
+                <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
+              </tr>
+              <tr>
+                <td class="row-label">隨機檔</td>
+                <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
+                <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
+                <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
+                <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
+                <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
+              </tr>
+              <tr>
+                <td class="row-label">配點</td>
+                <td><input class="manual-point" type="number" value="0" min="0"></td>
+                <td><input class="manual-point" type="number" value="0" min="0"></td>
+                <td><input class="manual-point" type="number" value="0" min="0"></td>
+                <td><input class="manual-point" type="number" value="0" min="0"></td>
+                <td><input class="manual-point" type="number" value="0" min="0"></td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          <div class="pet-portrait-box" id="petPortraitBox" hidden>
+            <img id="petPortrait" alt="" decoding="async">
+          </div>
         </div>
 
         <div class="hint">🎲 隨機檔總和：<strong id="randDisplay">10</strong> / 10</div>
@@ -632,6 +681,7 @@
       './data/pets.json',
     ];
     const PET_PATCH_URL = './pet_profiles_patch.json';
+    const PET_IMAGE_BASE = 'https://guide.starcg.net/pet/';
     const STAT_NAMES = ['體', '力', '強', '速', '魔'];
     const BP_INITIAL_RATE = 0.2; // 官方固定：檔次→1等BP 係數
 
@@ -657,7 +707,67 @@
         total: p.total || 0,
         skillSlots: p.skillSlots || 0,
         washPrice: p.washPrice || 0,
+        imageId: p.imageId != null && p.imageId !== '' ? String(p.imageId) : '',
       };
+    }
+
+    function resolveImageId(pet) {
+      if (!pet) return null;
+      const fromPet = String(pet.imageId ?? '').match(/\d+/);
+      if (fromPet) return fromPet[0];
+      const raw = Array.isArray(self.PET_PROFILES_RAW)
+        ? self.PET_PROFILES_RAW.find(p => p.name === pet.name)
+        : null;
+      const fromRaw = String(raw?.imageId ?? '').match(/\d+/);
+      return fromRaw ? fromRaw[0] : null;
+    }
+
+    function petImageCandidates(pet) {
+      const id = resolveImageId(pet);
+      if (!id) return [];
+      return [`${PET_IMAGE_BASE}${id}.gif`];
+    }
+
+    function updatePetPortrait(pet) {
+      const box = document.getElementById('petPortraitBox');
+      const img = document.getElementById('petPortrait');
+      if (!pet) {
+        box.hidden = true;
+        img.removeAttribute('src');
+        img.onerror = null;
+        img.style.display = '';
+        box.querySelector('.pet-portrait-placeholder')?.remove();
+        return;
+      }
+      const urls = petImageCandidates(pet);
+      if (!urls.length) {
+        box.hidden = true;
+        return;
+      }
+      box.hidden = false;
+      img.style.display = '';
+      box.querySelector('.pet-portrait-placeholder')?.remove();
+      img.alt = pet.name;
+      let urlIdx = 0;
+      img.onload = () => {
+        img.style.display = '';
+        box.querySelector('.pet-portrait-placeholder')?.remove();
+      };
+      img.onerror = () => {
+        urlIdx += 1;
+        if (urlIdx < urls.length) {
+          img.src = urls[urlIdx];
+          return;
+        }
+        img.style.display = 'none';
+        if (!box.querySelector('.pet-portrait-placeholder')) {
+          const ph = document.createElement('div');
+          ph.className = 'pet-portrait-placeholder';
+          ph.textContent = '🐾\n無圖';
+          box.appendChild(ph);
+        }
+      };
+      img.src = urls[0];
     }
 
     function cardRankFromType(cardType) {
@@ -818,8 +928,16 @@
       });
 
       const sel = document.getElementById('petSelect');
+      const prevIdx = parseInt(sel.value, 10);
       sel.innerHTML = '<option value="">請選擇</option>' +
         filteredPets.map((p, i) => `<option value="${i}">${p.name}（${p.cardType} · 總${p.total}）</option>`).join('');
+      if (!Number.isNaN(prevIdx) && prevIdx < filteredPets.length) {
+        sel.value = String(prevIdx);
+        updatePetPortrait(filteredPets[prevIdx]);
+      } else {
+        sel.value = '';
+        updatePetPortrait(null);
+      }
     }
 
     function applyPetToInputs(pet) {
@@ -855,6 +973,7 @@
       }
 
       calculateCurrent();
+      updatePetPortrait(pet);
     }
 
     function addToComparison() {
@@ -1186,7 +1305,11 @@
 
     document.getElementById('petSelect').addEventListener('change', () => {
       const idx = parseInt(document.getElementById('petSelect').value, 10);
-      if (!Number.isNaN(idx)) applyPetToInputs(filteredPets[idx]);
+      if (Number.isNaN(idx)) {
+        updatePetPortrait(null);
+        return;
+      }
+      applyPetToInputs(filteredPets[idx]);
     });
 
     document.getElementById('maxStarBtn').addEventListener('click', () => {
