@@ -624,15 +624,14 @@
     </div>
   </div>
 
-  <script src="pets-data.js"></script>
+  <script src="pet_profiles_data.js"></script>
   <script>
-    // 本機優先（需 http 開啟）；遠端為備援（可能受 CORS 限制）
     const PETS_URLS = [
       './pets.json',
       './pets-local.json',
       './data/pets.json',
-      'https://guide.starcg.net/data/pets.json',
     ];
+    const PET_PATCH_URL = './pet_profiles_patch.json';
     const STAT_NAMES = ['體', '力', '強', '速', '魔'];
     const BP_INITIAL_RATE = 0.2; // 官方固定：檔次→1等BP 係數
 
@@ -1073,8 +1072,45 @@
       renderComparison();
     }
 
+    function normalizePetList(raw) {
+      if (Array.isArray(raw)) return raw;
+      if (Array.isArray(raw?.pets)) return raw.pets;
+      return null;
+    }
+
+    function mergePetList(base, patches) {
+      const byName = new Map();
+      let nextId = 1;
+      for (const p of base) {
+        if (!p?.name) continue;
+        byName.set(p.name, { ...p });
+        if (p.id >= nextId) nextId = p.id + 1;
+      }
+      for (const p of patches) {
+        if (!p?.name) continue;
+        const prev = byName.get(p.name);
+        const merged = { ...prev, ...p, name: p.name };
+        if (merged.id == null) merged.id = prev?.id ?? nextId++;
+        byName.set(p.name, merged);
+      }
+      return Array.from(byName.values()).sort((a, b) => (a.id || 0) - (b.id || 0));
+    }
+
+    async function applyPetPatch(baseList) {
+      try {
+        const res = await fetch(PET_PATCH_URL, { cache: 'no-store' });
+        if (!res.ok) return baseList;
+        const patch = await res.json();
+        const extras = normalizePetList(patch);
+        if (!extras?.length) return baseList;
+        return mergePetList(baseList, extras);
+      } catch {
+        return baseList;
+      }
+    }
+
     function applyPetsData(raw) {
-      const list = Array.isArray(raw) ? raw : null;
+      const list = normalizePetList(raw);
       if (!list?.length) throw new Error('圖鑑資料格式錯誤');
       allPets = list.map(adaptPet);
       const bar = document.getElementById('loadBar');
@@ -1085,27 +1121,41 @@
     }
 
     async function loadPetsFromFile(file) {
-      const text = await file.text();
-      applyPetsData(JSON.parse(text));
+      const raw = JSON.parse(await file.text());
+      const list = normalizePetList(raw);
+      if (!list?.length) throw new Error('圖鑑資料格式錯誤');
+      applyPetsData(list);
     }
 
     async function loadPets() {
       const bar = document.getElementById('loadBar');
-      if (window.PETS_DATA?.length) {
+
+      if (Array.isArray(self.PET_PROFILES_RAW) && self.PET_PROFILES_RAW.length) {
         try {
-          applyPetsData(window.PETS_DATA);
+          applyPetsData(await applyPetPatch(self.PET_PROFILES_RAW));
           return;
         } catch (err) {
-          console.warn('內建圖鑑解析失敗', err);
+          console.warn('pet_profiles_data.js 解析失敗', err);
+        }
+      }
+
+      if (Array.isArray(window.PETS_DATA) && window.PETS_DATA.length) {
+        try {
+          applyPetsData(await applyPetPatch(window.PETS_DATA));
+          return;
+        } catch (err) {
+          console.warn('PETS_DATA 解析失敗', err);
         }
       }
 
       let lastErr = null;
       for (const url of PETS_URLS) {
         try {
-          const res = await fetch(url);
+          const res = await fetch(url, { cache: 'no-store' });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          applyPetsData(await res.json());
+          const list = normalizePetList(await res.json());
+          if (!list?.length) throw new Error('圖鑑資料格式錯誤');
+          applyPetsData(await applyPetPatch(list));
           return;
         } catch (err) {
           lastErr = err;
