@@ -674,9 +674,15 @@
   </div>
 
   <script>
+    const PET_REPO_RAW = 'https://raw.githubusercontent.com/wodenchen/StarCG/main/';
+    function resolveDataUrl(relative) {
+      return new URL(relative, location.href).href;
+    }
     const PETS_URLS = [
-      './pets-local.json',
-      './pets.json',
+      resolveDataUrl('pets-local.json'),
+      resolveDataUrl('pets.json'),
+      PET_REPO_RAW + 'pets-local.json',
+      PET_REPO_RAW + 'pets.json',
     ];
     const PET_GUIDE_JSON_URL = 'https://guide.starcg.net/data/pets.json';
     const CORS_PROXY_PREFIXES = [
@@ -684,6 +690,9 @@
       'https://api.allorigins.win/raw?url=',
       'https://api.codetabs.com/v1/proxy/?quest=',
     ];
+    function needsCorsProxy(url) {
+      return url.startsWith('http') && !url.includes('raw.githubusercontent.com');
+    }
     const PET_IMAGE_BASE = 'https://guide.starcg.net/pet/';
     const STAT_NAMES = ['體', '力', '強', '速', '魔'];
     const BP_INITIAL_RATE = 0.2; // 官方固定：檔次→1等BP 係數
@@ -1239,7 +1248,7 @@
       let lastErr = null;
       for (const url of remoteUrls) {
         try {
-          const useProxy = url.startsWith('http');
+          const useProxy = needsCorsProxy(url);
           const text = await fetchText(url, useProxy);
           applyPetsData(JSON.parse(text));
           return;
