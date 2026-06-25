@@ -301,6 +301,36 @@
       color: var(--text-primary);
     }
 
+    .reverse-panel {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+    }
+    .reverse-panel summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--text-primary);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .reverse-panel summary::-webkit-details-marker { display: none; }
+    .reverse-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .reverse-grid-verify {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: 360px;
+      margin-top: 8px;
+    }
+    @media (max-width: 720px) {
+      .reverse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
     .params-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -640,6 +670,27 @@
           <div class="box"><div class="ico">🔮</div><div class="k">精神</div><div class="v" data-k="spt">-</div></div>
           <div class="box"><div class="ico">💚</div><div class="k">回復</div><div class="v" data-k="rec">-</div></div>
         </div>
+
+        <details class="reverse-panel" id="reversePanel">
+          <summary>🔁 反推隨機檔</summary>
+          <p class="hint" style="margin-top:10px">輸入遊戲面板的 HP / MP / 攻 / 防 / 敏，依目前檔次、掉檔、配點反推隨機檔（倍率固定 0.2）。</p>
+          <div class="reverse-grid">
+            <div class="field"><label>❤️ HP</label><input type="number" step="0.01" id="obsHp" placeholder="觀測值"></div>
+            <div class="field"><label>💧 MP</label><input type="number" step="0.01" id="obsMp" placeholder="觀測值"></div>
+            <div class="field"><label>⚔️ 攻擊</label><input type="number" step="0.01" id="obsAtk" placeholder="觀測值"></div>
+            <div class="field"><label>🛡️ 防禦</label><input type="number" step="0.01" id="obsDef" placeholder="觀測值"></div>
+            <div class="field"><label>💨 敏捷</label><input type="number" step="0.01" id="obsAgi" placeholder="觀測值"></div>
+          </div>
+          <div class="reverse-grid reverse-grid-verify">
+            <div class="field"><label>🔮 精神（驗證）</label><input type="number" step="0.01" id="obsSpt" placeholder="選填"></div>
+            <div class="field"><label>💚 回復（驗證）</label><input type="number" step="0.01" id="obsRec" placeholder="選填"></div>
+          </div>
+          <div class="btn-row" style="margin-top:12px">
+            <button type="button" class="secondary" id="fillObsFromPreviewBtn">📋 帶入試算值</button>
+            <button type="button" id="reverseCalcBtn">🔁 反推隨機檔</button>
+          </div>
+          <div id="reverseStatus" class="hint" style="display:none"></div>
+        </details>
       </section>
 
       <section class="card">
@@ -696,6 +747,14 @@
     const PET_IMAGE_BASE = 'https://guide.starcg.net/pet/';
     const STAT_NAMES = ['體', '力', '強', '速', '魔'];
     const BP_INITIAL_RATE = 0.2; // 官方固定：檔次→1等BP 係數
+    const BP_TO_STAT_MATRIX = [
+      [8.0, 2.0, 3.0, 3.0, 1.0],
+      [1.0, 2.0, 2.0, 2.0, 10.0],
+      [0.2, 2.7, 0.3, 0.3, 0.2],
+      [0.2, 0.3, 3.0, 0.3, 0.2],
+      [0.1, 0.2, 0.2, 2.0, 0.1],
+    ];
+    const STAT_BASE = { hp: 20, mp: 20, atk: 20, def: 20, agi: 20, spt: 100, rec: 100 };
 
     function round2(n) {
       return Math.round((Number(n) || 0) * 100) / 100;
@@ -713,6 +772,7 @@
     let basePetId = null;
     let sortConfig = { key: 'name', order: 'asc' };
     let dragPetId = null;
+    let isReversedRand = false;
 
     function adaptPet(p) {
       return {
@@ -821,13 +881,11 @@
       };
     }
 
-    function calculateStats(data, syncManual = true) {
+    function computeManualCapped(data) {
       const lvlLimit = Math.max(0, data.level - 1);
       const modLimit = data.cardRank * data.modGrade;
       const totalLimit = lvlLimit + modLimit;
-
       const ranks = data.base.map((rank, i) => rank - Math.abs(data.lost[i]));
-      const manualInputs = Array.from(document.querySelectorAll('.manual-point'));
 
       const bpBase = ranks.map((realRank, i) => {
         const bpLv1 = (realRank * BP_INITIAL_RATE) + (data.rand[i] * BP_INITIAL_RATE);
@@ -857,11 +915,220 @@
         currentUsed = runningSum;
       }
 
+      return { ranks, bpBase, manualCapped, perStatMaxBP, totalLimit, currentUsed };
+    }
+
+    function statsFromBP(bp) {
+      const statKeys = ['hp', 'mp', 'atk', 'def', 'agi'];
+      const stats = {};
+      for (let s = 0; s < 5; s++) {
+        let v = STAT_BASE[statKeys[s]];
+        for (let j = 0; j < 5; j++) v += bp[j] * BP_TO_STAT_MATRIX[s][j];
+        stats[statKeys[s]] = round2(v);
+      }
+      stats.spt = round2(100 + bp[0] * -0.3 + bp[1] * -0.1 + bp[2] * 0.2 + bp[3] * -0.1 + bp[4] * 0.8);
+      stats.rec = round2(100 + bp[0] * 0.8 + bp[1] * -0.1 + bp[2] * -0.1 + bp[3] * 0.2 + bp[4] * -0.3);
+      return stats;
+    }
+
+    function solveBPFromObserved(observed) {
+      const keys = ['hp', 'mp', 'atk', 'def', 'agi'];
+      const rhs = keys.map(k => (observed[k] || 0) - STAT_BASE[k] + 0.5);
+      const n = 5;
+      const M = BP_TO_STAT_MATRIX.map((row, i) => [...row, rhs[i]]);
+
+      for (let col = 0; col < n; col++) {
+        let pivot = col;
+        for (let row = col + 1; row < n; row++) {
+          if (Math.abs(M[row][col]) > Math.abs(M[pivot][col])) pivot = row;
+        }
+        if (Math.abs(M[pivot][col]) < 1e-9) throw new Error('矩陣奇異，無法反解');
+        [M[col], M[pivot]] = [M[pivot], M[col]];
+
+        for (let row = col + 1; row < n; row++) {
+          const factor = M[row][col] / M[col][col];
+          for (let j = col; j <= n; j++) M[row][j] -= factor * M[col][j];
+        }
+      }
+
+      const bp = new Array(n);
+      for (let row = n - 1; row >= 0; row--) {
+        let sum = M[row][n];
+        for (let j = row + 1; j < n; j++) sum -= M[row][j] * bp[j];
+        bp[row] = sum / M[row][row];
+      }
+      return bp;
+    }
+
+    function bpToRand(bp, ranks, level, manual) {
+      return bp.map((bpi, i) => {
+        const realRank = ranks[i];
+        const base = (realRank * BP_INITIAL_RATE) + (realRank / 24) * (level - 1);
+        return Math.round((bpi - manual[i] - base) / BP_INITIAL_RATE);
+      });
+    }
+
+    function getObservedInputs() {
+      const num = id => {
+        const v = document.getElementById(id).value;
+        return v === '' ? null : Number(v);
+      };
+      return {
+        hp: num('obsHp'), mp: num('obsMp'), atk: num('obsAtk'),
+        def: num('obsDef'), agi: num('obsAgi'),
+        spt: num('obsSpt'), rec: num('obsRec'),
+      };
+    }
+
+    function randQualityLabel(sum) {
+      if (sum >= 30) return '極品';
+      if (sum >= 20) return '優秀';
+      if (sum >= 10) return '普通';
+      return '偏低';
+    }
+
+    function scoreReverseCandidate(data, manualTrial, observed, rand) {
+      const { ranks } = computeManualCapped({ ...data, manual: manualTrial });
+      const bp = ranks.map((realRank, i) => {
+        const bpLv1 = (realRank * BP_INITIAL_RATE) + (rand[i] * BP_INITIAL_RATE);
+        const bpGrowth = realRank / 24;
+        return bpLv1 + bpGrowth * (data.level - 1) + manualTrial[i];
+      });
+      const stats = statsFromBP(bp);
+
+      let err = 0;
+      for (const k of ['hp', 'mp', 'atk', 'def', 'agi']) {
+        if (observed[k] == null) continue;
+        const diff = observed[k] - stats[k];
+        err += diff * diff;
+      }
+      if (observed.spt != null) {
+        const diff = observed.spt - stats.spt;
+        err += diff * diff * 0.5;
+      }
+      if (observed.rec != null) {
+        const diff = observed.rec - stats.rec;
+        err += diff * diff * 0.5;
+      }
+
+      const sum = rand.reduce((a, b) => a + b, 0);
+      let penalty = 0;
+      if (sum > 10) penalty += (sum - 10) * 3;
+      for (const r of rand) {
+        if (r < 0) penalty += Math.abs(r) * 15;
+        if (r > 15) penalty += (r - 15) * 2;
+      }
+
+      return { score: err + penalty, err, sum, stats };
+    }
+
+    function showReverseStatus(best) {
+      const el = document.getElementById('reverseStatus');
+      const parts = best.rand.map((v, i) => `${STAT_NAMES[i]}${v >= 0 ? '+' : ''}${v}`);
+      const diffs = [];
+      for (const k of ['hp', 'mp', 'atk', 'def', 'agi']) {
+        const obs = getObservedInputs()[k];
+        if (obs == null) continue;
+        const d = round2(obs - best.stats[k]);
+        if (Math.abs(d) >= 0.01) diffs.push(`${k.toUpperCase()} ${d >= 0 ? '+' : ''}${d.toFixed(2)}`);
+      }
+      const { totalLimit, currentUsed } = computeManualCapped(getInputs());
+      const remaining = totalLimit - currentUsed;
+      el.style.display = 'block';
+      el.innerHTML = [
+        `✅ 反推：${parts.join(' ')}｜總和 <strong>${best.sum}</strong>（${randQualityLabel(best.sum)}）`,
+        diffs.length ? `誤差：${diffs.join('、')}` : '七圍吻合',
+        remaining > 0 ? `⚠️ 尚有 ${remaining} 點未配，可能影響反推精度` : '',
+      ].filter(Boolean).join('<br>');
+    }
+
+    function doReverseCalc() {
+      const data = getInputs();
+      const observed = getObservedInputs();
+      const statusEl = document.getElementById('reverseStatus');
+
+      const hasCore = ['hp', 'mp', 'atk', 'def', 'agi'].every(k => observed[k] != null);
+      if (!hasCore) {
+        statusEl.style.display = 'block';
+        statusEl.textContent = '⚠️ 請輸入完整的 HP / MP / 攻 / 防 / 敏 五項觀測值';
+        return;
+      }
+
+      const filled = {
+        hp: observed.hp, mp: observed.mp, atk: observed.atk,
+        def: observed.def, agi: observed.agi,
+      };
+
+      const { manualCapped, totalLimit, currentUsed } = computeManualCapped(data);
+      const maxIdx = manualCapped.indexOf(Math.max(...manualCapped));
+      let best = null;
+
+      for (let unused = 0; unused <= 5; unused++) {
+        const manualTrial = [...manualCapped];
+        if (maxIdx >= 0 && manualCapped[maxIdx] > 0) {
+          manualTrial[maxIdx] = Math.max(0, manualCapped[maxIdx] - unused);
+        }
+
+        let bp;
+        try {
+          bp = solveBPFromObserved(filled);
+        } catch {
+          continue;
+        }
+
+        const ranks = data.base.map((rank, i) => rank - Math.abs(data.lost[i]));
+        const rand = bpToRand(bp, ranks, data.level, manualTrial);
+        const result = scoreReverseCandidate(data, manualTrial, filled, rand);
+
+        if (!best || result.score < best.score) {
+          best = { rand, manualTrial, ...result };
+        }
+      }
+
+      if (!best) {
+        statusEl.style.display = 'block';
+        statusEl.textContent = '⚠️ 反推失敗，請確認觀測值與檔次設定是否正確';
+        return;
+      }
+
+      document.querySelectorAll('.rand-stat').forEach((el, i) => {
+        el.value = best.rand[i];
+      });
+      isReversedRand = true;
+      calculateCurrent();
+      showReverseStatus(best);
+
+      if (totalLimit - currentUsed > 0) {
+        document.getElementById('reversePanel').open = true;
+      }
+    }
+
+    function fillObsFromPreview() {
+      const map = { hp: 'obsHp', mp: 'obsMp', atk: 'obsAtk', def: 'obsDef', agi: 'obsAgi', spt: 'obsSpt', rec: 'obsRec' };
+      document.querySelectorAll('#preview .v').forEach(el => {
+        const id = map[el.dataset.k];
+        if (id && el.textContent !== '-') document.getElementById(id).value = el.textContent;
+      });
+      document.getElementById('reversePanel').open = true;
+    }
+
+    function calculateStats(data, syncManual = true) {
+      const { ranks, manualCapped, perStatMaxBP, totalLimit, currentUsed } = computeManualCapped(data);
+      const manualInputs = Array.from(document.querySelectorAll('.manual-point'));
       const remaining = totalLimit - currentUsed;
       const randSum = data.rand.reduce((a, b) => a + b, 0);
 
       document.getElementById('randDisplay').textContent = randSum;
-      document.getElementById('randWarn').style.display = randSum > 10 ? 'inline' : 'none';
+      const randWarn = document.getElementById('randWarn');
+      if (isReversedRand) {
+        randWarn.textContent = randSum > 10
+          ? `⚠️ 總和 ${randSum} 偏高（反推 ${randQualityLabel(randSum)}）`
+          : `✅ 反推 ${randQualityLabel(randSum)}`;
+        randWarn.style.display = 'inline';
+      } else {
+        randWarn.textContent = '⚠️ 隨機檔總和過高！';
+        randWarn.style.display = randSum > 10 ? 'inline' : 'none';
+      }
 
       const pointDisplay = document.getElementById('pointDisplay');
       pointDisplay.textContent = `${currentUsed} / ${totalLimit}（剩餘 ${remaining}）`;
@@ -897,17 +1164,7 @@
         return bpLv1 + bpGrowth * (data.level - 1) + manualCapped[i];
       });
 
-      const stats = {
-        hp:  20 + bp[0] * 8.0 + bp[1] * 2.0 + bp[2] * 3.0 + bp[3] * 3.0 + bp[4] * 1.0,
-        mp:  20 + bp[0] * 1.0 + bp[1] * 2.0 + bp[2] * 2.0 + bp[3] * 2.0 + bp[4] * 10.0,
-        atk: 20 + bp[0] * 0.2 + bp[1] * 2.7 + bp[2] * 0.3 + bp[3] * 0.3 + bp[4] * 0.2,
-        def: 20 + bp[0] * 0.2 + bp[1] * 0.3 + bp[2] * 3.0 + bp[3] * 0.3 + bp[4] * 0.2,
-        agi: 20 + bp[0] * 0.1 + bp[1] * 0.2 + bp[2] * 0.2 + bp[3] * 2.0 + bp[4] * 0.1,
-        spt: 100 + bp[0] * -0.3 + bp[1] * -0.1 + bp[2] * 0.2 + bp[3] * -0.1 + bp[4] * 0.8,
-        rec: 100 + bp[0] * 0.8 + bp[1] * -0.1 + bp[2] * -0.1 + bp[3] * 0.2 + bp[4] * -0.3,
-      };
-
-      for (const k of Object.keys(stats)) stats[k] = round2(stats[k]);
+      const stats = statsFromBP(bp);
       return { stats, manualCapped, totalLimit, currentUsed };
     }
 
@@ -958,6 +1215,8 @@
 
     function applyPetToInputs(pet) {
       if (!pet) return;
+      isReversedRand = false;
+      document.getElementById('reverseStatus').style.display = 'none';
       document.getElementById('petName').value = pet.name;
       document.getElementById('cardRank').value = String(cardRankFromType(pet.cardType));
 
@@ -1283,6 +1542,12 @@
         document.getElementById('petsFileInput').click();
       });
     }
+
+    document.getElementById('reverseCalcBtn').addEventListener('click', doReverseCalc);
+    document.getElementById('fillObsFromPreviewBtn').addEventListener('click', fillObsFromPreview);
+    document.querySelectorAll('.rand-stat').forEach(el => {
+      el.addEventListener('input', () => { isReversedRand = false; });
+    });
 
     document.querySelectorAll('input, select').forEach(el => {
       el.addEventListener('input', calculateCurrent);
