@@ -3007,6 +3007,8 @@ let historyApiExhausted = false;
 const HISTORY_FEED_PAGE_SIZE = 30;
 let historyChartOpen = false;
 let historyChartUserDismissed = false;
+const EXCHANGE_RATE_DEFAULT = 260;
+const EXCHANGE_RATE_STORAGE_KEY = 'starcg_exchangeRate';
 let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || [];
 let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || [];
 let trackedItems = (() => {
@@ -3172,7 +3174,7 @@ function initMapModal() {
 }
 
 function updateExchangeRateHint() {
-    const rate = parseInt(document.getElementById('exchangeRate').value) || 260;
+    const rate = getExchangeRate();
     const crystal = 1000000 / rate;
     const display = Number.isInteger(crystal)
         ? crystal.toLocaleString()
@@ -3222,14 +3224,11 @@ function initEventListeners() {
     document.getElementById('babyOnlyFilter').addEventListener('change', applyFilters);
     document.getElementById('durabilityFullFilter').addEventListener('change', applyFilters);
     
-    // 匯率變更時重新渲染
-    document.getElementById('exchangeRate').addEventListener('input', () => {
-        updateExchangeRateHint();
-        applyFilters();
-        if (isHistoryTab(currentTab)) {
-            renderHistoryData();
-        }
-    });
+    // 匯率變更時重新渲染並記住設定
+    loadExchangeRate();
+    const exchangeRateEl = document.getElementById('exchangeRate');
+    exchangeRateEl.addEventListener('input', onExchangeRateChange);
+    exchangeRateEl.addEventListener('change', onExchangeRateChange);
     updateExchangeRateHint();
     
     // Tab 切換
@@ -3526,7 +3525,13 @@ function sumPetStats(stats) {
 const PET_RARITY_MAX_ALLOC = { '普': 125, '銀': 127, '金': 129 };
 const PET_RARITY_BASE_ALLOC = { '普': 100, '銀': 102, '金': 104 };
 const PET_GUIDE_JSON_URL = 'https://guide.starcg.net/data/pets.json';
-const PET_JSON_URLS = ['pets-local.json', 'pets.json']; // 自備完整快照，前者優先
+const PET_REPO_RAW = 'https://raw.githubusercontent.com/wodenchen/StarCG/main/';
+const PET_JSON_URLS = [
+    'pets-local.json',
+    'pets.json',
+    PET_REPO_RAW + 'pets-local.json',
+    PET_REPO_RAW + 'pets.json',
+];
 const PET_PROFILES = {};
 const PET_NAME_ALIASES = {}; // 市場名 → 圖鑑名
 let petProfilesLoadPromise = null;
@@ -3604,7 +3609,8 @@ function mergePetNameAliases(aliases, sourceLabel) {
 }
 
 async function fetchPetJson(url, useProxy = false) {
-    const text = useProxy ? await fetchWithProxy(url) : await (await fetch(url, { cache: 'no-store' })).text();
+    const viaProxy = useProxy && !String(url).includes('raw.githubusercontent.com');
+    const text = viaProxy ? await fetchWithProxy(url) : await (await fetch(url, { cache: 'no-store' })).text();
     return JSON.parse(text);
 }
 
@@ -3621,7 +3627,9 @@ function mergePetGuideEntriesFillOnly(pets, sourceLabel) {
 }
 
 async function loadPetJsonSource(url) {
-    const data = await fetchPetJson(url, false);
+    const isRemote = String(url).startsWith('http');
+    const resolved = isRemote ? url : new URL(url, location.href).href;
+    const data = await fetchPetJson(resolved, isRemote);
     let n = 0;
     if (Array.isArray(data)) {
         n += mergePetGuideEntries(data, url);
@@ -4492,8 +4500,32 @@ function getHistoryEmptyMessage() {
     return '無符合條件的成交紀錄';
 }
 
+function getExchangeRate() {
+    return parseInt(document.getElementById('exchangeRate').value, 10) || EXCHANGE_RATE_DEFAULT;
+}
+
 function getHistoryExchangeRate() {
-    return parseInt(document.getElementById('exchangeRate').value, 10) || 260;
+    return getExchangeRate();
+}
+
+function loadExchangeRate() {
+    const saved = localStorage.getItem(EXCHANGE_RATE_STORAGE_KEY);
+    if (saved == null) return;
+    const n = parseInt(saved, 10);
+    if (n >= 1) document.getElementById('exchangeRate').value = n;
+}
+
+function saveExchangeRate() {
+    localStorage.setItem(EXCHANGE_RATE_STORAGE_KEY, String(getExchangeRate()));
+}
+
+function onExchangeRateChange() {
+    saveExchangeRate();
+    updateExchangeRateHint();
+    applyFilters();
+    if (isHistoryTab(currentTab)) {
+        renderHistoryData();
+    }
 }
 
 /** 跨幣別排序用：換算成魔晶等值；單一幣別篩選時維持原價 */
@@ -5231,7 +5263,7 @@ function renderMarketTable(items) {
         }
     });
     
-    const rate = parseInt(document.getElementById('exchangeRate').value) || 300;
+    const rate = getExchangeRate();
     
     tbody.innerHTML = Object.values(merged).map(item => {
         // 計算換算價格
@@ -5406,7 +5438,7 @@ function simplifyData(data) {
 
 function updateStats(items) {
     const currency = marketPriceUnit;
-    const rate = parseInt(document.getElementById('exchangeRate').value) || 260;
+    const rate = getExchangeRate();
     
     if (currency === 'all') {
         // 分別計算兩種幣種的數量
