@@ -575,11 +575,11 @@
             <tbody>
               <tr>
                 <td class="row-label">原始檔次</td>
-                <td><input class="base-stat" type="number" value="30"></td>
-                <td><input class="base-stat" type="number" value="35"></td>
-                <td><input class="base-stat" type="number" value="30"></td>
-                <td><input class="base-stat" type="number" value="25"></td>
-                <td><input class="base-stat" type="number" value="20"></td>
+              <td><input class="base-stat" type="number" step="0.01" value="30"></td>
+              <td><input class="base-stat" type="number" step="0.01" value="35"></td>
+              <td><input class="base-stat" type="number" step="0.01" value="30"></td>
+              <td><input class="base-stat" type="number" step="0.01" value="25"></td>
+              <td><input class="base-stat" type="number" step="0.01" value="20"></td>
               </tr>
               <tr>
                 <td class="row-label">掉檔</td>
@@ -696,6 +696,15 @@
     const PET_IMAGE_BASE = 'https://guide.starcg.net/pet/';
     const STAT_NAMES = ['體', '力', '強', '速', '魔'];
     const BP_INITIAL_RATE = 0.2; // 官方固定：檔次→1等BP 係數
+
+    function round2(n) {
+      return Math.round((Number(n) || 0) * 100) / 100;
+    }
+
+    function fmtStat(n) {
+      const v = round2(n);
+      return v.toFixed(2).replace(/\.?0+$/, '') || '0';
+    }
 
     let allPets = [];
     let filteredPets = [];
@@ -898,7 +907,7 @@
         rec: 100 + bp[0] * 0.8 + bp[1] * -0.1 + bp[2] * -0.1 + bp[3] * 0.2 + bp[4] * -0.3,
       };
 
-      for (const k of Object.keys(stats)) stats[k] = Math.floor(stats[k]);
+      for (const k of Object.keys(stats)) stats[k] = round2(stats[k]);
       return { stats, manualCapped, totalLimit, currentUsed };
     }
 
@@ -907,7 +916,7 @@
       const { stats } = calculateStats(data);
       document.querySelectorAll('#preview .v').forEach(el => {
         const k = el.dataset.k;
-        el.textContent = stats[k];
+        el.textContent = fmtStat(stats[k]);
       });
     }
 
@@ -958,10 +967,10 @@
 
       if (isMaxStar && target > 0 && missing > 0) {
         const add = missing / 5;
-        bases = bases.map(v => Number.isInteger(add) ? v + add : parseFloat((v + add).toFixed(1)));
+        bases = bases.map(v => round2(v + add));
       }
 
-      document.querySelectorAll('.base-stat').forEach((input, i) => { input.value = bases[i]; });
+      document.querySelectorAll('.base-stat').forEach((input, i) => { input.value = fmtStat(bases[i]); });
       document.querySelectorAll('.lost-stat').forEach(input => { input.value = 0; });
       document.querySelectorAll('.rand-stat').forEach(input => { input.value = 2; });
 
@@ -1084,12 +1093,14 @@
         if (pet.id === basePetId) tr.classList.add('highlight');
 
         const cell = (val, key) => {
-          let html = `<span>${val}</span>`;
+          const text = fmtStat(val);
+          let html = `<span>${text}</span>`;
           if (basePet && basePet.id !== pet.id && pet.stats[key] != null) {
-            const diff = val - basePet.stats[key];
+            const diff = round2(val - basePet.stats[key]);
             if (diff !== 0) {
               const cls = diff > 0 ? 'diff-pos' : 'diff-neg';
-              html += `<br><span class="${cls}">(${diff > 0 ? '+' : ''}${diff})</span>`;
+              const sign = diff > 0 ? '+' : '';
+              html += `<br><span class="${cls}">(${sign}${fmtStat(diff)})</span>`;
             }
           }
           return html;
@@ -1179,7 +1190,8 @@
       comparisonList.forEach(p => {
         rows.push([
           p.name, p.level,
-          p.stats.hp, p.stats.mp, p.stats.atk, p.stats.def, p.stats.agi, p.stats.spt, p.stats.rec,
+          fmtStat(p.stats.hp), fmtStat(p.stats.mp), fmtStat(p.stats.atk), fmtStat(p.stats.def),
+          fmtStat(p.stats.agi), fmtStat(p.stats.spt), fmtStat(p.stats.rec),
           p.modInfo,
           `${p.lostLabel || ''} ${p.allocLabel || ''}`.trim(),
         ]);
