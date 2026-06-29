@@ -67,6 +67,23 @@
       font-weight: 700;
       color: #6b5a45;
     }
+    .header-nav {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 14px;
+    }
+    .header-link {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .header-link:hover {
+      color: #8b6914;
+      text-decoration: underline;
+    }
     header p {
       flex: 1 1 100%;
       margin: 0;
@@ -601,6 +618,9 @@
   <div class="wrap">
     <header>
       <h1>🐾 寵物成長模擬器</h1>
+      <nav class="header-nav" aria-label="站內工具">
+        <a href="StarCG_PriceChecker.html" class="header-link">⭐ 市場查價器</a>
+      </nav>
     </header>
 
     <div id="loadBar" class="load-bar">⏳ 正在載入寵物圖鑑…</div>
