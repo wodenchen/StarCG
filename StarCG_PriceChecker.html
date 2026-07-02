@@ -2982,6 +2982,8 @@ if (['localhost', '127.0.0.1'].includes(location.hostname)) {
     CORS_PROXIES.unshift({ prefix: '/proxy?u=', encode: true });
 }
 let currentProxyIndex = 0;
+let marketSearchToken = 0;
+let historyLoadToken = 0;
 
 function looksLikeJson(text) {
     const t = text.trim();
@@ -3008,6 +3010,22 @@ const HISTORY_PAGE_CONCURRENCY = 6;
 const HISTORY_FETCH_INITIAL_PAGES = 6;
 const HISTORY_FETCH_BATCH_PAGES = 18;
 const HISTORY_SESSION_TTL_MS = 3 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 22000;
+
+async function fetchWithTimeout(resource, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        return await fetch(resource, { ...options, signal: controller.signal });
+    } catch (err) {
+        if (err.name === 'AbortError') {
+            throw new Error(`連線逾時（${Math.round(timeoutMs / 1000)} 秒）`);
+        }
+        throw err;
+    } finally {
+        clearTimeout(timer);
+    }
+}
 
 // 嘗試 fetch，失敗則換下一個 proxy
 async function fetchWithProxy(targetUrl) {
@@ -3022,7 +3040,7 @@ async function fetchWithProxy(targetUrl) {
         const url = proxy.prefix + (proxy.encode ? encodeURIComponent(urlWithCache) : urlWithCache);
         
         try {
-            const resp = await fetch(url, { cache: 'no-store' });
+            const resp = await fetchWithTimeout(url, { cache: 'no-store' });
             const text = await resp.text();
             
             // 檢查是否為錯誤回應（含 PHP/HTML 錯誤頁）
@@ -3373,13 +3391,15 @@ function addTag(tag) {
 async function searchMarket() {
     const keyword = document.getElementById('searchInput').value.trim();
     if (!keyword) return alert('請輸入搜尋關鍵字');
+
+    const token = ++marketSearchToken;
+    const searchBtn = document.getElementById('searchBtn');
+    searchBtn.disabled = true;
     lastSearchKeyword = keyword;
-    
-    showLoading(true, '正在載入寵物圖鑑…');
-    await loadPetProfilesFromGuide();
+
     showLoading(true, '正在連線搜尋…');
     hideAll();
-    
+
     allHistoryLogs = [];
     lastHistoryKeyword = '';
     historyCacheKey = '';
@@ -3398,29 +3418,38 @@ async function searchMarket() {
         historyChartBtn.textContent = '📈 走勢圖';
         historyChartBtn.disabled = true;
     }
-    
+
     const exactSearch = document.getElementById('exactSearchFilter').checked;
     let marketShown = false;
     try {
         allMarketItems = [];
-        await fetchMarketData(keyword, {
-            exact: exactSearch,
-            onProgress(page, totalPages, count) {
-                showLoading(true, `載入第 ${page}/${totalPages} 頁…（已找到 ${count} 筆）`);
-            },
-            onPartial(newItems) {
-                allMarketItems.push(...newItems);
-                if (!marketShown && allMarketItems.length > 0) {
-                    marketShown = true;
-                    addTag(keyword);
-                    document.getElementById('tabsContainer').style.display = 'flex';
-                    switchTab('market');
-                    document.getElementById('emptyState').style.display = 'none';
+        await Promise.all([
+            loadPetProfilesFromGuide().catch(err => {
+                console.warn('[寵物圖鑑] 搜尋時載入略過', err);
+            }),
+            fetchMarketData(keyword, {
+                exact: exactSearch,
+                onProgress(page, totalPages, count) {
+                    if (token !== marketSearchToken) return;
+                    showLoading(true, `載入第 ${page}/${totalPages} 頁…（已找到 ${count} 筆）`);
+                },
+                onPartial(newItems) {
+                    if (token !== marketSearchToken) return;
+                    allMarketItems.push(...newItems);
+                    if (!marketShown && allMarketItems.length > 0) {
+                        marketShown = true;
+                        addTag(keyword);
+                        document.getElementById('tabsContainer').style.display = 'flex';
+                        switchTab('market');
+                        document.getElementById('emptyState').style.display = 'none';
+                    }
+                    if (marketShown) applyFilters();
                 }
-                if (marketShown) applyFilters();
-            }
-        });
-        
+            })
+        ]);
+
+        if (token !== marketSearchToken) return;
+
         if (allMarketItems.length > 0) {
             if (!marketShown) {
                 addTag(keyword);
@@ -3432,6 +3461,7 @@ async function searchMarket() {
             showEmpty('找不到符合的物品');
         }
     } catch (err) {
+        if (token !== marketSearchToken) return;
         console.error(err);
         const hint = location.protocol === 'file:'
             ? '\n\n你目前用 file:// 開啟，請改執行 python proxy.py 後用 http://localhost:8000/ 開啟。'
@@ -3439,7 +3469,10 @@ async function searchMarket() {
         alert('搜尋失敗：' + (err.message || '請稍後再試') + hint);
         showEmpty('搜尋失敗');
     } finally {
-        showLoading(false);
+        if (token === marketSearchToken) {
+            showLoading(false);
+            searchBtn.disabled = false;
+        }
     }
 }
 
@@ -3658,7 +3691,9 @@ function mergePetNameAliases(aliases, sourceLabel) {
 
 async function fetchPetJson(url, useProxy = false) {
     const viaProxy = useProxy && !String(url).includes('raw.githubusercontent.com');
-    const text = viaProxy ? await fetchWithProxy(url) : await (await fetch(url, { cache: 'no-store' })).text();
+    const text = viaProxy
+        ? await fetchWithProxy(url)
+        : await (await fetchWithTimeout(url, { cache: 'no-store' })).text();
     return JSON.parse(text);
 }
 
@@ -4030,16 +4065,40 @@ async function fetchMarketData(keyword, callbacks = {}) {
     onPartial?.(first.items);
     onProgress?.(1, totalPages, items.length);
 
+    const fetchPage = p => fetchMarketPage(keyword, p, normalizedKeyword, exact);
+    const mergePageResult = pg => {
+        items.push(...pg.items);
+        onPartial?.(pg.items);
+    };
+
     for (let start = 2; start <= totalPages; start += MARKET_PAGE_CONCURRENCY) {
         const pageNums = [];
         for (let p = start; p < start + MARKET_PAGE_CONCURRENCY && p <= totalPages; p++) {
             pageNums.push(p);
         }
-        const pages = await Promise.all(pageNums.map(p => fetchMarketPage(keyword, p, normalizedKeyword, exact)));
-        for (const pg of pages) {
-            items.push(...pg.items);
-            onPartial?.(pg.items);
+
+        let results = await Promise.allSettled(pageNums.map(fetchPage));
+        const retryPages = [];
+        results.forEach((result, i) => {
+            if (result.status === 'fulfilled') {
+                mergePageResult(result.value);
+            } else {
+                retryPages.push(pageNums[i]);
+                console.warn(`市場第 ${pageNums[i]} 頁失敗`, result.reason);
+            }
+        });
+
+        if (retryPages.length) {
+            results = await Promise.allSettled(retryPages.map(fetchPage));
+            results.forEach((result, i) => {
+                if (result.status === 'fulfilled') {
+                    mergePageResult(result.value);
+                } else {
+                    console.warn(`市場第 ${retryPages[i]} 頁重試仍失敗`, result.reason);
+                }
+            });
         }
+
         onProgress?.(Math.min(start + MARKET_PAGE_CONCURRENCY - 1, totalPages), totalPages, items.length);
     }
 
@@ -4690,6 +4749,7 @@ async function loadHistoryTab(force = false) {
         }
     }
 
+    const token = ++historyLoadToken;
     showLoading(true, '載入歷史成交…');
     document.getElementById('historySection').style.display = 'none';
     document.getElementById('emptyState').style.display = 'none';
@@ -4700,9 +4760,11 @@ async function loadHistoryTab(force = false) {
             append: false,
             maxPages: HISTORY_FETCH_INITIAL_PAGES,
             onProgress(page, totalPages, count) {
+                if (token !== historyLoadToken) return;
                 showLoading(true, `載入歷史第 ${page}/${totalPages} 頁…（${count} 筆）`);
             },
             onPartial(logsSoFar) {
+                if (token !== historyLoadToken) return;
                 allHistoryLogs = logsSoFar;
                 if (!historyShown && allHistoryLogs.length > 0) {
                     historyShown = true;
@@ -4713,6 +4775,9 @@ async function loadHistoryTab(force = false) {
                 if (historyShown) renderHistoryData();
             }
         });
+
+        if (token !== historyLoadToken) return false;
+
         lastHistoryKeyword = keyword;
         historyCacheKey = cacheKey;
         historyDisplayPage = 1;
@@ -4730,12 +4795,15 @@ async function loadHistoryTab(force = false) {
         showEmpty('找不到歷史成交記錄（近 30 天）');
         return false;
     } catch (err) {
+        if (token !== historyLoadToken) return false;
         console.error(err);
         alert('搜尋失敗，請稍後再試或檢查網路連線');
         showEmpty('搜尋歷史失敗');
         return false;
     } finally {
-        showLoading(false);
+        if (token === historyLoadToken) {
+            showLoading(false);
+        }
     }
 }
 
