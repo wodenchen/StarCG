@@ -4405,13 +4405,18 @@ function getHistoryKeywordMatchedLogs(logs) {
     return logs.filter(l => marketNameMatches(normalizeStr(l.item), nk, exact));
 }
 
+function historyListingPrice(netPrice, pricetype) {
+    const rate = pricetype === 1 ? 0.94 : 0.9;
+    return Math.ceil(Number(netPrice) / rate);
+}
+
 function parseHistoryLogEntry(log) {
     const apiItemName = String(log.item_name || '').trim();
     const apiQty = Math.max(1, parseInt(log.qty, 10) || 1);
     if (apiItemName) {
         const unitPrice = log.unit_price != null
-            ? Math.ceil(Number(log.unit_price))
-            : Math.ceil(Math.ceil(log.price / (log.pricetype === 1 ? 0.94 : 0.9)) / apiQty);
+            ? historyListingPrice(log.unit_price, log.pricetype)
+            : Math.ceil(historyListingPrice(log.price, log.pricetype) / apiQty);
         return {
             item: apiItemName,
             price: unitPrice,
@@ -4434,8 +4439,7 @@ function parseHistoryLogEntry(log) {
     }
     itemName = itemName.trim();
 
-    const originalTotalPrice = Math.ceil(log.price / (log.pricetype === 1 ? 0.94 : 0.9));
-    const unitPrice = Math.ceil(originalTotalPrice / quantity);
+    const unitPrice = Math.ceil(historyListingPrice(log.price, log.pricetype) / quantity);
     return {
         item: itemName,
         price: unitPrice,
