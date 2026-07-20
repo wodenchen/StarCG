@@ -3337,7 +3337,7 @@ const PET_SCAN_MAX_PAGES = 100;
 const PET_GUIDE_LOAD_TIMEOUT_MS = 15000;
 const MARKET_PAGE_CONCURRENCY = 4;
 const HISTORY_PAGE_CONCURRENCY = 6;
-const HISTORY_FETCH_INITIAL_PAGES = 6;
+const HISTORY_FETCH_INITIAL_PAGES = 1;
 const HISTORY_FETCH_BATCH_PAGES = 18;
 const HISTORY_SESSION_TTL_MS = 3 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 22000;
@@ -4775,29 +4775,42 @@ function getTrackedUpdatedMeta(lastUpdated) {
 
 async function fetchTrackedHistory(keyword, type = 'all', maxPages = TRACKED_HISTORY_PAGES, hours = TRACKED_HISTORY_HOURS) {
     const logs = [];
+    const seenKeys = buildHistorySeenKeys(logs);
     const timeRange = hours * 60 * 60 * 1000;
     const now = Date.now();
     let page = 1;
+    let apiLastPage = null;
 
-    while (page <= maxPages) {
+    while (page <= maxPages && (apiLastPage == null || page <= apiLastPage)) {
         const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=${encodeURIComponent(type)}&page=${page}&search=${encodeSearchParam(keyword)}`;
         const text = await fetchWithProxy(targetUrl);
         const data = parseJsonResponse(text, '追蹤歷史成交');
 
         if (!data.logs || data.logs.length === 0) break;
+        if (apiLastPage == null) {
+            apiLastPage = getHistoryApiLastPage({
+                totalFiltered: data.totalFiltered ?? data.totalFilteredRaw,
+                perPage: data.perPage
+            });
+        }
 
         let stop = false;
+        let added = 0;
         for (const log of data.logs) {
-            const logTime = new Date(log.time_text).getTime();
+            const logTime = resolveHistoryTimestamp(log);
+            if (logTime == null) continue;
             if (now - logTime > timeRange) {
                 stop = true;
                 break;
             }
-
+            const key = historyLogDedupeKey(log);
+            if (seenKeys.has(key)) continue;
+            seenKeys.add(key);
             logs.push(parseHistoryLogEntry(log));
+            added++;
         }
 
-        if (stop) break;
+        if (stop || added === 0) break;
         page++;
     }
 
@@ -5027,7 +5040,55 @@ function getHistoryCacheKey(keyword) {
 }
 
 function getHistorySessionStorageKey(keyword) {
-    return `starcg_hist_v1_${keyword}`;
+    return `starcg_hist_v3_${keyword}`;
+}
+
+function historyLogDedupeKey(rawLog) {
+    if (rawLog?.id != null) return `id:${rawLog.id}`;
+    const name = rawLog?.item_name || rawLog?.buff || '';
+    return `t:${rawLog?.time_text}|p:${rawLog?.price}|pt:${rawLog?.pricetype}|n:${name}`;
+}
+
+function historyEntryDedupeKey(entry) {
+    if (entry?.id != null) return `id:${entry.id}`;
+    return `t:${entry.time}|p:${entry.price}|pt:${entry.pricetype}|q:${entry.quantity}|n:${entry.item}`;
+}
+
+function buildHistorySeenKeys(logs) {
+    const seen = new Set();
+    for (const entry of logs) seen.add(historyEntryDedupeKey(entry));
+    return seen;
+}
+
+function dedupeHistoryLogs(logs) {
+    const seen = new Set();
+    const out = [];
+    for (const entry of logs) {
+        const key = historyEntryDedupeKey(entry);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(entry);
+    }
+    return ensureHistoryLogTimestamps(out);
+}
+
+function appendRawHistoryLogs(logs, rawLogs, seenKeys) {
+    let added = 0;
+    for (const raw of rawLogs) {
+        const key = historyLogDedupeKey(raw);
+        if (seenKeys.has(key)) continue;
+        seenKeys.add(key);
+        logs.push(parseHistoryLogEntry(raw));
+        added++;
+    }
+    return added;
+}
+
+function getHistoryApiLastPage(meta) {
+    const total = meta?.totalFiltered ?? 0;
+    const perPage = meta?.perPage || 50;
+    if (total <= 0) return 1;
+    return Math.max(1, Math.ceil(total / perPage));
 }
 
 function loadHistorySessionCache(keyword) {
@@ -5037,6 +5098,7 @@ function loadHistorySessionCache(keyword) {
         const parsed = JSON.parse(raw);
         if (!parsed?.ts || Date.now() - parsed.ts > HISTORY_SESSION_TTL_MS) return null;
         if (!Array.isArray(parsed.logs)) return null;
+        parsed.logs = dedupeHistoryLogs(parsed.logs);
         return parsed;
     } catch {
         return null;
@@ -5059,8 +5121,8 @@ function filterByHistoryDisplayRange(logs) {
     if (!days) return logs;
     const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
     return logs.filter(l => {
-        const ts = parseHistoryLogTime(l.time);
-        return ts == null || ts >= cutoff;
+        const ts = getHistoryLogTimestamp(l);
+        return ts != null && ts >= cutoff;
     });
 }
 
@@ -5090,10 +5152,12 @@ function parseHistoryLogEntry(log) {
             ? historyListingPrice(log.unit_price, log.pricetype)
             : Math.ceil(historyListingPrice(log.price, log.pricetype) / apiQty);
         return {
+            id: log.id ?? null,
             item: apiItemName,
             price: unitPrice,
             pricetype: log.pricetype,
             time: log.time_text,
+            ts: resolveHistoryTimestamp(log),
             quantity: apiQty
         };
     }
@@ -5113,17 +5177,53 @@ function parseHistoryLogEntry(log) {
 
     const unitPrice = Math.ceil(historyListingPrice(log.price, log.pricetype) / quantity);
     return {
+        id: log.id ?? null,
         item: itemName,
         price: unitPrice,
         pricetype: log.pricetype,
         time: log.time_text,
+        ts: resolveHistoryTimestamp(log),
         quantity
     };
 }
 
 function parseHistoryLogTime(timeStr) {
-    const ts = new Date(timeStr).getTime();
+    if (timeStr == null || timeStr === '') return null;
+    const s = String(timeStr).trim();
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+    if (m) {
+        const ts = new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0)).getTime();
+        return Number.isNaN(ts) ? null : ts;
+    }
+    const ts = new Date(s).getTime();
     return Number.isNaN(ts) ? null : ts;
+}
+
+function normalizeHistoryUnixMs(value) {
+    const n = Number(value);
+    if (Number.isNaN(n) || n <= 0) return null;
+    return n < 1e12 ? n * 1000 : n;
+}
+
+function resolveHistoryTimestamp(source) {
+    if (!source) return null;
+    const fromTs = normalizeHistoryUnixMs(source.ts);
+    if (fromTs != null) return fromTs;
+    const fromTime = normalizeHistoryUnixMs(source.time);
+    if (fromTime != null) return fromTime;
+    return parseHistoryLogTime(source.time_text ?? source.time);
+}
+
+function getHistoryLogTimestamp(log) {
+    return resolveHistoryTimestamp(log);
+}
+
+function ensureHistoryLogTimestamps(logs) {
+    return logs.map(l => {
+        const ts = getHistoryLogTimestamp(l);
+        if (ts == null) return l;
+        return l.ts === ts ? l : { ...l, ts };
+    });
 }
 
 function initHistoryFilters() {
@@ -5261,22 +5361,23 @@ function getHistoryComparablePrice(log) {
 
 function applyHistorySort(logs) {
     const sorted = [...logs];
+    const tsOf = l => getHistoryLogTimestamp(l) ?? 0;
     switch (historySort) {
         case 'time_asc':
-            sorted.sort((a, b) => new Date(a.time) - new Date(b.time));
+            sorted.sort((a, b) => tsOf(a) - tsOf(b));
             break;
         case 'price_desc':
             sorted.sort((a, b) =>
                 getHistoryComparablePrice(b) - getHistoryComparablePrice(a)
-                || new Date(b.time) - new Date(a.time));
+                || tsOf(b) - tsOf(a));
             break;
         case 'price_asc':
             sorted.sort((a, b) =>
                 getHistoryComparablePrice(a) - getHistoryComparablePrice(b)
-                || new Date(b.time) - new Date(a.time));
+                || tsOf(b) - tsOf(a));
             break;
         default:
-            sorted.sort((a, b) => new Date(b.time) - new Date(a.time));
+            sorted.sort((a, b) => tsOf(b) - tsOf(a));
     }
     return sorted;
 }
@@ -5315,8 +5416,8 @@ function buildHistoryPriceHtml(log) {
 }
 
 function formatRelativeTime(timeStr) {
-    const ts = new Date(timeStr).getTime();
-    if (Number.isNaN(ts)) return timeStr;
+    const ts = parseHistoryLogTime(timeStr);
+    if (ts == null) return timeStr;
     const diff = Date.now() - ts;
     const mins = Math.floor(diff / 60000);
     if (mins < 1) return '剛剛';
@@ -5341,6 +5442,7 @@ async function loadHistoryTab(force = false) {
 
     const cacheKey = getHistoryCacheKey(keyword);
     if (!force && cacheKey === historyCacheKey && allHistoryLogs.length > 0) {
+        allHistoryLogs = dedupeHistoryLogs(allHistoryLogs);
         renderHistoryData();
         return true;
     }
@@ -5445,32 +5547,44 @@ async function fetchHistoryPage(keyword, page) {
     const targetUrl = `${API_HISTORY_BASE}?ajax=1&type=all&page=${page}&search=${encodeSearchParam(keyword)}`;
     const text = await fetchWithProxy(targetUrl);
     const data = parseJsonResponse(text, '歷史成交');
-    return { page, logs: data.logs || [] };
+    return {
+        page,
+        logs: data.logs || [],
+        totalFiltered: data.totalFiltered ?? data.totalFilteredRaw ?? 0,
+        perPage: data.perPage || 50
+    };
 }
 
 async function fetchHistoryData(keyword, { append = false, maxPages = HISTORY_FETCH_BATCH_PAGES, onProgress, onPartial } = {}) {
-    const logs = append ? [...allHistoryLogs] : [];
+    const logs = append ? dedupeHistoryLogs([...allHistoryLogs]) : [];
+    const seenKeys = buildHistorySeenKeys(logs);
     if (!append) {
         historyLastFetchedPage = 0;
         historyApiExhausted = false;
     }
 
     const startPage = append ? historyLastFetchedPage + 1 : 1;
-    const endPage = Math.min(startPage + maxPages - 1, 100);
+    let endPage = Math.min(startPage + maxPages - 1, 100);
+    let apiLastPage = null;
     const poolMaxMs = HISTORY_RANGE_DAYS['30d'] * 24 * 60 * 60 * 1000;
     const now = Date.now();
 
     for (let batchStart = startPage; batchStart <= endPage; batchStart += HISTORY_PAGE_CONCURRENCY) {
+        if (apiLastPage != null && batchStart > apiLastPage) break;
+
         const pageNums = [];
         for (let p = batchStart; p < batchStart + HISTORY_PAGE_CONCURRENCY && p <= endPage; p++) {
+            if (apiLastPage != null && p > apiLastPage) break;
             pageNums.push(p);
         }
+        if (!pageNums.length) break;
 
         const pages = await Promise.all(pageNums.map(p => fetchHistoryPage(keyword, p)));
         pages.sort((a, b) => a.page - b.page);
 
         let stopByAge = false;
         let hitEmpty = false;
+        let hitDuplicate = false;
 
         for (const pg of pages) {
             if (!pg.logs.length) {
@@ -5478,15 +5592,26 @@ async function fetchHistoryData(keyword, { append = false, maxPages = HISTORY_FE
                 continue;
             }
 
+            if (apiLastPage == null) {
+                apiLastPage = getHistoryApiLastPage(pg);
+                endPage = Math.min(endPage, apiLastPage);
+            }
+
             historyLastFetchedPage = Math.max(historyLastFetchedPage, pg.page);
 
-            for (const log of pg.logs) {
-                const logTime = parseHistoryLogTime(log.time_text);
+            const inRangeLogs = pg.logs.filter(log => {
+                const logTime = resolveHistoryTimestamp(log);
                 if (logTime != null && now - logTime > poolMaxMs) {
                     stopByAge = true;
-                    continue;
+                    return false;
                 }
-                logs.push(parseHistoryLogEntry(log));
+                return true;
+            });
+
+            const added = appendRawHistoryLogs(logs, inRangeLogs, seenKeys);
+            if (pg.logs.length > 0 && added === 0) {
+                hitDuplicate = true;
+                break;
             }
         }
 
@@ -5497,13 +5622,13 @@ async function fetchHistoryData(keyword, { append = false, maxPages = HISTORY_FE
             logs.length
         );
 
-        if (stopByAge || hitEmpty) {
+        if (stopByAge || hitEmpty || hitDuplicate) {
             historyApiExhausted = true;
             break;
         }
     }
 
-    return logs;
+    return dedupeHistoryLogs(logs);
 }
 
 function renderHistorySummaryBar(logs) {
@@ -5577,7 +5702,8 @@ function renderHistoryFeed(logs) {
 
     if (countEl) {
         const rangeLabel = HISTORY_RANGE_SEGS.find(([v]) => v === historyRange)?.[1] || historyRange;
-        countEl.textContent = `成交紀錄：${logs.length} 筆（近 ${rangeLabel}）${historyLastFetchedPage ? ` · 資料池 ${historyLastFetchedPage} 頁` : ''}`;
+        const matchedAll = getHistoryKeywordMatchedLogs(allHistoryLogs);
+        countEl.textContent = `近 ${rangeLabel} ${logs.length} 筆 / 關鍵字池 ${matchedAll.length} 筆${historyLastFetchedPage ? ` · 已抓 ${historyLastFetchedPage} 頁` : ''}`;
     }
 
     if (pageLogs.length === 0) {
