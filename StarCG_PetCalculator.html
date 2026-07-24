@@ -554,6 +554,25 @@
       background: var(--accent-gold);
       border-color: #a08058;
     }
+    .compare-grade {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      vertical-align: baseline;
+    }
+    .compare-grade.perfect { background: #dcfce7; color: #166534; }
+    .compare-grade.lost { background: #fef3c7; color: #92400e; }
+    .compare-meta {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: 18px;
+      margin-top: 2px;
+      line-height: 1.45;
+      white-space: normal;
+    }
 
     .load-bar {
       padding: 12px 16px;
@@ -2171,11 +2190,50 @@
       return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    function sumLostStats(lostArr) {
+      return (lostArr || []).reduce((s, v) => s + (Number(v) || 0), 0);
+    }
+
+    function buildLostLabelFromArray(lostArr) {
+      return (lostArr || []).map((v, i) => v !== 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ');
+    }
+
+    function lostTotalFromLabel(lostLabel) {
+      if (!lostLabel) return 0;
+      let sum = 0;
+      for (const ch of STAT_NAMES) {
+        const m = lostLabel.match(new RegExp(`(\\d+)${ch}`));
+        if (m) sum += Number(m[1]);
+      }
+      return sum;
+    }
+
+    function getCompareLostMeta(pet) {
+      const lostArr = Array.isArray(pet.lost) ? pet.lost : null;
+      const lostTotal = pet.lostTotal != null
+        ? pet.lostTotal
+        : lostArr
+          ? sumLostStats(lostArr)
+          : lostTotalFromLabel(pet.lostLabel);
+      const lostDetail = pet.lostLabel || (lostArr ? buildLostLabelFromArray(lostArr) : '');
+      const lostText = lostTotal === 0
+        ? '滿檔'
+        : lostDetail
+          ? `掉${lostTotal}檔（${lostDetail}）`
+          : `掉${lostTotal}檔`;
+      return { lostTotal, lostText };
+    }
+
+    function formatCompareAllocLabel(allocLabel) {
+      return allocLabel ? `配 ${allocLabel}` : '配 0';
+    }
+
     function addToComparison() {
       const data = getInputs();
       const { stats, manualCapped } = calculateStats(data, false);
       const allocLabel = manualCapped.map((v, i) => v > 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ');
       const lostLabel = data.lost.map((v, i) => v !== 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ');
+      const lostTotal = sumLostStats(data.lost);
 
       comparisonList.push({
         id: Date.now() + Math.random(),
@@ -2183,6 +2241,8 @@
         level: data.level,
         stats,
         modInfo: data.cardRank > 0 ? `${data.modGrade}改` : '無',
+        lost: [...data.lost],
+        lostTotal,
         allocLabel,
         lostLabel,
       });
@@ -2285,11 +2345,19 @@
           return html;
         };
 
+        const { lostTotal, lostText } = getCompareLostMeta(pet);
+        const allocText = formatCompareAllocLabel(pet.allocLabel);
+        const gradeClass = lostTotal === 0 ? 'perfect' : 'lost';
+
         tr.innerHTML = `
           <td style="text-align:left">
             <span class="base-dot ${pet.id === basePetId ? 'active' : ''}"></span>
-            <strong>${pet.name}</strong><br>
-            <span style="font-size:0.78rem;color:var(--muted);margin-left:18px">${pet.modInfo}</span>
+            <strong>${escapeHtml(pet.name)}</strong>
+            <span class="compare-meta">
+              ${escapeHtml(pet.modInfo)}
+              · <span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>
+              · ${escapeHtml(allocText)}
+            </span>
           </td>
           <td>${pet.level}</td>
           <td>${cell(pet.stats.hp, 'hp')}</td>
@@ -2299,7 +2367,10 @@
           <td>${cell(pet.stats.agi, 'agi')}</td>
           <td>${cell(pet.stats.rec, 'rec')}</td>
           <td>${cell(pet.stats.spt, 'spt')}</td>
-          <td style="font-size:0.82rem">${pet.lostLabel ? `掉：${pet.lostLabel} ` : ''}${pet.allocLabel ? `配：${pet.allocLabel}` : '配：0'}</td>
+          <td style="font-size:0.82rem;white-space:normal;min-width:88px">
+            <span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>
+            <br>${escapeHtml(allocText)}
+          </td>
           <td>
             <div class="compare-ops">
               <span class="drag-handle" draggable="true" title="拖曳調整順序">⋮⋮</span>
@@ -2365,14 +2436,16 @@
         alert('比較清單為空');
         return;
       }
-      const rows = [['名稱', '等級', 'HP', 'MP', '攻擊', '防禦', '敏捷', '回復', '精神', '備註', '配點']];
+      const rows = [['名稱', '等級', 'HP', 'MP', '攻擊', '防禦', '敏捷', '回復', '精神', '改造', '檔次', '配點']];
       comparisonList.forEach(p => {
+        const { lostText } = getCompareLostMeta(p);
         rows.push([
           p.name, p.level,
           fmtStat(p.stats.hp), fmtStat(p.stats.mp), fmtStat(p.stats.atk), fmtStat(p.stats.def),
           fmtStat(p.stats.agi), fmtStat(p.stats.rec), fmtStat(p.stats.spt),
           p.modInfo,
-          `${p.lostLabel || ''} ${p.allocLabel || ''}`.trim(),
+          lostText,
+          p.allocLabel || '0',
         ]);
       });
       const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
