@@ -564,6 +564,8 @@
     }
     .compare-grade.perfect { background: #dcfce7; color: #166534; }
     .compare-grade.lost { background: #fef3c7; color: #92400e; }
+    .compare-grade.star { background: #dbeafe; color: #1e40af; }
+    .compare-grade.star-max { background: #fef3c7; color: #92400e; }
     .compare-meta {
       display: block;
       font-size: 0.78rem;
@@ -982,6 +984,10 @@
     const REVERSE_EVAL_STORAGE_KEY = 'starcg_reverseEvalList';
     const LOCK_MANUAL_STORAGE_KEY = 'starcg_lockManual';
     const REVERSE_PARAMS_STORAGE_KEY = 'starcg_reverseParams';
+    /** 官方圖鑑勘誤 */
+    const PET_DATA_OVERRIDES = {
+      '碧藍龍舟': { cardTier: '銀' },
+    };
 
     function round2(n) {
       return Math.round((Number(n) || 0) * 100) / 100;
@@ -1091,6 +1097,63 @@
       if (cardType.includes('銀')) return 127;
       if (cardType.includes('普')) return 125;
       return 0;
+    }
+
+    function cardBaseTotal(cardTypeOrRank) {
+      if (typeof cardTypeOrRank === 'number') {
+        if (cardTypeOrRank === 8) return 104;
+        if (cardTypeOrRank === 7) return 102;
+        if (cardTypeOrRank === 6) return 100;
+        return 0;
+      }
+      const cardType = String(cardTypeOrRank || '');
+      if (cardType.includes('金')) return 104;
+      if (cardType.includes('銀')) return 102;
+      if (cardType.includes('普')) return 100;
+      return 0;
+    }
+
+    function cardTypeFromRank(cardRank) {
+      if (cardRank === 8) return '金';
+      if (cardRank === 7) return '銀';
+      if (cardRank === 6) return '普';
+      return '';
+    }
+
+    function findCatalogPetByName(name) {
+      return allPets.find(p => p.name === name) || null;
+    }
+
+    function computeCompareStarMeta(catalogPet, cardRank, maxStarApplied) {
+      const cardType = catalogPet?.cardType || cardTypeFromRank(cardRank);
+      const target = starTarget(cardType);
+      const base = cardBaseTotal(cardType || cardRank);
+      if (!target || !base) return { starCount: null, starText: '', starIsMax: false };
+      const maxStar = target - base;
+      const total = catalogPet?.total ?? 0;
+      if (maxStarApplied || total >= target) {
+        return { starCount: maxStar, starText: '滿星', starIsMax: true };
+      }
+      const starCount = Math.max(0, Math.round(total - base));
+      const starIsMax = starCount >= maxStar;
+      return {
+        starCount,
+        starText: starIsMax ? '滿星' : `${starCount}星`,
+        starIsMax,
+      };
+    }
+
+    function getCompareStarMeta(pet) {
+      if (pet.starText) {
+        return {
+          starText: pet.starText,
+          starIsMax: !!pet.starIsMax,
+        };
+      }
+      const catalogPet = pet.catalogTotal != null
+        ? { total: pet.catalogTotal, cardType: cardTypeFromRank(pet.cardRank) }
+        : findCatalogPetByName(pet.name);
+      return computeCompareStarMeta(catalogPet, pet.cardRank, pet.maxStarApplied);
     }
 
     function computePetBases(pet, applyMaxStar = isMaxStar) {
@@ -2234,6 +2297,9 @@
       const allocLabel = manualCapped.map((v, i) => v > 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ');
       const lostLabel = data.lost.map((v, i) => v !== 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ');
       const lostTotal = sumLostStats(data.lost);
+      const idx = parseInt(document.getElementById('petSelect').value, 10);
+      const catalogPet = !Number.isNaN(idx) ? filteredPets[idx] : findCatalogPetByName(data.name);
+      const { starCount, starText, starIsMax } = computeCompareStarMeta(catalogPet, data.cardRank, isMaxStar);
 
       comparisonList.push({
         id: Date.now() + Math.random(),
@@ -2241,6 +2307,12 @@
         level: data.level,
         stats,
         modInfo: data.cardRank > 0 ? `${data.modGrade}改` : '無',
+        cardRank: data.cardRank,
+        catalogTotal: catalogPet?.total ?? null,
+        maxStarApplied: isMaxStar,
+        starCount,
+        starText,
+        starIsMax,
         lost: [...data.lost],
         lostTotal,
         allocLabel,
@@ -2346,8 +2418,13 @@
         };
 
         const { lostTotal, lostText } = getCompareLostMeta(pet);
+        const { starText, starIsMax } = getCompareStarMeta(pet);
         const allocText = formatCompareAllocLabel(pet.allocLabel);
         const gradeClass = lostTotal === 0 ? 'perfect' : 'lost';
+        const starClass = starIsMax ? 'star-max' : 'star';
+        const starHtml = starText
+          ? ` · <span class="compare-grade ${starClass}">${escapeHtml(starText)}</span>`
+          : '';
 
         tr.innerHTML = `
           <td style="text-align:left">
@@ -2355,7 +2432,7 @@
             <strong>${escapeHtml(pet.name)}</strong>
             <span class="compare-meta">
               ${escapeHtml(pet.modInfo)}
-              · <span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>
+              · <span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>${starHtml}
               · ${escapeHtml(allocText)}
             </span>
           </td>
@@ -2369,6 +2446,7 @@
           <td>${cell(pet.stats.spt, 'spt')}</td>
           <td style="font-size:0.82rem;white-space:normal;min-width:88px">
             <span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>
+            ${starText ? `<br><span class="compare-grade ${starClass}">${escapeHtml(starText)}</span>` : ''}
             <br>${escapeHtml(allocText)}
           </td>
           <td>
@@ -2436,15 +2514,17 @@
         alert('比較清單為空');
         return;
       }
-      const rows = [['名稱', '等級', 'HP', 'MP', '攻擊', '防禦', '敏捷', '回復', '精神', '改造', '檔次', '配點']];
+      const rows = [['名稱', '等級', 'HP', 'MP', '攻擊', '防禦', '敏捷', '回復', '精神', '改造', '檔次', '星數', '配點']];
       comparisonList.forEach(p => {
         const { lostText } = getCompareLostMeta(p);
+        const { starText } = getCompareStarMeta(p);
         rows.push([
           p.name, p.level,
           fmtStat(p.stats.hp), fmtStat(p.stats.mp), fmtStat(p.stats.atk), fmtStat(p.stats.def),
           fmtStat(p.stats.agi), fmtStat(p.stats.rec), fmtStat(p.stats.spt),
           p.modInfo,
           lostText,
+          starText || '',
           p.allocLabel || '0',
         ]);
       });
@@ -2491,10 +2571,20 @@
       throw lastErr || new Error('遠端載入失敗');
     }
 
+    function applyPetDataOverrides() {
+      for (const pet of allPets) {
+        const patch = PET_DATA_OVERRIDES[pet.name];
+        if (!patch) continue;
+        if (patch.cardTier) pet.cardType = patch.cardTier;
+        Object.assign(pet, patch);
+      }
+    }
+
     function applyPetsData(raw) {
       const list = normalizePetList(raw);
       if (!list?.length) throw new Error('圖鑑資料格式錯誤');
       allPets = list.map(adaptPet);
+      applyPetDataOverrides();
       const bar = document.getElementById('loadBar');
       bar.className = 'load-bar status ok';
       bar.textContent = `✅ 圖鑑已就緒，共 ${allPets.length} 隻寵物`;
