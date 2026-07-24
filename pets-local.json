@@ -1205,8 +1205,19 @@
     "water": 20,
     "earth": 0,
     "wind": 0,
-    "imageId": 101434,
-    "obtainInfo": "打開金卡寵物蛋 隨機獲取"
+    "imageId": "101434",
+    "obtainInfo": "打開金卡寵物蛋 隨機獲取",
+    "skins": [
+      {
+        "key": "巨大火焰舞者",
+        "name": "巨大火焰舞者",
+        "imageId": "101434_b",
+        "obtainInfo": {
+          "text": "巨大魔物討伐戰S3 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
+          "url": "https://guide.starcg.net/quests/events/giant-boss-s3"
+        }
+      }
+    ]
   },
   {
     "id": 57,
@@ -1390,7 +1401,7 @@
         "name": "巨大死灰螳螂",
         "imageId": "101323_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰S2 收集外形圖",
+          "text": "巨大魔物討伐戰S2 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss-s2"
         }
       }
@@ -1521,7 +1532,7 @@
         "name": "巨大地獄妖犬",
         "imageId": "101033_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰 收集外形圖",
+          "text": "巨大魔物討伐戰 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss"
         }
       }
@@ -1925,11 +1936,22 @@
     "water": 0,
     "earth": 0,
     "wind": 40,
-    "imageId": 101102,
+    "imageId": "101102",
     "obtainInfo": {
       "text": "《誘拐事件任務》 【捕捉位置】阿魯巴斯的研究所(22.22)",
       "url": "https://guide.starcg.net/quests/chili/%E8%AA%98%E6%8B%90%E4%BB%BB%E5%8B%99#%E8%AA%98%E6%8B%90%E4%BB%BB%E5%8B%99"
-    }
+    },
+    "skins": [
+      {
+        "key": "巨大食屍鬼",
+        "name": "巨大食屍鬼",
+        "imageId": "101102_b",
+        "obtainInfo": {
+          "text": "巨大魔物討伐戰S3 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
+          "url": "https://guide.starcg.net/quests/events/giant-boss-s3"
+        }
+      }
+    ]
   },
   {
     "id": 89,
@@ -2065,7 +2087,7 @@
         "name": "巨大雷獸",
         "imageId": "108075_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰 收集外形圖",
+          "text": "巨大魔物討伐戰 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss"
         }
       }
@@ -2231,8 +2253,19 @@
     "water": 80,
     "earth": 0,
     "wind": 0,
-    "imageId": 101721,
-    "obtainInfo": "從維諾亞村出發 【捕捉位置】索奇亞海底洞窟 地下2樓(48.8)"
+    "imageId": "101721",
+    "obtainInfo": "從維諾亞村出發 【捕捉位置】索奇亞海底洞窟 地下2樓(48.8)",
+    "skins": [
+      {
+        "key": "巨大水龍蜥",
+        "name": "巨大水龍蜥",
+        "imageId": "101721_b",
+        "obtainInfo": {
+          "text": "巨大魔物討伐戰S3 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
+          "url": "https://guide.starcg.net/quests/events/giant-boss-s3"
+        }
+      }
+    ]
   },
   {
     "id": 103,
@@ -2614,7 +2647,7 @@
         "name": "巨大殺龍之刃",
         "imageId": "101601_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰S2 收集外形圖",
+          "text": "巨大魔物討伐戰S2 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss-s2"
         }
       }
@@ -2955,8 +2988,28 @@
     "water": 20,
     "earth": 80,
     "wind": 0,
-    "imageId": 101010,
-    "obtainInfo": "從維諾亞村出發 【捕捉位置】維諾亞洞穴（熊洞）一層(18.16)"
+    "imageId": "101010",
+    "obtainInfo": "從維諾亞村出發 【捕捉位置】維諾亞洞穴（熊洞）一層(18.16)",
+    "skins": [
+      {
+        "key": "Amethyst Cave Bear",
+        "name": "紫晶穴熊",
+        "imageId": "119339",
+        "obtainInfo": {
+          "text": "《公主傳說一 - 通緝令》任務獲取",
+          "url": "https://guide.starcg.net/quests/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA%E4%B8%80---%E9%80%9A%E7%B7%9D%E4%BB%A4"
+        }
+      },
+      {
+        "key": "Red-Eyed Cave Bear",
+        "name": "赤目穴熊",
+        "imageId": "119340",
+        "obtainInfo": {
+          "text": "《公主傳說一 - 通緝令》任務獲取",
+          "url": "https://guide.starcg.net/quests/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA%E4%B8%80---%E9%80%9A%E7%B7%9D%E4%BB%A4"
+        }
+      }
+    ]
   },
   {
     "id": 137,
@@ -4384,8 +4437,28 @@
     "water": 0,
     "earth": 10,
     "wind": 90,
-    "imageId": 101421,
-    "obtainInfo": "從維諾亞村出發 【捕捉位置】芙蕾雅(333.480)"
+    "imageId": "101421",
+    "obtainInfo": "從維諾亞村出發 【捕捉位置】芙蕾雅(333.480)",
+    "skins": [
+      {
+        "key": "Yellow Poison-Lipped Ghost",
+        "name": "黃色毒唇鬼",
+        "imageId": "119341",
+        "obtainInfo": {
+          "text": "《公主傳說一 - 通緝令》任務獲取",
+          "url": "https://guide.starcg.net/quests/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA%E4%B8%80---%E9%80%9A%E7%B7%9D%E4%BB%A4"
+        }
+      },
+      {
+        "key": "Yellow Red-Lipped Ghost",
+        "name": "黃色紅唇鬼",
+        "imageId": "119342",
+        "obtainInfo": {
+          "text": "《公主傳說一 - 通緝令》任務獲取",
+          "url": "https://guide.starcg.net/quests/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA%E4%B8%80---%E9%80%9A%E7%B7%9D%E4%BB%A4"
+        }
+      }
+    ]
   },
   {
     "id": 205,
@@ -4496,8 +4569,19 @@
     "water": 30,
     "earth": 70,
     "wind": 0,
-    "imageId": 101800,
-    "obtainInfo": "從法蘭城出發【捕捉位置】芙蕾雅(478.196)"
+    "imageId": "101800",
+    "obtainInfo": "從法蘭城出發【捕捉位置】芙蕾雅(478.196)",
+    "skins": [
+      {
+        "key": "巨大哥布林",
+        "name": "巨大哥布林",
+        "imageId": "101800_b",
+        "obtainInfo": {
+          "text": "巨大魔物討伐戰S3 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
+          "url": "https://guide.starcg.net/quests/events/giant-boss-s3"
+        }
+      }
+    ]
   },
   {
     "id": 210,
@@ -4607,7 +4691,7 @@
         "name": "巨大史萊姆",
         "imageId": "101500_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰 收集外形圖",
+          "text": "巨大魔物討伐戰 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss"
         }
       }
@@ -4916,7 +5000,7 @@
         "name": "巨大液態史萊姆",
         "imageId": "101501_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰 收集外形圖",
+          "text": "巨大魔物討伐戰 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss"
         }
       }
@@ -5271,7 +5355,7 @@
         "name": "巨大鬼靈",
         "imageId": "101121_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰S2 收集外形圖",
+          "text": "巨大魔物討伐戰S2 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss-s2"
         }
       }
@@ -6103,7 +6187,7 @@
         "name": "巨大兔耳嚇人箱",
         "imageId": "101611_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰 收集外形圖",
+          "text": "巨大魔物討伐戰 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss"
         }
       }
@@ -6904,7 +6988,7 @@
         "name": "巨大粉紅菇",
         "imageId": "107402_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰S2 收集外形圖",
+          "text": "巨大魔物討伐戰S2 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss-s2"
         }
       }
@@ -7198,7 +7282,7 @@
         "name": "巨大純白嚇人箱",
         "imageId": "101615_b",
         "obtainInfo": {
-          "text": "巨大魔物討伐戰 收集外形圖",
+          "text": "巨大魔物討伐戰 收集外形圖 【皮膚加成】傷害+3% 及 受到傷害-3% (PVE & PVP 均適用)",
           "url": "https://guide.starcg.net/quests/events/giant-boss"
         }
       }
@@ -10552,7 +10636,7 @@
     "water": 0,
     "earth": 50,
     "wind": 0,
-    "imageId": "119338-",
+    "imageId": "119338",
     "obtainInfo": {
       "text": "2026年六月充值禮盒獲取",
       "url": "https://guide.starcg.net/quests/events/%E5%85%85%E5%80%BC%E7%9B%92%E5%AD%90%E6%9B%B4%E6%96%B0%20(2026%E5%B9%B46%E6%9C%88)"
@@ -10675,6 +10759,158 @@
   },
   {
     "id": 497,
+    "name": "布特拉",
+    "race": "飛行系",
+    "cardTier": "普",
+    "total": 115,
+    "hp": 26,
+    "power": 36,
+    "defense": 12,
+    "speed": 23,
+    "magic": 18,
+    "skillSlots": 7,
+    "washPrice": 40,
+    "fire": 30,
+    "water": 70,
+    "earth": 0,
+    "wind": 0,
+    "imageId": "104301",
+    "obtainInfo": "從朝日村出發【捕捉位置】日耀之域(358.414)"
+  },
+  {
+    "id": 498,
+    "name": "巴拉斯",
+    "race": "飛行系",
+    "cardTier": "普",
+    "total": 115,
+    "hp": 24,
+    "power": 37,
+    "defense": 12,
+    "speed": 22,
+    "magic": 20,
+    "skillSlots": 7,
+    "washPrice": 40,
+    "fire": 0,
+    "water": 0,
+    "earth": 30,
+    "wind": 70,
+    "imageId": "104302",
+    "obtainInfo": "從朝日村出發【捕捉位置】往朝日村通道全區域"
+  },
+  {
+    "id": 499,
+    "name": "烏金鬼鍬",
+    "race": "昆蟲系",
+    "cardTier": "銀",
+    "total": 117,
+    "hp": 21,
+    "power": 40,
+    "defense": 11,
+    "speed": 30,
+    "magic": 15,
+    "skillSlots": 7,
+    "washPrice": 188,
+    "fire": 80,
+    "water": 0,
+    "earth": 0,
+    "wind": 20,
+    "imageId": "119343",
+    "obtainInfo": "從朝日村出發【捕捉位置】日耀之域 朝日村外(282.400)"
+  },
+  {
+    "id": 500,
+    "name": "斷刃的幻影",
+    "race": "人形系",
+    "cardTier": "銀",
+    "total": 122,
+    "hp": 36,
+    "power": 42,
+    "defense": 15,
+    "speed": 17,
+    "magic": 12,
+    "skillSlots": 8,
+    "washPrice": 228,
+    "fire": 100,
+    "water": 0,
+    "earth": 0,
+    "wind": 0,
+    "imageId": "104430",
+    "obtainInfo": {
+      "text": "《公主傳說八 - 再會席琳公主》任務獲取",
+      "url": "https://guide.starcg.net/quests/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA%E5%85%AB---%E5%86%8D%E6%9C%83%E5%B8%AD%E7%90%B3%E5%85%AC%E4%B8%BB"
+    }
+  },
+  {
+    "id": 501,
+    "name": "詠唱的幻影",
+    "race": "人形系",
+    "cardTier": "銀",
+    "total": 122,
+    "hp": 26,
+    "power": 41,
+    "defense": 18,
+    "speed": 25,
+    "magic": 12,
+    "skillSlots": 8,
+    "washPrice": 228,
+    "fire": 0,
+    "water": 0,
+    "earth": 100,
+    "wind": 0,
+    "imageId": "104437",
+    "obtainInfo": {
+      "text": "《公主傳說八 - 再會席琳公主》任務獲取",
+      "url": "https://guide.starcg.net/quests/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA%E5%85%AB---%E5%86%8D%E6%9C%83%E5%B8%AD%E7%90%B3%E5%85%AC%E4%B8%BB"
+    }
+  },
+  {
+    "id": 502,
+    "name": "破空的幻影",
+    "race": "人形系",
+    "cardTier": "銀",
+    "total": 122,
+    "hp": 30,
+    "power": 10,
+    "defense": 18,
+    "speed": 20,
+    "magic": 44,
+    "skillSlots": 8,
+    "washPrice": 228,
+    "fire": 0,
+    "water": 100,
+    "earth": 0,
+    "wind": 0,
+    "imageId": "104452",
+    "obtainInfo": {
+      "text": "《公主傳說八 - 再會席琳公主》任務獲取",
+      "url": "https://guide.starcg.net/quests/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA%E5%85%AB---%E5%86%8D%E6%9C%83%E5%B8%AD%E7%90%B3%E5%85%AC%E4%B8%BB"
+    }
+  },
+  {
+    "id": 503,
+    "name": "流星的幻影",
+    "race": "人形系",
+    "cardTier": "銀",
+    "total": 122,
+    "hp": 27,
+    "power": 41,
+    "defense": 12,
+    "speed": 30,
+    "magic": 12,
+    "skillSlots": 8,
+    "washPrice": 228,
+    "fire": 0,
+    "water": 0,
+    "earth": 0,
+    "wind": 100,
+    "imageId": "104459",
+    "obtainInfo": {
+      "text": "《公主傳說八 - 再會席琳公主》任務獲取",
+      "url": "https://guide.starcg.net/quests/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA/%E5%85%AC%E4%B8%BB%E5%82%B3%E8%AA%AA%E5%85%AB---%E5%86%8D%E6%9C%83%E5%B8%AD%E7%90%B3%E5%85%AC%E4%B8%BB"
+    }
+  },
+  {
+    "id": 504,
     "name": "金米粽靈",
     "race": "特殊系",
     "cardTier": "普",
@@ -10689,12 +10925,15 @@
     "fire": 0,
     "water": 0,
     "earth": 0,
-    "wind": 10,
+    "wind": 100,
     "imageId": "104759",
-    "obtainInfo": "2026端午「回憶屈原的勇者」任務獎勵"
+    "obtainInfo": {
+      "text": "2026年端午節任務獲取",
+      "url": "https://guide.starcg.net/quests/events/%E5%9B%9E%E6%86%B6%E5%B1%88%E5%8E%9F%E7%9A%84%E5%8B%87%E8%80%85%20(2026%E5%B9%B4)"
+    }
   },
   {
-    "id": 498,
+    "id": 505,
     "name": "紫芋粽靈",
     "race": "特殊系",
     "cardTier": "普",
@@ -10707,14 +10946,40 @@
     "skillSlots": 8,
     "washPrice": 100,
     "fire": 0,
-    "water": 10,
+    "water": 100,
     "earth": 0,
     "wind": 0,
     "imageId": "104761",
-    "obtainInfo": "2026端午「回憶屈原的勇者」任務獎勵"
+    "obtainInfo": {
+      "text": "2026年端午節任務獲取",
+      "url": "https://guide.starcg.net/quests/events/%E5%9B%9E%E6%86%B6%E5%B1%88%E5%8E%9F%E7%9A%84%E5%8B%87%E8%80%85%20(2026%E5%B9%B4)"
+    }
   },
   {
-    "id": 499,
+    "id": 506,
+    "name": "碧藍龍舟",
+    "race": "特殊系",
+    "cardTier": "普",
+    "total": 122,
+    "hp": 35,
+    "power": 7,
+    "defense": 18,
+    "speed": 18,
+    "magic": 44,
+    "skillSlots": 8,
+    "washPrice": 500,
+    "fire": 0,
+    "water": 100,
+    "earth": 0,
+    "wind": 0,
+    "imageId": "104757",
+    "obtainInfo": {
+      "text": "2026年端午節任務獲取",
+      "url": "https://guide.starcg.net/quests/events/%E5%9B%9E%E6%86%B6%E5%B1%88%E5%8E%9F%E7%9A%84%E5%8B%87%E8%80%85%20(2026%E5%B9%B4)"
+    }
+  },
+  {
+    "id": 507,
     "name": "颯影龍舟",
     "race": "特殊系",
     "cardTier": "銀",
@@ -10729,28 +10994,34 @@
     "fire": 0,
     "water": 0,
     "earth": 0,
-    "wind": 10,
+    "wind": 100,
     "imageId": "104758",
-    "obtainInfo": "2026端午「魔力大會考」兌換颯影龍舟封印珠"
+    "obtainInfo": {
+      "text": "2026年端午節任務獲取",
+      "url": "https://guide.starcg.net/quests/events/%E5%9B%9E%E6%86%B6%E5%B1%88%E5%8E%9F%E7%9A%84%E5%8B%87%E8%80%85%20(2026%E5%B9%B4)"
+    }
   },
   {
-    "id": 500,
-    "name": "碧瀾龍舟",
-    "race": "特殊系",
-    "cardTier": "銀",
-    "total": 122,
-    "hp": 35,
-    "power": 7,
-    "defense": 18,
-    "speed": 18,
-    "magic": 44,
+    "id": 508,
+    "name": "烈炎聖劍",
+    "race": "金屬系",
+    "cardTier": "金",
+    "total": 129,
+    "hp": 23,
+    "power": 50,
+    "defense": 20,
+    "speed": 26,
+    "magic": 10,
     "skillSlots": 8,
     "washPrice": 500,
-    "fire": 0,
-    "water": 10,
-    "earth": 0,
-    "wind": 0,
-    "imageId": "104757",
-    "obtainInfo": "2026端午「魔力大會考」兌換碧瀾龍舟封印珠"
+    "fire": 30,
+    "water": 30,
+    "earth": 30,
+    "wind": 30,
+    "imageId": "108259",
+    "obtainInfo": {
+      "text": "S2跨服PK對抗賽獎勵",
+      "url": "https://www.starcg.net/pkevent2/202606S2.html"
+    }
   }
 ]
