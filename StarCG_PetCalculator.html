@@ -566,6 +566,8 @@
     .compare-grade.lost { background: #fef3c7; color: #92400e; }
     .compare-grade.star { background: #dbeafe; color: #1e40af; }
     .compare-grade.star-max { background: #fef3c7; color: #92400e; }
+    .compare-grade.mod { background: #dc2626; color: #fff; }
+    .compare-grade.mod-none { background: #e7e5e4; color: #57534e; }
     .compare-meta {
       display: block;
       font-size: 0.78rem;
@@ -2291,6 +2293,14 @@
       return allocLabel ? `配 ${allocLabel}` : '配 0';
     }
 
+    function getCompareModMeta(pet) {
+      const text = pet.modInfo
+        ?? (pet.modGrade != null && pet.cardRank > 0 ? `${pet.modGrade}改` : null)
+        ?? '無';
+      if (text === '無') return { modText: '無改', modClass: 'mod-none' };
+      return { modText: text, modClass: 'mod' };
+    }
+
     function addToComparison() {
       const data = getInputs();
       const { stats, manualCapped } = calculateStats(data, false);
@@ -2307,6 +2317,7 @@
         level: data.level,
         stats,
         modInfo: data.cardRank > 0 ? `${data.modGrade}改` : '無',
+        modGrade: data.modGrade,
         cardRank: data.cardRank,
         catalogTotal: catalogPet?.total ?? null,
         maxStarApplied: isMaxStar,
@@ -2419,6 +2430,7 @@
 
         const { lostTotal, lostText } = getCompareLostMeta(pet);
         const { starText, starIsMax } = getCompareStarMeta(pet);
+        const { modText, modClass } = getCompareModMeta(pet);
         const allocText = formatCompareAllocLabel(pet.allocLabel);
         const gradeClass = lostTotal === 0 ? 'perfect' : 'lost';
         const starClass = starIsMax ? 'star-max' : 'star';
@@ -2431,7 +2443,7 @@
             <span class="base-dot ${pet.id === basePetId ? 'active' : ''}"></span>
             <strong>${escapeHtml(pet.name)}</strong>
             <span class="compare-meta">
-              ${escapeHtml(pet.modInfo)}
+              <span class="compare-grade ${modClass}">${escapeHtml(modText)}</span>
               · <span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>${starHtml}
               · ${escapeHtml(allocText)}
             </span>
@@ -2445,7 +2457,8 @@
           <td>${cell(pet.stats.rec, 'rec')}</td>
           <td>${cell(pet.stats.spt, 'spt')}</td>
           <td style="font-size:0.82rem;white-space:normal;min-width:88px">
-            <span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>
+            <span class="compare-grade ${modClass}">${escapeHtml(modText)}</span>
+            <br><span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>
             ${starText ? `<br><span class="compare-grade ${starClass}">${escapeHtml(starText)}</span>` : ''}
             <br>${escapeHtml(allocText)}
           </td>
