@@ -4132,6 +4132,10 @@ const PET_JSON_URLS = [
 ];
 const PET_PROFILES = {};
 const PET_NAME_ALIASES = { '碧瀾龍舟': '碧藍龍舟' }; // 市場名 → 圖鑑名
+/** 官方圖鑑勘誤（本地載入後強制覆寫） */
+const PET_PROFILE_OVERRIDES = {
+    '碧藍龍舟': { cardTier: '銀' }
+};
 let petProfilesLoadPromise = null;
 
 function buildPetProfileFromGuide(pet) {
@@ -4273,6 +4277,7 @@ async function loadPetProfilesFromGuide() {
                     );
                 } catch (_) { /* 遠端補漏失敗不影響本地 */ }
             }
+            mergePetProfileOverrides(PET_PROFILE_OVERRIDES, '官方勘誤');
             const count = Object.keys(PET_PROFILES).length;
             console.info(`[寵物圖鑑] 合計 ${count} 隻（有效合併 ${total} 筆）`);
             if (count > 0 && allMarketItems.length > 0) {
