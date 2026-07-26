@@ -12,6 +12,7 @@
       --text-primary: #443c34; --text-secondary: #7a7268;
       --accent: #8b7355; --accent-soft: #ebe6de; --accent-gold: #b8956a;
       --accent-green: #6a9468; --accent-red: #b86868; --radius: 10px;
+      --crystal-battle: #2d8a8a; --crystal-vital: #b8860b; --crystal-mod: #6a9468;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
@@ -173,14 +174,6 @@
     .picker-icon { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; margin-bottom: 4px; }
     .picker-icon.placeholder { display: block; background: var(--accent-soft); border-radius: 4px; }
     .picker-item .lv { font-size: 0.68rem; color: var(--text-secondary); margin-bottom: 2px; font-weight: 700; }
-    .picker-item .lv.soul-tag { color: #fff; padding: 1px 7px; border-radius: 8px; display: inline-block; }
-    .soul-blue { background: #2980b9; }
-    .soul-red { background: #c0392b; }
-    .soul-yellow { background: #e69b00; }
-    .equip-btn .soul-tag {
-      display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 8px;
-      font-size: 0.72rem; color: #fff; vertical-align: middle;
-    }
     .picker-item .name { font-size: 0.78rem; line-height: 1.3; font-weight: 700; color: var(--text-primary); word-break: break-all; }
     @media (max-width: 640px) {
       .picker-layout { flex-direction: column; }
@@ -192,6 +185,53 @@
     table.compare th, table.compare td { border-bottom: 1px solid var(--border); padding: 8px; text-align: center; }
     table.compare th { background: var(--accent-soft); }
     .compare-wrap { overflow-x: auto; margin-top: 10px; }
+    .crystal-panel { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+    .crystal-title { font-size: 0.92rem; margin-bottom: 6px; color: #6b5a45; }
+    .crystal-enable { display: block; font-size: 0.85rem; margin-bottom: 10px; cursor: pointer; color: var(--text-secondary); }
+    .crystal-enable input { accent-color: var(--accent); margin-right: 6px; }
+    .crystal-roll-actions { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+    .crystal-panel.disabled .crystal-fields,
+    .crystal-panel.disabled .crystal-roll-actions,
+    .crystal-panel.disabled .crystal-custom-panel { opacity: 0.45; pointer-events: none; }
+    #crystalStatPreview { margin-top: 8px; min-height: 2em; }
+    .crystal-custom-panel { margin-top: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+    .crystal-custom-panel.hidden { display: none; }
+    .crystal-custom-title { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+    .crystal-custom-row { display: grid; grid-template-columns: 42px 1fr; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .crystal-custom-row:last-child { margin-bottom: 0; }
+    .crystal-custom-row label { font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); text-align: center; }
+    .crystal-pick-select { width: 100%; padding: 5px 6px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.78rem; background: #fff; }
+    #crystalRerollBtn.hidden { display: none; }
+    .crystal-ref-wrap { margin-top: 10px; }
+    .crystal-ref-wrap details { border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+    .crystal-ref-wrap summary {
+      padding: 8px 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);
+      cursor: pointer; list-style: none; user-select: none;
+    }
+    .crystal-ref-wrap summary::-webkit-details-marker { display: none; }
+    .crystal-ref-wrap summary::before { content: '▸ '; color: var(--accent); }
+    .crystal-ref-wrap details[open] summary::before { content: '▾ '; }
+    .crystal-ref-wrap summary:hover { color: var(--text-primary); background: var(--accent-soft); border-radius: 8px; }
+    .crystal-ref-table-wrap { overflow-x: hidden; max-height: 240px; overflow-y: auto; border-top: 1px solid var(--border); }
+    table.crystal-ref-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; table-layout: fixed; }
+    table.crystal-ref-table th, table.crystal-ref-table td { border-bottom: 1px solid var(--border); padding: 6px 5px; text-align: left; vertical-align: top; line-height: 1.4; }
+    table.crystal-ref-table thead th { background: var(--accent-soft); font-weight: 700; white-space: nowrap; }
+    table.crystal-ref-table tbody th {
+      background: var(--accent-soft); font-weight: 700; color: var(--text-primary);
+      width: 48px; padding: 6px 3px; text-align: center; white-space: normal; font-size: 0.72rem; line-height: 1.25;
+    }
+    table.crystal-ref-table thead th:first-child { width: 48px; text-align: center; }
+    table.crystal-ref-table tbody td { overflow-wrap: anywhere; word-break: break-word; }
+    table.crystal-ref-table tr:last-child th, table.crystal-ref-table tr:last-child td { border-bottom: none; }
+    .crystal-ref-lvl-sub { display: block; font-size: 0.68rem; font-weight: 600; color: var(--text-secondary); margin-top: 1px; }
+    .crystal-ref-empty { color: var(--text-secondary); opacity: 0.45; }
+    .crystal-grp-battle, .crystal-ref-grp.crystal-grp-battle { color: var(--crystal-battle); }
+    .crystal-grp-vital, .crystal-ref-grp.crystal-grp-vital { color: var(--crystal-vital); }
+    .crystal-grp-mod, .crystal-ref-grp.crystal-grp-mod { color: var(--crystal-mod); }
+    #crystalStatPreview .crystal-preview-label { display: block; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+    #crystalStatPreview .crystal-preview-stats { display: block; }
+    #crystalStatPreview .crystal-grp { display: block; font-weight: 600; }
+    #crystalStatPreview .crystal-grp + .crystal-grp { margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -231,6 +271,35 @@
         <div class="field"><div class="field-head"><label for="def">強度</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="remain">剩餘</button></div></div><input type="number" id="def" value="0" min="0"></div>
         <div class="field"><div class="field-head"><label for="agi">速度</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="remain">剩餘</button></div></div><input type="number" id="agi" value="0" min="0"></div>
         <div class="field"><div class="field-head"><label for="mag">魔法</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="remain">剩餘</button></div></div><input type="number" id="mag" value="0" min="0"></div>
+      </div>
+      <div class="crystal-panel" id="crystalPanel">
+        <h3 class="crystal-title">水晶改造</h3>
+        <label class="crystal-enable"><input type="checkbox" id="crystalEnabled"> 計入水晶能力</label>
+        <div class="field-row crystal-fields">
+          <div class="field"><label for="crystalLevel">水晶等級</label><input type="number" id="crystalLevel" value="1" min="1" max="10"></div>
+          <div class="field"><label for="crystalRollMode">區間取値</label><select id="crystalRollMode">
+            <option value="random" selected>隨機</option>
+            <option value="min">最低</option>
+            <option value="avg">平均</option>
+            <option value="max">最高</option>
+            <option value="custom">自選</option>
+          </select></div>
+        </div>
+        <div class="crystal-roll-actions">
+          <button type="button" class="stat-shortcut-btn" id="crystalRerollBtn">🎲 重骰改造</button>
+          <span class="hint" id="crystalRollHint" style="margin:0">變更等級時自動補骰缺少的級數</span>
+        </div>
+        <div id="crystalCustomPanel" class="crystal-custom-panel hidden">
+          <div class="crystal-custom-title">自選詞條（每級擇一，區間取平均）</div>
+          <div id="crystalCustomRows"></div>
+        </div>
+        <div id="crystalStatPreview" class="equip-stat-preview">未計入水晶能力</div>
+        <div class="crystal-ref-wrap">
+          <details id="crystalRefDetails">
+            <summary>升級詞條表（每級隨機擇一）</summary>
+            <div id="crystalRefTable" class="crystal-ref-table-wrap"></div>
+          </details>
+        </div>
       </div>
     </section>
 
@@ -281,7 +350,11 @@
     <div class="compare-wrap">
       <table class="compare" id="compareTable">
         <thead><tr>
-          <th>名稱</th><th>Lv</th><th>HP</th><th>MP</th><th>攻</th><th>防</th><th>敏</th><th>精</th><th>回</th><th>魔攻</th><th>抗魔</th><th>必殺</th><th>反擊</th><th>命中</th><th>閃躲</th><th></th>
+          <th>名稱</th><th>Lv</th>
+          <th>生命</th><th>魔力</th>
+          <th>攻擊</th><th>防禦</th><th>敏捷</th><th>回復</th><th>精神</th><th>魔攻</th><th>魔抗</th>
+          <th>必殺</th><th>命中</th><th>反擊</th><th>閃躲</th>
+          <th>中毒</th><th>石化</th><th>酒醉</th><th>昏睡</th><th>混亂</th><th>遺忘</th><th></th>
         </tr></thead>
         <tbody></tbody>
       </table>
@@ -358,20 +431,9 @@ const PICKER_NAME_ORDER = (() => {
   return map;
 })();
 
-function getItemVariantBadge(item) {
-  if (!item) return null;
-  if (item.variant) {
-    const cls = Object.values(SOUL_VARIANTS).find(v => v.label === item.variant)?.cls;
-    return { label: item.variant, cls: cls || 'soul-blue' };
-  }
-  return item.itemId ? (SOUL_VARIANTS[item.itemId] || null) : null;
-}
-
 function formatItemDisplayName(item) {
   if (!item) return '';
-  const variant = getItemVariantBadge(item);
-  if (!variant) return escapeHtml(item.name);
-  return `${escapeHtml(item.name)} <span class="soul-tag ${variant.cls}">${escapeHtml(variant.label)}</span>`;
+  return escapeHtml(item.name);
 }
 
 function getPickerCategory(it) {
@@ -386,23 +448,153 @@ function pickerSortKey(it) {
 
 const STAT_LABELS = {
   hp:'生命', mp:'魔力', atk:'攻擊', def:'防禦', agi:'敏捷', spt:'精神', rec:'回復',
-  charm:'魅力', matk:'魔攻', amres:'抗魔', crit:'必殺', counter:'反擊', hit:'命中', dodge:'閃躲',
+  charm:'魅力', matk:'魔攻', amres:'魔抗', crit:'必殺', counter:'反擊', hit:'命中', dodge:'閃躲',
   poison:'中毒', sleep:'昏睡', stone:'石化', drunk:'酒醉', chaos:'混亂', forget:'遺忘',
 };
 
-const BASIC_KEYS = ['hp','mp','atk','def','agi','spt','rec','charm','matk','amres'];
+const COMPARE_KEYS = ['hp','mp','atk','def','agi','rec','spt','matk','amres','crit','hit','counter','dodge','poison','stone','drunk','sleep','chaos','forget'];
+const COMPARE_FROM_SUM = new Set(['hp','mp','atk','def','agi','rec','spt','matk','amres']);
+const RESULT_BASIC_KEYS = COMPARE_KEYS.filter(k => COMPARE_FROM_SUM.has(k));
+const RESULT_MOD_KEYS = COMPARE_KEYS.filter(k => !COMPARE_FROM_SUM.has(k));
+const BASIC_KEYS = [...RESULT_BASIC_KEYS, 'charm'];
+const MOD_KEYS = [...RESULT_MOD_KEYS];
 const GENERAL_CORE_KEYS = ['atk', 'def', 'agi', 'rec', 'spt'];
 const HYORIKI_RATE = 1.05;
-const MOD_KEYS = ['crit','poison','drunk','counter','stone','forget','hit','chaos','dodge','sleep'];
+
+const CRYSTAL_BASE = { hp: 10, mp: 10, atk: 1, def: 1, agi: 1 };
+/** Lv N → N+1 的可選能力（每級隨機一條） */
+const CRYSTAL_UPGRADE_TIERS = [
+  [
+    { key: 'atk', min: 6, max: 8 }, { key: 'def', min: 6, max: 8 }, { key: 'agi', min: 6, max: 8 },
+    { key: 'hp', min: 25, max: 30 }, { key: 'mp', min: 25, max: 30 },
+    { key: 'spt', min: 3, max: 3 }, { key: 'rec', min: 3, max: 3 },
+  ],
+  [
+    { key: 'atk', min: 8, max: 10 }, { key: 'def', min: 8, max: 10 }, { key: 'agi', min: 8, max: 10 },
+    { key: 'hp', min: 35, max: 40 }, { key: 'mp', min: 35, max: 40 },
+    { key: 'spt', min: 4, max: 4 }, { key: 'rec', min: 4, max: 4 },
+  ],
+  [
+    { key: 'atk', min: 10, max: 12 }, { key: 'def', min: 10, max: 12 }, { key: 'agi', min: 10, max: 12 },
+    { key: 'hp', min: 45, max: 50 }, { key: 'mp', min: 45, max: 50 },
+    { key: 'spt', min: 5, max: 5 }, { key: 'rec', min: 5, max: 5 },
+    { key: 'crit', min: 1, max: 1 }, { key: 'dodge', min: 1, max: 1 },
+    { key: 'hit', min: 1, max: 1 }, { key: 'counter', min: 1, max: 1 },
+  ],
+  [
+    { key: 'atk', min: 12, max: 14 }, { key: 'def', min: 12, max: 14 }, { key: 'agi', min: 12, max: 14 },
+    { key: 'hp', min: 55, max: 60 }, { key: 'mp', min: 55, max: 60 },
+    { key: 'spt', min: 6, max: 6 }, { key: 'rec', min: 6, max: 6 },
+    { key: 'crit', min: 1, max: 1 }, { key: 'dodge', min: 1, max: 2 },
+    { key: 'hit', min: 1, max: 1 }, { key: 'counter', min: 1, max: 2 },
+  ],
+  [
+    { key: 'atk', min: 14, max: 16 }, { key: 'def', min: 14, max: 16 }, { key: 'agi', min: 14, max: 16 },
+    { key: 'hp', min: 65, max: 70 }, { key: 'mp', min: 65, max: 70 },
+    { key: 'spt', min: 7, max: 7 }, { key: 'rec', min: 7, max: 7 },
+    { key: 'crit', min: 1, max: 1 }, { key: 'dodge', min: 2, max: 2 },
+    { key: 'hit', min: 1, max: 1 }, { key: 'counter', min: 2, max: 2 },
+  ],
+  [
+    { key: 'atk', min: 17, max: 19 }, { key: 'def', min: 17, max: 19 }, { key: 'agi', min: 17, max: 19 },
+    { key: 'hp', min: 75, max: 80 }, { key: 'mp', min: 75, max: 80 },
+    { key: 'spt', min: 9, max: 9 }, { key: 'rec', min: 9, max: 9 },
+    { key: 'crit', min: 2, max: 2 }, { key: 'dodge', min: 1, max: 2 },
+    { key: 'hit', min: 2, max: 2 }, { key: 'counter', min: 1, max: 2 },
+  ],
+  [
+    { key: 'atk', min: 20, max: 22 }, { key: 'def', min: 20, max: 22 }, { key: 'agi', min: 20, max: 22 },
+    { key: 'hp', min: 85, max: 95 }, { key: 'mp', min: 85, max: 90 },
+    { key: 'spt', min: 11, max: 11 }, { key: 'rec', min: 11, max: 11 },
+    { key: 'crit', min: 1, max: 1 }, { key: 'dodge', min: 1, max: 1 },
+    { key: 'hit', min: 1, max: 1 }, { key: 'counter', min: 1, max: 1 },
+  ],
+  [
+    { key: 'atk', min: 22, max: 26 }, { key: 'def', min: 22, max: 26 }, { key: 'agi', min: 22, max: 26 },
+    { key: 'hp', min: 95, max: 100 }, { key: 'mp', min: 95, max: 100 },
+    { key: 'spt', min: 13, max: 13 }, { key: 'rec', min: 13, max: 13 },
+    { key: 'crit', min: 1, max: 2 }, { key: 'dodge', min: 1, max: 2 },
+    { key: 'hit', min: 1, max: 2 }, { key: 'counter', min: 1, max: 2 },
+  ],
+  [
+    { key: 'atk', min: 26, max: 30 }, { key: 'def', min: 26, max: 30 }, { key: 'agi', min: 26, max: 30 },
+    { key: 'hp', min: 110, max: 120 }, { key: 'mp', min: 110, max: 120 },
+    { key: 'spt', min: 16, max: 16 }, { key: 'rec', min: 16, max: 16 },
+    { key: 'crit', min: 2, max: 2 }, { key: 'dodge', min: 2, max: 2 },
+    { key: 'hit', min: 2, max: 2 }, { key: 'counter', min: 2, max: 2 },
+  ],
+];
+let crystalRolls = Array(9).fill(null);
+
+const CRYSTAL_REF_LABELS = {
+  hp: '血量', mp: '魔力', atk: '攻擊', def: '防禦', agi: '敏捷',
+  spt: '精神', rec: '回復', crit: '必殺', hit: '命中', dodge: '閃躲', counter: '反擊',
+};
+
+const CRYSTAL_STAT_GROUPS = [
+  { cls: 'crystal-grp-battle', label: '攻防敏', keys: ['atk', 'def', 'agi'] },
+  { cls: 'crystal-grp-vital', label: '血魔精回', keys: ['hp', 'mp', 'spt', 'rec'] },
+  { cls: 'crystal-grp-mod', label: '必反命閃', keys: ['crit', 'counter', 'hit', 'dodge'] },
+];
+
+function getCrystalRollMode() {
+  return document.getElementById('crystalRollMode')?.value || 'random';
+}
+
+function crystalRollValueMode(mode) {
+  return mode === 'custom' ? 'avg' : mode;
+}
+
+function crystalGroupClass(key) {
+  return CRYSTAL_STAT_GROUPS.find(g => g.keys.includes(key))?.cls || '';
+}
+
+function formatCrystalRefOption(opt) {
+  const name = CRYSTAL_REF_LABELS[opt.key] || STAT_LABELS[opt.key] || opt.key;
+  if (opt.min === opt.max) return `${name} +${opt.min}`;
+  return `${name} +${opt.min}~${opt.max}`;
+}
+
+function formatCrystalRefRowCells(opts) {
+  const buckets = Object.fromEntries(CRYSTAL_STAT_GROUPS.map(g => [g.cls, []]));
+  for (const o of opts) {
+    const cls = crystalGroupClass(o.key);
+    if (cls) buckets[cls].push(o);
+  }
+  return CRYSTAL_STAT_GROUPS.map(g => {
+    if (!buckets[g.cls].length) return '<span class="crystal-ref-empty">—</span>';
+    const lines = buckets[g.cls].map(o => escapeHtml(formatCrystalRefOption(o))).join('<br>');
+    return `<span class="crystal-ref-grp ${g.cls}">${lines}</span>`;
+  });
+}
+
+function renderCrystalRefRow(levelLabel, opts) {
+  const [battle, vital, mod] = formatCrystalRefRowCells(opts);
+  return `<tr><th>${levelLabel}</th><td>${battle}</td><td>${vital}</td><td>${mod}</td></tr>`;
+}
+
+function renderCrystalRefTable() {
+  const el = document.getElementById('crystalRefTable');
+  if (!el) return;
+  const baseRow = renderCrystalRefRow(
+    '1<span class="crystal-ref-lvl-sub">起始</span>',
+    Object.entries(CRYSTAL_BASE).map(([key, val]) => ({ key, min: val, max: val }))
+  );
+  const tierRows = CRYSTAL_UPGRADE_TIERS.map((tier, i) =>
+    renderCrystalRefRow(`${i + 1}→${i + 2}`, tier)
+  ).join('');
+  el.innerHTML = `<table class="crystal-ref-table"><thead><tr>
+    <th>升級</th>
+    <th class="crystal-grp-battle">攻防敏</th>
+    <th class="crystal-grp-vital">血魔精回</th>
+    <th class="crystal-grp-mod">必反命閃</th>
+  </tr></thead><tbody>${baseRow}${tierRows}</tbody></table>`;
+}
+
 const RESIST_KEYS = ['poison','sleep','stone','drunk','chaos','forget'];
 const CORRECT_KEYS = ['crit','counter','hit','dodge'];
 const PICKER_FLAT_CATEGORIES = new Set(['fudan', 'water-dragon', ...SLOT_CATEGORY_ORDER.acc]);
 const PICKER_STAT_GROUP_LABELS = { basic: '一般屬性', extra: '修正／抗性' };
-const SOUL_VARIANTS = {
-  1007001: { label: '藍', cls: 'soul-blue' },
-  1007002: { label: '紅', cls: 'soul-red' },
-  1007003: { label: '黃', cls: 'soul-yellow' },
-};
 const STAT_MODE_OPTIONS = [
   { value: 'max', label: '頂值', ratio: 1 },
   { value: 'near', label: '近頂（90%）', ratio: 0.9 },
@@ -954,10 +1146,7 @@ function formatItemStatPreview(item, slotId = null) {
   const basic = BASIC_KEYS.filter(k => stats[k]).map(k => `${STAT_LABELS[k]}${stats[k] > 0 ? '+' : ''}${stats[k]}`);
   const modLine = MOD_KEYS.filter(k => stats[k]).map(k => `${STAT_LABELS[k]}${stats[k] > 0 ? '+' : ''}${stats[k]}`);
   const detail = [basic.join(' · '), modLine.join(' · ')].filter(Boolean).join(' ｜ ') || '—';
-  const variant = getItemVariantBadge(item);
-  const name = variant
-    ? `${escapeHtml(item.name)} <span class="soul-tag ${variant.cls}">${escapeHtml(variant.label)}</span>`
-    : escapeHtml(item.name);
+  const name = escapeHtml(item.name);
   return `<span class="name">${name}</span>${escapeHtml(detail)}`;
 }
 
@@ -1034,6 +1223,168 @@ function getEquipTotals() {
   return total;
 }
 
+function mergeStatMaps(a, b) {
+  const out = { ...a };
+  for (const [k, v] of Object.entries(b)) out[k] = (out[k] || 0) + (v || 0);
+  return out;
+}
+
+function resolveCrystalRollValue(opt, mode) {
+  if (opt.min === opt.max) return opt.min;
+  const m = crystalRollValueMode(mode);
+  if (m === 'min') return opt.min;
+  if (m === 'max') return opt.max;
+  if (m === 'avg') return Math.round((opt.min + opt.max) / 2);
+  return opt.min + Math.floor(Math.random() * (opt.max - opt.min + 1));
+}
+
+function rollCrystalTier(t, mode) {
+  const tier = CRYSTAL_UPGRADE_TIERS[t];
+  const idx = Math.floor(Math.random() * tier.length);
+  const opt = tier[idx];
+  return { idx, val: resolveCrystalRollValue(opt, mode) };
+}
+
+function ensureCrystalRolls({ rerollAll = false } = {}) {
+  if (!document.getElementById('crystalEnabled')?.checked) return;
+  const lvl = Math.min(10, Math.max(1, getNum('crystalLevel') || 1));
+  const mode = getCrystalRollMode();
+  for (let t = 0; t < 9; t++) {
+    if (t >= lvl - 1) {
+      crystalRolls[t] = null;
+    } else if (mode === 'custom') {
+      const tier = CRYSTAL_UPGRADE_TIERS[t];
+      if (!crystalRolls[t]) {
+        crystalRolls[t] = { idx: 0, val: resolveCrystalRollValue(tier[0], mode) };
+      } else {
+        crystalRolls[t].idx = Math.min(crystalRolls[t].idx, tier.length - 1);
+        const opt = tier[crystalRolls[t].idx];
+        crystalRolls[t].val = resolveCrystalRollValue(opt, mode);
+      }
+    } else if (rerollAll || crystalRolls[t] == null) {
+      crystalRolls[t] = rollCrystalTier(t, mode);
+    }
+  }
+}
+
+function refreshCrystalRollValues() {
+  const mode = getCrystalRollMode();
+  for (let t = 0; t < crystalRolls.length; t++) {
+    const roll = crystalRolls[t];
+    if (!roll) continue;
+    const opt = CRYSTAL_UPGRADE_TIERS[t][roll.idx];
+    roll.val = resolveCrystalRollValue(opt, mode);
+  }
+}
+
+function buildCrystalTierSelectHtml(t, selectedIdx) {
+  const tier = CRYSTAL_UPGRADE_TIERS[t];
+  return CRYSTAL_STAT_GROUPS.map(g => {
+    const items = tier.map((o, idx) => ({ o, idx })).filter(({ o }) => g.keys.includes(o.key));
+    if (!items.length) return '';
+    const opts = items.map(({ o, idx }) =>
+      `<option value="${idx}"${idx === selectedIdx ? ' selected' : ''}>${escapeHtml(formatCrystalRefOption(o))}</option>`
+    ).join('');
+    return `<optgroup label="${g.label}">${opts}</optgroup>`;
+  }).join('');
+}
+
+function renderCrystalCustomPanel() {
+  const panel = document.getElementById('crystalCustomPanel');
+  const rows = document.getElementById('crystalCustomRows');
+  if (!panel || !rows) return;
+  const mode = getCrystalRollMode();
+  const enabled = document.getElementById('crystalEnabled')?.checked;
+  panel.classList.toggle('hidden', mode !== 'custom' || !enabled);
+  if (mode !== 'custom' || !enabled) return;
+
+  const lvl = Math.min(10, Math.max(1, getNum('crystalLevel') || 1));
+  if (lvl <= 1) {
+    rows.innerHTML = '<p class="hint" style="margin:0">Lv.1 無升級詞條</p>';
+    return;
+  }
+  rows.innerHTML = Array.from({ length: lvl - 1 }, (_, t) => {
+    const idx = crystalRolls[t]?.idx ?? 0;
+    return `<div class="crystal-custom-row">
+      <label for="crystalPick${t}">${t + 1}→${t + 2}</label>
+      <select id="crystalPick${t}" class="crystal-pick-select" data-tier="${t}">${buildCrystalTierSelectHtml(t, idx)}</select>
+    </div>`;
+  }).join('');
+}
+
+function onCrystalCustomPick(t, idx) {
+  const tier = CRYSTAL_UPGRADE_TIERS[t];
+  if (!tier || idx < 0 || idx >= tier.length) return;
+  crystalRolls[t] = { idx, val: resolveCrystalRollValue(tier[idx], getCrystalRollMode()) };
+  recalc();
+}
+
+function formatCrystalOption(opt) {
+  const name = STAT_LABELS[opt.key] || opt.key;
+  if (opt.min === opt.max) return `${name} +${opt.min}`;
+  return `${name} +${opt.min}~${opt.max}`;
+}
+
+function getCrystalStats() {
+  if (!document.getElementById('crystalEnabled')?.checked) return emptyEquipStats();
+  const out = emptyEquipStats();
+  for (const [k, v] of Object.entries(CRYSTAL_BASE)) out[k] = v;
+  const lvl = Math.min(10, Math.max(1, getNum('crystalLevel') || 1));
+  for (let t = 0; t < lvl - 1; t++) {
+    const roll = crystalRolls[t];
+    if (!roll) continue;
+    const opt = CRYSTAL_UPGRADE_TIERS[t]?.[roll.idx];
+    if (!opt) continue;
+    out[opt.key] = (out[opt.key] || 0) + roll.val;
+  }
+  return out;
+}
+
+function getCombinedBonusStats() {
+  return mergeStatMaps(getEquipTotals(), getCrystalStats());
+}
+
+function formatCrystalStatLine(stats) {
+  const groups = CRYSTAL_STAT_GROUPS.map(g => {
+    const items = g.keys.filter(k => stats[k]).map(k => {
+      const name = CRYSTAL_REF_LABELS[k] || STAT_LABELS[k] || k;
+      return `${name}${stats[k] > 0 ? '+' : ''}${stats[k]}`;
+    });
+    if (!items.length) return '';
+    return `<span class="crystal-grp ${g.cls}">${escapeHtml(items.join(' · '))}</span>`;
+  }).filter(Boolean);
+  return groups.join('') || '—';
+}
+
+function updateCrystalPanelState() {
+  const enabled = document.getElementById('crystalEnabled')?.checked;
+  document.getElementById('crystalPanel')?.classList.toggle('disabled', !enabled);
+  const mode = getCrystalRollMode();
+  document.getElementById('crystalRerollBtn')?.classList.toggle('hidden', mode === 'custom');
+  const hint = document.getElementById('crystalRollHint');
+  if (hint) {
+    hint.textContent = mode === 'custom'
+      ? '自選模式下請於下方挑選各級詞條'
+      : '變更等級時自動補骰缺少的級數';
+  }
+  renderCrystalCustomPanel();
+}
+
+function updateCrystalPreview() {
+  updateCrystalPanelState();
+  const el = document.getElementById('crystalStatPreview');
+  if (!el) return;
+  if (!document.getElementById('crystalEnabled')?.checked) {
+    el.classList.remove('active');
+    el.textContent = '未計入水晶能力';
+    return;
+  }
+  const c = getCrystalStats();
+  el.classList.add('active');
+  const line = formatCrystalStatLine(c);
+  el.innerHTML = `<span class="crystal-preview-label">水晶能力：</span><span class="crystal-preview-stats">${line}</span>`;
+}
+
 function recalc(refreshCustomPanel = true) {
   const { avail, singleMax } = clampPoints();
   const vit = getNum('vit'), str = getNum('str'), def = getNum('def'), agi = getNum('agi'), mag = getNum('mag');
@@ -1051,7 +1402,7 @@ function recalc(refreshCustomPanel = true) {
   add(vit, CONTRIB.vit); add(str, CONTRIB.str); add(def, CONTRIB.def);
   add(agi, CONTRIB.agi); add(mag, CONTRIB.mag);
 
-  const eq = getEquipTotals();
+  const eq = getCombinedBonusStats();
   const display = {
     hp: Math.floor(sum.hp + (eq.hp || 0)),
     mp: Math.floor(sum.mp + (eq.mp || 0)),
@@ -1065,14 +1416,15 @@ function recalc(refreshCustomPanel = true) {
     amres: eq.amres || 0,
   };
 
-  document.getElementById('basicResults').innerHTML = BASIC_KEYS.map(k =>
+  document.getElementById('basicResults').innerHTML = RESULT_BASIC_KEYS.map(k =>
     `<div class="result-item"><span>${STAT_LABELS[k]}</span><strong>${display[k]}</strong></div>`
   ).join('');
 
-  document.getElementById('modResults').innerHTML = MOD_KEYS.map(k =>
+  document.getElementById('modResults').innerHTML = RESULT_MOD_KEYS.map(k =>
     `<div class="result-item"><span>${STAT_LABELS[k]}</span><strong>${eq[k] || 0}</strong></div>`
   ).join('');
 
+  updateCrystalPreview();
   renderEquipStage();
   if (refreshCustomPanel) renderCustomStatPanelIfNeeded();
 }
@@ -1188,8 +1540,7 @@ function sortPickerItems(items) {
 }
 
 function getLevelBadge(item, groupItems) {
-  const variant = getItemVariantBadge(item);
-  if (variant) return variant.label;
+  if (item.name === '英靈之誓' && item.itemId) return '';
   if (!item.level) return '';
   const same = sortPickerItems(groupItems.filter(x => x.level === item.level && x.name === item.name));
   if (same.length <= 1) return String(item.level);
@@ -1270,10 +1621,7 @@ function renderPickerGridItems(items, { badgeGroup = null } = {}) {
   return sorted.map(it => {
     const { general, mod } = getStatModes();
     const stats = formatStatLine(resolveEquipStats(it, general, mod, null));
-    const variant = getItemVariantBadge(it);
-    const lv = variant
-      ? `<span class="lv soul-tag ${variant.cls}">${escapeHtml(variant.label)}</span>`
-      : (getLevelBadge(it, badgeItems) ? `<span class="lv">${getLevelBadge(it, badgeItems)}</span>` : '');
+    const lv = getLevelBadge(it, badgeItems) ? `<span class="lv">${getLevelBadge(it, badgeItems)}</span>` : '';
     return `<button type="button" class="picker-item" data-id="${escapeHtml(it.id)}" title="${escapeHtml(stats)}">
       ${renderPickerIcon(it)}
       ${lv}
@@ -1414,7 +1762,7 @@ function currentBuild() {
   const lvl = Math.max(1, getNum('level'));
   clampPoints();
   recalc();
-  const eq = getEquipTotals();
+  const eq = getCombinedBonusStats();
   const vit = getNum('vit'), str = getNum('str'), def = getNum('def'), agi = getNum('agi'), mag = getNum('mag');
   const sum = { ...BASE };
   const add = (p, c) => { sum.hp += p*c.hp; sum.mp += p*c.mp; sum.atk += p*c.atk; sum.def += p*c.def; sum.agi += p*c.agi; sum.spt += p*c.spt; sum.rec += p*c.rec; };
@@ -1423,7 +1771,7 @@ function currentBuild() {
   return {
     name: document.getElementById('buildName').value.trim() || '未命名',
     lvl,
-    stats: { hp:sum.hp, mp:sum.mp, atk:sum.atk, def:sum.def, agi:sum.agi, spt:sum.spt, rec:sum.rec, matk:eq.matk, amres:eq.amres, crit:eq.crit, counter:eq.counter, hit:eq.hit, dodge:eq.dodge },
+    stats: Object.fromEntries(COMPARE_KEYS.map(k => [k, COMPARE_FROM_SUM.has(k) ? (sum[k] || 0) : (eq[k] || 0)])),
   };
 }
 
@@ -1431,10 +1779,7 @@ function renderCompare() {
   const tbody = document.querySelector('#compareTable tbody');
   tbody.innerHTML = compareList.map((b, i) => `<tr>
     <td style="text-align:left">${escapeHtml(b.name)}</td><td>${b.lvl}</td>
-    <td>${b.stats.hp}</td><td>${b.stats.mp}</td><td>${b.stats.atk}</td><td>${b.stats.def}</td>
-    <td>${b.stats.agi}</td><td>${b.stats.spt}</td><td>${b.stats.rec}</td>
-    <td>${b.stats.matk}</td><td>${b.stats.amres}</td><td>${b.stats.crit}</td><td>${b.stats.counter}</td>
-    <td>${b.stats.hit}</td><td>${b.stats.dodge}</td>
+    ${COMPARE_KEYS.map(k => `<td>${b.stats[k] ?? 0}</td>`).join('')}
     <td><button type="button" class="secondary" data-i="${i}">刪除</button></td>
   </tr>`).join('');
   tbody.querySelectorAll('button[data-i]').forEach(btn => {
@@ -1567,6 +1912,28 @@ document.querySelectorAll('#level,#vit,#str,#def,#agi,#mag,#statModeGeneral,#sta
   });
 });
 document.getElementById('hyorikiToggle').addEventListener('change', () => recalc());
+document.getElementById('crystalEnabled').addEventListener('change', () => {
+  ensureCrystalRolls();
+  recalc();
+});
+document.getElementById('crystalLevel').addEventListener('input', () => {
+  ensureCrystalRolls();
+  recalc();
+});
+document.getElementById('crystalRollMode').addEventListener('change', () => {
+  ensureCrystalRolls();
+  refreshCrystalRollValues();
+  recalc();
+});
+document.getElementById('crystalCustomRows').addEventListener('change', e => {
+  const sel = e.target.closest('.crystal-pick-select');
+  if (!sel) return;
+  onCrystalCustomPick(+sel.dataset.tier, +sel.value);
+});
+document.getElementById('crystalRerollBtn').addEventListener('click', () => {
+  ensureCrystalRolls({ rerollAll: true });
+  recalc();
+});
 document.getElementById('clearAllEquipsBtn').addEventListener('click', clearAllEquips);
 document.getElementById('clearAllStatsBtn').addEventListener('click', clearAllStatPoints);
 document.querySelectorAll('.stat-shortcut-btn[data-stat]').forEach(btn => {
@@ -1608,6 +1975,8 @@ document.getElementById('equipFileInput').addEventListener('change', async (e) =
 
 function boot() {
   initStatModeSelects();
+  renderCrystalRefTable();
+  updateCrystalPanelState();
   renderEquipStage();
   recalc();
   loadCatalog()
