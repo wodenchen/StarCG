@@ -640,72 +640,59 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>🐾 寵物成長模擬器</h1>
-      <nav class="header-nav" aria-label="相關連結">
-        <a href="StarCG_PriceChecker.html" class="header-link">⭐ 市場查價器</a>
-        <a href="StarCG_CharacterCalculator.html" class="header-link">⚔️ 角色能力計算</a>
-        <a href="https://www.starcg.net/" target="_blank" rel="noopener noreferrer" class="header-link">🌐 官網</a>
-        <a href="https://guide.starcg.net/" target="_blank" rel="noopener noreferrer" class="header-link">📖 官方攻略網</a>
+      <h1 data-i18n="pet.title">🐾 寵物成長模擬器</h1>
+      <nav class="header-nav" data-i18n-aria="nav.aria">
+        <a href="StarCG_PriceChecker.html" class="header-link" data-i18n="nav.price">⭐ 市場查價器</a>
+        <a href="StarCG_CharacterCalculator.html" class="header-link" data-i18n="nav.char">⚔️ 角色能力計算</a>
+        <a href="https://www.starcg.net/" target="_blank" rel="noopener noreferrer" class="header-link" data-i18n="nav.site">🌐 官網</a>
+        <a href="https://guide.starcg.net/" target="_blank" rel="noopener noreferrer" class="header-link" data-i18n="nav.guide">📖 官方攻略網</a>
       </nav>
     </header>
 
-    <div id="loadBar" class="load-bar">⏳ 正在載入寵物圖鑑…</div>
+    <div id="loadBar" class="load-bar" data-i18n="pet.loadCatalog">⏳ 正在載入寵物圖鑑…</div>
     <input type="file" id="petsFileInput" accept=".json,application/json">
 
     <div class="stack">
       <section class="card">
-        <h2><span class="section-icon">⚙️</span> 參數設定</h2>
+        <h2><span class="section-icon">⚙️</span> <span data-i18n="pet.params">參數設定</span></h2>
 
         <div class="params-grid">
           <div class="params-main">
             <div class="row">
-              <div class="field"><label>🧬 種族</label><select id="raceFilter"><option value="">全部</option></select></div>
-              <div class="field"><label>🃏 卡等</label>
+              <div class="field"><label data-i18n="pet.race">🧬 種族</label><select id="raceFilter"><option value="" data-i18n-opt="common.all">全部</option></select></div>
+              <div class="field"><label data-i18n="pet.cardFilter">🃏 卡等</label>
                 <select id="cardFilter">
-                  <option value="">全部</option>
-                  <option value="普">普卡</option>
-                  <option value="銀">銀卡</option>
-                  <option value="金">金卡</option>
+                  <option value="" data-i18n-opt="common.all">全部</option>
+                  <option value="普" data-i18n-opt="pet.cardNormal">普卡</option>
+                  <option value="銀" data-i18n-opt="pet.cardSilver">銀卡</option>
+                  <option value="金" data-i18n-opt="pet.cardGold">金卡</option>
                 </select>
               </div>
             </div>
 
             <div class="row row-pet-select">
-              <div class="field" style="flex:2"><label>🔍 選擇圖鑑寵物</label><select id="petSelect"><option value="">請選擇</option></select></div>
+              <div class="field" style="flex:2"><label data-i18n="pet.selectPet">🔍 選擇圖鑑寵物</label><select id="petSelect"><option value="" data-i18n-opt="pet.pleaseSelect">請選擇</option></select></div>
               <div class="field field-btn" style="align-self:end">
                 <label>&nbsp;</label>
-                <button type="button" id="maxStarBtn" class="toggle secondary">⭐ 一鍵滿星：OFF</button>
+                <button type="button" id="maxStarBtn" class="toggle secondary" data-i18n="pet.maxStarOff">⭐ 一鍵滿星：OFF</button>
               </div>
             </div>
             <div id="starStatus" class="hint" style="display:none"></div>
 
             <div class="row">
-              <div class="field" style="flex:2"><label>✏️ 寵物名稱</label><input id="petName" value="" placeholder="選擇圖鑑後自動帶入"></div>
+              <div class="field" style="flex:2"><label data-i18n="pet.name">✏️ 寵物名稱</label><input id="petName" value="" data-i18n-placeholder="pet.namePh" placeholder="選擇圖鑑後自動帶入"></div>
             </div>
           </div>
 
           <div class="params-side">
-            <div class="field"><label>📈 等級 (Lv)</label><input type="number" id="level" value="120" min="1" max="200"></div>
+            <div class="field"><label data-i18n="pet.level">📈 等級 (Lv)</label><input type="number" id="level" value="120" min="1" max="200"></div>
             <div class="field">
-              <label>🃏 卡片等級</label>
-              <select id="cardRank">
-                <option value="0">—</option>
-                <option value="6">普卡 (+6 BP/改)</option>
-                <option value="7">銀卡 (+7 BP/改)</option>
-                <option value="8">金卡 (+8 BP/改)</option>
-              </select>
+              <label data-i18n="pet.cardRank">🃏 卡片等級</label>
+              <select id="cardRank"></select>
             </div>
             <div class="field">
-              <label>🔧 改造次數</label>
-              <select id="modGrade">
-                <option value="0">0 改</option>
-                <option value="1">1 改</option>
-                <option value="2">2 改</option>
-                <option value="3">3 改</option>
-                <option value="4">4 改</option>
-                <option value="5">5 改</option>
-                <option value="6">6 改</option>
-              </select>
+              <label data-i18n="pet.modGrade">🔧 改造次數</label>
+              <select id="modGrade"></select>
             </div>
           </div>
         </div>
@@ -716,12 +703,12 @@
             <thead>
               <tr>
                 <th></th>
-                <th>體</th><th>力</th><th>強</th><th>速</th><th>魔</th>
+                <th data-i18n="pet.statVit">體</th><th data-i18n="pet.statStr">力</th><th data-i18n="pet.statDef">強</th><th data-i18n="pet.statAgi">速</th><th data-i18n="pet.statMag">魔</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="row-label">原始檔次</td>
+                <td class="row-label" data-i18n="pet.rowBase">原始檔次</td>
               <td><input class="base-stat" type="number" step="0.01" value="30"></td>
               <td><input class="base-stat" type="number" step="0.01" value="35"></td>
               <td><input class="base-stat" type="number" step="0.01" value="30"></td>
@@ -729,7 +716,7 @@
               <td><input class="base-stat" type="number" step="0.01" value="20"></td>
               </tr>
               <tr>
-                <td class="row-label">掉檔</td>
+                <td class="row-label" data-i18n="pet.rowLost">掉檔</td>
                 <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
                 <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
                 <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
@@ -737,7 +724,7 @@
                 <td><input class="lost-stat" type="number" value="0" min="0" max="4"></td>
               </tr>
               <tr>
-                <td class="row-label">隨機檔</td>
+                <td class="row-label" data-i18n="pet.rowRand">隨機檔</td>
                 <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
                 <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
                 <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
@@ -745,7 +732,7 @@
                 <td><input class="rand-stat" type="number" value="2" min="0" max="10"></td>
               </tr>
               <tr>
-                <td class="row-label">配點</td>
+                <td class="row-label" data-i18n="pet.rowManual">配點</td>
                 <td><input class="manual-point" type="number" value="0" min="0"></td>
                 <td><input class="manual-point" type="number" value="0" min="0"></td>
                 <td><input class="manual-point" type="number" value="0" min="0"></td>
@@ -760,103 +747,90 @@
           </div>
         </div>
 
-        <div class="hint">🎲 隨機檔總和：<strong id="randDisplay">10</strong><span id="randDisplaySuffix"> / 10</span></div>
-        <div id="randWarn" class="warn">⚠️ 隨機檔總和過高！</div>
-        <div class="hint">💎 可用點數：<strong id="pointDisplay">0 / 0</strong></div>
-        <div id="pointWarn" class="warn">⚠️ 配點超過上限！</div>
+        <div class="hint"><span data-i18n="pet.randSum">🎲 隨機檔總和：</span><strong id="randDisplay">10</strong><span id="randDisplaySuffix"> / 10</span></div>
+        <div id="randWarn" class="warn" data-i18n="pet.randWarn">⚠️ 隨機檔總和過高！</div>
+        <div class="hint"><span data-i18n="pet.points">💎 可用點數：</span><strong id="pointDisplay">0 / 0</strong></div>
+        <div id="pointWarn" class="warn" data-i18n="pet.pointWarn">⚠️ 配點超過上限！</div>
         <div id="manualWarn" class="warn"></div>
 
         <div class="btn-row">
-          <button type="button" class="secondary" onclick="maxStat(0)">❤️ 全體</button>
-          <button type="button" class="secondary" onclick="maxStat(1)">💪 全力</button>
-          <button type="button" class="secondary" onclick="maxStat(2)">⚔️ 全強</button>
-          <button type="button" class="secondary" onclick="maxStat(3)">💨 全速</button>
-          <button type="button" class="secondary" onclick="maxStat(4)">✨ 全魔</button>
-          <button type="button" onclick="addToComparison()">➕ 加入比較清單</button>
+          <button type="button" class="secondary" onclick="maxStat(0)" data-i18n="pet.btnAllVit">❤️ 全體</button>
+          <button type="button" class="secondary" onclick="maxStat(1)" data-i18n="pet.btnAllStr">💪 全力</button>
+          <button type="button" class="secondary" onclick="maxStat(2)" data-i18n="pet.btnAllDef">⚔️ 全強</button>
+          <button type="button" class="secondary" onclick="maxStat(3)" data-i18n="pet.btnAllAgi">💨 全速</button>
+          <button type="button" class="secondary" onclick="maxStat(4)" data-i18n="pet.btnAllMag">✨ 全魔</button>
+          <button type="button" onclick="addToComparison()" data-i18n="pet.addCompare">➕ 加入比較清單</button>
         </div>
       </section>
 
       <section class="card">
-        <h2><span class="section-icon">📊</span> 當前數值試算</h2>
+        <h2><span class="section-icon">📊</span> <span data-i18n="pet.preview">當前數值試算</span></h2>
         <div class="preview" id="preview">
           <div class="box"><div class="ico">❤️</div><div class="k">HP</div><div class="v" data-k="hp">-</div></div>
           <div class="box"><div class="ico">💧</div><div class="k">MP</div><div class="v" data-k="mp">-</div></div>
-          <div class="box"><div class="ico">⚔️</div><div class="k">攻擊</div><div class="v" data-k="atk">-</div></div>
-          <div class="box"><div class="ico">🛡️</div><div class="k">防禦</div><div class="v" data-k="def">-</div></div>
-          <div class="box"><div class="ico">💨</div><div class="k">敏捷</div><div class="v" data-k="agi">-</div></div>
-          <div class="box"><div class="ico">💚</div><div class="k">回復</div><div class="v" data-k="rec">-</div></div>
-          <div class="box"><div class="ico">🔮</div><div class="k">精神</div><div class="v" data-k="spt">-</div></div>
+          <div class="box"><div class="ico">⚔️</div><div class="k" data-k="atk">攻擊</div><div class="v" data-k="atk">-</div></div>
+          <div class="box"><div class="ico">🛡️</div><div class="k" data-k="def">防禦</div><div class="v" data-k="def">-</div></div>
+          <div class="box"><div class="ico">💨</div><div class="k" data-k="agi">敏捷</div><div class="v" data-k="agi">-</div></div>
+          <div class="box"><div class="ico">💚</div><div class="k" data-k="rec">回復</div><div class="v" data-k="rec">-</div></div>
+          <div class="box"><div class="ico">🔮</div><div class="k" data-k="spt">精神</div><div class="v" data-k="spt">-</div></div>
         </div>
       </section>
 
       <section class="card">
-      <h2><span class="section-icon">📋</span> 成長模擬比較清單 <span class="badge" id="compareCount">0</span></h2>
-      <p class="hint">👆 點列設為基準；再點一次取消。表頭可排序。拖曳 ⋮⋮ 或 ▲▼ 調整順序。</p>
+      <h2><span class="section-icon">📋</span> <span data-i18n="pet.compare">成長模擬比較清單</span> <span class="badge" id="compareCount">0</span></h2>
+      <p class="hint" data-i18n="pet.compareHint">👆 點列設為基準；再點一次取消。表頭可排序。拖曳 ⋮⋮ 或 ▲▼ 調整順序。</p>
       <div class="compare-wrap">
         <table class="compare" id="compareTable">
           <thead>
             <tr>
-              <th data-sort="name">名稱</th>
-              <th data-sort="level">Lv</th>
+              <th data-sort="name" data-i18n="common.name">名稱</th>
+              <th data-sort="level" data-i18n="common.lv">Lv</th>
               <th data-sort="hp">HP</th>
               <th data-sort="mp">MP</th>
-              <th data-sort="atk">攻擊</th>
-              <th data-sort="def">防禦</th>
-              <th data-sort="agi">敏捷</th>
-              <th data-sort="rec">回復</th>
-              <th data-sort="spt">精神</th>
-              <th>檔次配點</th>
-              <th>操作</th>
+              <th data-sort="atk" data-i18n="stat.atk">攻擊</th>
+              <th data-sort="def" data-i18n="stat.def">防禦</th>
+              <th data-sort="agi" data-i18n="stat.agi">敏捷</th>
+              <th data-sort="rec" data-i18n="stat.rec">回復</th>
+              <th data-sort="spt" data-i18n="stat.spt">精神</th>
+              <th data-i18n="pet.colPoints">檔次配點</th>
+              <th data-i18n="pet.colActions">操作</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
       <div class="btn-row">
-        <button type="button" class="secondary" onclick="downloadCSV()">📥 下載 CSV</button>
-        <button type="button" class="secondary" onclick="clearList()">🗑️ 清空列表</button>
+        <button type="button" class="secondary" onclick="downloadCSV()" data-i18n="pet.downloadCsv">📥 下載 CSV</button>
+        <button type="button" class="secondary" onclick="clearList()" data-i18n="pet.clearList">🗑️ 清空列表</button>
       </div>
       </section>
 
       <section class="card reverse-section" id="reverseEvalSection">
-        <h2><span class="section-icon">📊</span> 隨機檔優劣評估</h2>
-        <p class="hint">輸入遊戲面板的<strong>七圍數值</strong>，反推<strong>總隨機檔</strong>並判定優劣。<strong>建議小數第 2 位</strong>（PC 版面板可查看）。</p>
-        <p class="hint">ℹ️ 反推的<strong>總隨機檔</strong>含天生與成長亂數的綜合效果（無法拆分）。同等等級下總和越高通常代表隨機運越好。</p>
+        <h2><span class="section-icon">📊</span> <span data-i18n="pet.reverseTitle">隨機檔優劣評估</span></h2>
+        <p class="hint" data-i18n="pet.reverseHint1">輸入遊戲面板的<strong>七圍數值</strong>，反推<strong>總隨機檔</strong>並判定優劣。<strong>建議小數第 2 位</strong>（PC 版面板可查看）。</p>
+        <p class="hint" data-i18n="pet.reverseHint2">ℹ️ 反推的<strong>總隨機檔</strong>含天生與成長亂數的綜合效果（無法拆分）。同等等級下總和越高通常代表隨機運越好。</p>
 
         <div class="reverse-params">
-          <p class="hint" style="margin:0">⚙️ 以下參數<strong>獨立於成長模擬</strong>，僅用於反推；選圖鑑會同步檔次與卡片，其餘設定各自記憶。</p>
+          <p class="hint" style="margin:0" data-i18n="pet.reverseParamsHint">⚙️ 以下參數<strong>獨立於成長模擬</strong>，僅用於反推；選圖鑑會同步檔次與卡片，其餘設定各自記憶。</p>
           <div class="reverse-params-row">
-            <div class="field"><label>📈 等級 (Lv)</label><input type="number" class="rev-param" id="revLevel" value="1" min="1" max="200"></div>
+            <div class="field"><label data-i18n="pet.level">📈 等級 (Lv)</label><input type="number" class="rev-param" id="revLevel" value="1" min="1" max="200"></div>
             <div class="field">
-              <label>🃏 卡片等級</label>
-              <select class="rev-param" id="revCardRank">
-                <option value="0">—</option>
-                <option value="6">普卡 (+6 BP/改)</option>
-                <option value="7">銀卡 (+7 BP/改)</option>
-                <option value="8">金卡 (+8 BP/改)</option>
-              </select>
+              <label data-i18n="pet.cardRank">🃏 卡片等級</label>
+              <select class="rev-param" id="revCardRank"></select>
             </div>
             <div class="field">
-              <label>🔧 改造次數</label>
-              <select class="rev-param" id="revModGrade">
-                <option value="0">0 改</option>
-                <option value="1">1 改</option>
-                <option value="2">2 改</option>
-                <option value="3">3 改</option>
-                <option value="4">4 改</option>
-                <option value="5">5 改</option>
-                <option value="6">6 改</option>
-              </select>
+              <label data-i18n="pet.modGrade">🔧 改造次數</label>
+              <select class="rev-param" id="revModGrade"></select>
             </div>
           </div>
-          <div class="hint" style="margin-top:8px">💎 配點：<strong id="revPointDisplay">0 / 0</strong><span id="revPointWarn" class="warn" style="display:none;margin-left:8px">⚠️ 配點超過上限</span></div>
+          <div class="hint" style="margin-top:8px"><span data-i18n="pet.revPoints">💎 配點：</span><strong id="revPointDisplay">0 / 0</strong><span id="revPointWarn" class="warn" style="display:none;margin-left:8px" data-i18n="pet.revPointWarn">⚠️ 配點超過上限</span></div>
           <table class="stat-table rev-stat-table">
             <thead>
-              <tr><th></th><th>體</th><th>力</th><th>強</th><th>速</th><th>魔</th></tr>
+              <tr><th></th><th data-i18n="pet.statVit">體</th><th data-i18n="pet.statStr">力</th><th data-i18n="pet.statDef">強</th><th data-i18n="pet.statAgi">速</th><th data-i18n="pet.statMag">魔</th></tr>
             </thead>
             <tbody>
               <tr>
-                <td class="row-label">原始檔次</td>
+                <td class="row-label" data-i18n="pet.rowBase">原始檔次</td>
                 <td><input class="rev-base-stat rev-param" type="number" step="0.01" value="30"></td>
                 <td><input class="rev-base-stat rev-param" type="number" step="0.01" value="35"></td>
                 <td><input class="rev-base-stat rev-param" type="number" step="0.01" value="30"></td>
@@ -864,7 +838,7 @@
                 <td><input class="rev-base-stat rev-param" type="number" step="0.01" value="20"></td>
               </tr>
               <tr>
-                <td class="row-label">掉檔</td>
+                <td class="row-label" data-i18n="pet.rowLost">掉檔</td>
                 <td><input class="rev-lost-stat rev-param" type="number" value="0" min="0" max="4"></td>
                 <td><input class="rev-lost-stat rev-param" type="number" value="0" min="0" max="4"></td>
                 <td><input class="rev-lost-stat rev-param" type="number" value="0" min="0" max="4"></td>
@@ -872,7 +846,7 @@
                 <td><input class="rev-lost-stat rev-param" type="number" value="0" min="0" max="4"></td>
               </tr>
               <tr>
-                <td class="row-label">配點</td>
+                <td class="row-label" data-i18n="pet.rowManual">配點</td>
                 <td><input class="rev-manual-point rev-param" type="number" value="0" min="0"></td>
                 <td><input class="rev-manual-point rev-param" type="number" value="0" min="0"></td>
                 <td><input class="rev-manual-point rev-param" type="number" value="0" min="0"></td>
@@ -882,68 +856,74 @@
             </tbody>
           </table>
           <div class="btn-row" style="margin-top:8px">
-            <button type="button" class="secondary" onclick="maxRevStat(0)">❤️ 全體</button>
-            <button type="button" class="secondary" onclick="maxRevStat(1)">💪 全力</button>
-            <button type="button" class="secondary" onclick="maxRevStat(2)">⚔️ 全強</button>
-            <button type="button" class="secondary" onclick="maxRevStat(3)">💨 全速</button>
-            <button type="button" class="secondary" onclick="maxRevStat(4)">✨ 全魔</button>
+            <button type="button" class="secondary" onclick="maxRevStat(0)" data-i18n="pet.btnAllVit">❤️ 全體</button>
+            <button type="button" class="secondary" onclick="maxRevStat(1)" data-i18n="pet.btnAllStr">💪 全力</button>
+            <button type="button" class="secondary" onclick="maxRevStat(2)" data-i18n="pet.btnAllDef">⚔️ 全強</button>
+            <button type="button" class="secondary" onclick="maxRevStat(3)" data-i18n="pet.btnAllAgi">💨 全速</button>
+            <button type="button" class="secondary" onclick="maxRevStat(4)" data-i18n="pet.btnAllMag">✨ 全魔</button>
           </div>
         </div>
 
         <div class="reverse-grid reverse-grid-stats">
-          <div class="field"><label>❤️ HP <span class="req">*</span></label><input type="number" step="0.01" id="obsHp" placeholder="例：123.45" required></div>
-          <div class="field"><label>💧 MP <span class="req">*</span></label><input type="number" step="0.01" id="obsMp" placeholder="例：123.45" required></div>
-          <div class="field"><label>⚔️ 攻擊 <span class="req">*</span></label><input type="number" step="0.01" id="obsAtk" placeholder="例：123.45" required></div>
-          <div class="field"><label>🛡️ 防禦 <span class="req">*</span></label><input type="number" step="0.01" id="obsDef" placeholder="例：123.45" required></div>
-          <div class="field"><label>💨 敏捷 <span class="req">*</span></label><input type="number" step="0.01" id="obsAgi" placeholder="例：123.45" required></div>
-          <div class="field"><label>💚 回復 <span class="req">*</span></label><input type="number" step="0.01" id="obsRec" placeholder="例：100.00" required></div>
-          <div class="field"><label>🔮 精神 <span class="req">*</span></label><input type="number" step="0.01" id="obsSpt" placeholder="例：100.00" required></div>
+          <div class="field"><label>❤️ HP <span class="req">*</span></label><input type="number" step="0.01" id="obsHp" data-i18n-placeholder="pet.obsPh" placeholder="例：123.45" required></div>
+          <div class="field"><label>💧 MP <span class="req">*</span></label><input type="number" step="0.01" id="obsMp" data-i18n-placeholder="pet.obsPh" placeholder="例：123.45" required></div>
+          <div class="field"><label>⚔️ <span data-i18n="stat.atk">攻擊</span> <span class="req">*</span></label><input type="number" step="0.01" id="obsAtk" data-i18n-placeholder="pet.obsPh" placeholder="例：123.45" required></div>
+          <div class="field"><label>🛡️ <span data-i18n="stat.def">防禦</span> <span class="req">*</span></label><input type="number" step="0.01" id="obsDef" data-i18n-placeholder="pet.obsPh" placeholder="例：123.45" required></div>
+          <div class="field"><label>💨 <span data-i18n="stat.agi">敏捷</span> <span class="req">*</span></label><input type="number" step="0.01" id="obsAgi" data-i18n-placeholder="pet.obsPh" placeholder="例：123.45" required></div>
+          <div class="field"><label>💚 <span data-i18n="stat.rec">回復</span> <span class="req">*</span></label><input type="number" step="0.01" id="obsRec" data-i18n-placeholder="pet.obsPhRec" placeholder="例：100.00" required></div>
+          <div class="field"><label>🔮 <span data-i18n="stat.spt">精神</span> <span class="req">*</span></label><input type="number" step="0.01" id="obsSpt" data-i18n-placeholder="pet.obsPhRec" placeholder="例：100.00" required></div>
         </div>
         <div class="reverse-options">
-          <label><input type="checkbox" id="lockManualCheckbox"> 配點已確認（不搜尋其他配點）</label>
+          <label><input type="checkbox" id="lockManualCheckbox"> <span data-i18n="pet.lockManual">配點已確認（不搜尋其他配點）</span></label>
         </div>
         <div class="btn-row" style="margin-top:12px">
-          <button type="button" id="reverseCalcBtn">📊 評估隨機檔優劣</button>
-          <button type="button" class="secondary" id="addReverseEvalBtn" disabled>➕ 加入評估清單</button>
+          <button type="button" id="reverseCalcBtn" data-i18n="pet.reverseCalcBtn">📊 評估隨機檔優劣</button>
+          <button type="button" class="secondary" id="addReverseEvalBtn" disabled data-i18n="pet.addReverseEval">➕ 加入評估清單</button>
         </div>
         <div id="reverseStatus" style="display:none"></div>
         <div class="batch-obs-area">
-          <p class="hint">📋 <strong>批次貼上</strong>：每行一筆，格式 <code>評分,HP,MP,攻,防,敏,回復,精神</code>（評分可省略，會顯示於名稱旁）。使用<strong>上方反推參數</strong>，非成長模擬設定。</p>
+          <p class="hint" data-i18n="pet.batchHint">📋 <strong>批次貼上</strong>：每行一筆，格式 <code>評分,HP,MP,攻,防,敏,回復,精神</code>（評分可省略，會顯示於名稱旁）。使用<strong>上方反推參數</strong>，非成長模擬設定。</p>
           <textarea id="batchObsInput" placeholder="4353,3036,2384,1355.70,644.56,486.00,169.10,80.74&#10;4342,3024,2369,1354.81,644.72,483.69,168.44,80.28"></textarea>
           <div class="btn-row" style="margin-top:8px">
-            <button type="button" class="secondary" id="batchReverseBtn">📋 批次評估並加入清單</button>
+            <button type="button" class="secondary" id="batchReverseBtn" data-i18n="pet.batchReverseBtn">📋 批次評估並加入清單</button>
           </div>
         </div>
       </section>
 
       <section class="card">
-        <h2><span class="section-icon">📊</span> 反推評估比較清單 <span class="badge" id="reverseEvalCount">0</span></h2>
-        <p class="hint">👆 點列設為基準比較總和；表頭可排序。拖曳 ⋮⋮ 或 ▲▼ 調整順序。清單會自動儲存至瀏覽器。</p>
+        <h2><span class="section-icon">📊</span> <span data-i18n="pet.reverseCompareTitle">反推評估比較清單</span> <span class="badge" id="reverseEvalCount">0</span></h2>
+        <p class="hint" data-i18n="pet.reverseCompareHint">👆 點列設為基準比較總和；表頭可排序。拖曳 ⋮⋮ 或 ▲▼ 調整順序。清單會自動儲存至瀏覽器。</p>
         <div class="compare-wrap">
           <table class="compare" id="reverseEvalTable">
             <thead>
               <tr>
-                <th data-re-sort="name">名稱</th>
-                <th data-re-sort="level">Lv</th>
-                <th data-re-sort="quality">判定</th>
-                <th data-re-sort="randSum">總和</th>
-                <th>總隨機檔</th>
-                <th data-re-sort="fitErr">擬合</th>
-                <th>操作</th>
+                <th data-re-sort="name" data-i18n="common.name">名稱</th>
+                <th data-re-sort="level" data-i18n="common.lv">Lv</th>
+                <th data-re-sort="quality" data-i18n="pet.revColQuality">判定</th>
+                <th data-re-sort="randSum" data-i18n="pet.revColSum">總和</th>
+                <th data-i18n="pet.revColRand">總隨機檔</th>
+                <th data-re-sort="fitErr" data-i18n="pet.revColFit">擬合</th>
+                <th data-i18n="pet.colActions">操作</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
         <div class="btn-row">
-          <button type="button" class="secondary" onclick="downloadReverseEvalCSV()">📥 下載 CSV</button>
-          <button type="button" class="secondary" onclick="clearReverseEvalList()">🗑️ 清空列表</button>
+          <button type="button" class="secondary" onclick="downloadReverseEvalCSV()" data-i18n="pet.downloadCsv">📥 下載 CSV</button>
+          <button type="button" class="secondary" onclick="clearReverseEvalList()" data-i18n="pet.clearList">🗑️ 清空列表</button>
         </div>
       </section>
     </div>
   </div>
 
+  <script src="starcg_i18n.js"></script>
+  <script src="starcg_game_names.js"></script>
+  <script src="starcg_i18n_char_pet.js"></script>
+  <script src="starcg_i18n_messages.js"></script>
   <script>
+    function t(key, params) { return StarCG_I18N.t(key, params); }
+    function gn(name) { return StarCG_I18N.displayGameName(name); }
     const PET_REPO_RAW = 'https://raw.githubusercontent.com/wodenchen/StarCG/main/';
     function resolveDataUrl(relative) {
       return new URL(relative, location.href).href;
@@ -964,7 +944,10 @@
       return url.startsWith('http') && !url.includes('raw.githubusercontent.com');
     }
     const PET_IMAGE_BASE = 'https://guide.starcg.net/pet/';
-    const STAT_NAMES = ['體', '力', '強', '速', '魔'];
+    const STAT_NAME_KEYS = ['pet.statVit', 'pet.statStr', 'pet.statDef', 'pet.statAgi', 'pet.statMag'];
+    function statName(i) { return t(STAT_NAME_KEYS[i]); }
+    const REV_ISSUE = { UNALLOCATED: 'unallocated', NEG_RAND: 'negativeRand', NO_DECIMAL: 'noDecimal', HPMP_INT: 'hpmpInt' };
+    const REV_ISSUE_BLOCKING = new Set([REV_ISSUE.UNALLOCATED, REV_ISSUE.NEG_RAND]);
     const BP_INITIAL_RATE = 0.2; // 官方固定：檔次→1等BP 係數
     const BP_TO_STAT_MATRIX = [
       [8.0, 2.0, 3.0, 3.0, 1.0],
@@ -978,9 +961,7 @@
     const CORE_STAT_KEYS = ['hp', 'mp', 'atk', 'def', 'agi'];
     const EXT_STAT_KEYS = ['rec', 'spt'];
     const OBS_STAT_KEYS = [...CORE_STAT_KEYS, ...EXT_STAT_KEYS];
-    const OBS_STAT_LABELS = {
-      hp: 'HP', mp: 'MP', atk: '攻擊', def: '防禦', agi: '敏捷', spt: '精神', rec: '回復',
-    };
+    const OBS_STAT_LABELS = new Proxy({}, { get: (_, k) => StarCG_I18N.stat(k) });
     const RAND_SUM_MAX = 10;
     const RAND_STAT_MAX = 10;
     const STAT_BASE = { hp: 20, mp: 20, atk: 20, def: 20, agi: 20, spt: 100, rec: 100 };
@@ -991,6 +972,57 @@
     const PET_DATA_OVERRIDES = {
       '碧藍龍舟': { cardTier: '銀' },
     };
+
+    function formatPointsDisplay(used, limit) {
+      return t('pet.pointsFmt', { used, limit, remain: limit - used });
+    }
+
+    function refreshCardRankSelect(id) {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      const val = sel.value;
+      const opts = [
+        ['0', 'pet.cardRankNone'],
+        ['6', 'pet.cardRankBp6'],
+        ['7', 'pet.cardRankBp7'],
+        ['8', 'pet.cardRankBp8'],
+      ];
+      sel.innerHTML = opts.map(([v, key]) => `<option value="${v}">${t(key)}</option>`).join('');
+      sel.value = val;
+    }
+
+    function refreshModGradeSelect(id) {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      const val = sel.value;
+      sel.innerHTML = Array.from({ length: 7 }, (_, i) =>
+        `<option value="${i}">${t('pet.modN', { n: i })}</option>`
+      ).join('');
+      sel.value = val;
+    }
+
+    function refreshPetDropdowns() {
+      refreshCardRankSelect('cardRank');
+      refreshCardRankSelect('revCardRank');
+      refreshModGradeSelect('modGrade');
+      refreshModGradeSelect('revModGrade');
+    }
+
+    function updateMaxStarBtn() {
+      const btn = document.getElementById('maxStarBtn');
+      if (!btn) return;
+      btn.textContent = isMaxStar ? t('pet.maxStarOn') : t('pet.maxStarOff');
+      btn.classList.toggle('active', isMaxStar);
+    }
+
+    function buildAllocLabelFromArray(arr) {
+      return (arr || []).map((v, i) => v > 0 ? `${v}${statName(i)}` : '').filter(Boolean).join(' ');
+    }
+
+    function formatModText(modGrade, cardRank) {
+      if (!cardRank || cardRank <= 0) return t('pet.modNoneShort');
+      return t('pet.modNShort', { n: modGrade });
+    }
 
     function round2(n) {
       return Math.round((Number(n) || 0) * 100) / 100;
@@ -1080,7 +1112,7 @@
         if (!box.querySelector('.pet-portrait-placeholder')) {
           const ph = document.createElement('div');
           ph.className = 'pet-portrait-placeholder';
-          ph.textContent = '🐾\n無圖';
+          ph.textContent = t('pet.noImage');
           box.appendChild(ph);
         }
       };
@@ -1135,24 +1167,18 @@
       const maxStar = target - base;
       const total = catalogPet?.total ?? 0;
       if (maxStarApplied || total >= target) {
-        return { starCount: maxStar, starText: '滿星', starIsMax: true };
+        return { starCount: maxStar, starText: t('pet.starMax'), starIsMax: true };
       }
       const starCount = Math.max(0, Math.round(total - base));
       const starIsMax = starCount >= maxStar;
       return {
         starCount,
-        starText: starIsMax ? '滿星' : `${starCount}星`,
+        starText: starIsMax ? t('pet.starMax') : t('pet.starN', { n: starCount }),
         starIsMax,
       };
     }
 
     function getCompareStarMeta(pet) {
-      if (pet.starText) {
-        return {
-          starText: pet.starText,
-          starIsMax: !!pet.starIsMax,
-        };
-      }
       const catalogPet = pet.catalogTotal != null
         ? { total: pet.catalogTotal, cardType: cardTypeFromRank(pet.cardRank) }
         : findCatalogPetByName(pet.name);
@@ -1179,7 +1205,7 @@
       const catalogName = !Number.isNaN(idx) ? filteredPets[idx]?.name : '';
       const nameInput = document.getElementById('petName').value.trim();
       return {
-        name: nameInput || catalogName || '未命名',
+        name: nameInput || catalogName || t('common.unnamed'),
         level: Number(document.getElementById('level').value) || 1,
         base: getVals('.base-stat'),
         lost: getVals('.lost-stat'),
@@ -1195,7 +1221,7 @@
       const catalogName = !Number.isNaN(idx) ? filteredPets[idx]?.name : '';
       const nameInput = document.getElementById('petName').value.trim();
       return {
-        name: nameInput || catalogName || '未命名',
+        name: nameInput || catalogName || t('common.unnamed'),
         level: Number(document.getElementById('revLevel').value) || 1,
         base: getVals('.rev-base-stat'),
         lost: getVals('.rev-lost-stat'),
@@ -1216,7 +1242,7 @@
         }
       }
       const remaining = totalLimit - currentUsed;
-      document.getElementById('revPointDisplay').textContent = `${currentUsed} / ${totalLimit}（剩餘 ${remaining}）`;
+      document.getElementById('revPointDisplay').textContent = formatPointsDisplay(currentUsed, totalLimit);
       document.getElementById('revPointDisplay').style.color = currentUsed > totalLimit ? 'var(--danger)' : '';
       document.getElementById('revPointWarn').style.display = currentUsed > totalLimit ? 'inline' : 'none';
     }
@@ -1469,29 +1495,29 @@
     function randQualityInfo(sum, level = 1) {
       if (level <= 1) {
         if (sum >= RAND_SUM_MAX) {
-          return { label: '優', title: '滿隨機', tier: 'excellent', emoji: '🌟', desc: `總隨機檔已滿（${sum}/${RAND_SUM_MAX}）` };
+          return { label: t('pet.qLabelExcellent'), title: t('pet.qTitleFullRand'), tier: 'excellent', emoji: '🌟', desc: t('pet.qDescFull', { sum, max: RAND_SUM_MAX }) };
         }
         if (sum >= 8) {
-          return { label: '良', title: '優秀', tier: 'good', emoji: '✨', desc: `總和 ${sum}/${RAND_SUM_MAX}，不錯的隨機檔` };
+          return { label: t('pet.qLabelGood'), title: t('pet.qTitleExcellent'), tier: 'good', emoji: '✨', desc: t('pet.qDescGood', { sum, max: RAND_SUM_MAX }) };
         }
         if (sum >= 6) {
-          return { label: '普', title: '普通', tier: 'fair', emoji: '➖', desc: `總和 ${sum}/${RAND_SUM_MAX}，中規中矩` };
+          return { label: t('pet.qLabelFair'), title: t('pet.qTitleFair'), tier: 'fair', emoji: '➖', desc: t('pet.qDescFair', { sum, max: RAND_SUM_MAX }) };
         }
-        return { label: '劣', title: '偏低', tier: 'poor', emoji: '⚠️', desc: `總和 ${sum}/${RAND_SUM_MAX}，隨機檔偏差` };
+        return { label: t('pet.qLabelPoor'), title: t('pet.qTitlePoor'), tier: 'poor', emoji: '⚠️', desc: t('pet.qDescPoor', { sum, max: RAND_SUM_MAX }) };
       }
 
       const mid = expectedTotalRandMid(level);
       const diff = sum - mid;
       if (diff >= 3) {
-        return { label: '優', title: '隨機佳', tier: 'excellent', emoji: '🌟', desc: `總和 ${sum}，高於 Lv${level} 常見水準（參考約 ${round2(mid)}）` };
+        return { label: t('pet.qLabelExcellent'), title: t('pet.qTitleRandGood'), tier: 'excellent', emoji: '🌟', desc: t('pet.qDescHigh', { sum, level, mid: round2(mid) }) };
       }
       if (diff >= 0) {
-        return { label: '良', title: '偏好', tier: 'good', emoji: '✨', desc: `總和 ${sum}，略優於 Lv${level} 常見水準（參考約 ${round2(mid)}）` };
+        return { label: t('pet.qLabelGood'), title: t('pet.qTitlePrefer'), tier: 'good', emoji: '✨', desc: t('pet.qDescAbove', { sum, level, mid: round2(mid) }) };
       }
       if (diff >= -3) {
-        return { label: '普', title: '普通', tier: 'fair', emoji: '➖', desc: `總和 ${sum}，接近 Lv${level} 常見水準（參考約 ${round2(mid)}）` };
+        return { label: t('pet.qLabelFair'), title: t('pet.qTitleFair'), tier: 'fair', emoji: '➖', desc: t('pet.qDescNear', { sum, level, mid: round2(mid) }) };
       }
-      return { label: '劣', title: '偏差', tier: 'poor', emoji: '⚠️', desc: `總和 ${sum}，低於 Lv${level} 常見水準（參考約 ${round2(mid)}）` };
+      return { label: t('pet.qLabelPoor'), title: t('pet.qTitleDeviate'), tier: 'poor', emoji: '⚠️', desc: t('pet.qDescLow', { sum, level, mid: round2(mid) }) };
     }
 
     function randQualityLabel(sum, level = 1) {
@@ -1499,7 +1525,7 @@
     }
 
     function formatRandBreakdown(rand) {
-      return rand.map((v, i) => `${STAT_NAMES[i]}${v}`).join(' · ');
+      return rand.map((v, i) => `${statName(i)}${v}`).join(' · ');
     }
 
     function fitToleranceForLevel(level) {
@@ -1528,49 +1554,48 @@
     }
 
     function assessReverseConfidence(solvedData, observed, result) {
-      const issues = [];
+      const issueKeys = [];
       const { totalLimit, currentUsed } = computeManualCapped(solvedData);
-      if (totalLimit - currentUsed > 0) issues.push('尚有未配點');
+      if (totalLimit - currentUsed > 0) issueKeys.push(REV_ISSUE.UNALLOCATED);
 
       const { maxFitErr, worstKey, worstDiff } = computeFitMetrics(observed, result.stats);
       const tol = fitToleranceForLevel(solvedData.level);
       const hasNegativeRand = result.rand.some(r => r < 0);
-      if (hasNegativeRand) issues.push('反推結果含負值，請核對參數');
+      if (hasNegativeRand) issueKeys.push(REV_ISSUE.NEG_RAND);
       if (!observedHasDecimals(observed, OBS_STAT_KEYS)) {
-        issues.push('未使用小數第 2 位，精度可能不足');
+        issueKeys.push(REV_ISSUE.NO_DECIMAL);
       }
       if ((isStatInteger(observed.hp) || isStatInteger(observed.mp))
         && observedHasDecimals(observed, ['atk', 'def', 'agi', 'rec', 'spt'])) {
-        issues.push('HP/MP 為整數，擬合可能略偏差');
+        issueKeys.push(REV_ISSUE.HPMP_INT);
       }
 
-      const blockingIssues = issues.filter(i =>
-        i === '反推結果含負值，請核對參數' || i === '尚有未配點'
-      );
+      const blockingIssues = issueKeys.filter(k => REV_ISSUE_BLOCKING.has(k));
+      const issues = issueKeys.map(k => t('pet.issue.' + k));
 
       let level = 'low';
-      let text = '擬合偏差，請核對參數';
+      let msgKey = 'pet.confLow';
 
       if (hasNegativeRand || maxFitErr > tol.warn) {
         level = 'low';
-        text = '擬合偏差，請核對參數';
+        msgKey = 'pet.confLow';
       } else if (maxFitErr <= tol.good && blockingIssues.length === 0) {
         level = 'high';
-        text = '擬合佳';
+        msgKey = 'pet.confHigh';
       } else if (maxFitErr <= tol.ok) {
         level = 'medium';
-        text = solvedData.level > 50
-          ? '榜寵比較可用（含成長亂數殘差）'
-          : '擬合尚可（含模型殘差）';
+        msgKey = solvedData.level > 50 ? 'pet.confMediumHigh' : 'pet.confMedium';
       } else {
         level = 'medium';
-        text = '成長亂數殘差偏大，總隨機檔僅供參考';
+        msgKey = 'pet.confMediumLow';
       }
 
       return {
         level,
-        text,
+        text: t(msgKey),
+        msgKey,
         issues,
+        issueKeys,
         maxFitErr,
         worstKey,
         worstDiff,
@@ -1699,12 +1724,14 @@
       return { score: err + penalty, err, sum, stats };
     }
 
+    let lastReverseDisplay = null;
+
     function showReverseStatus(best, solvedData, observed, confidence) {
       const el = document.getElementById('reverseStatus');
       const level = solvedData.level;
       const quality = randQualityInfo(best.sum, level);
       const tierClass = confidence.level === 'low' ? 'tier-uncertain' : `tier-${quality.tier}`;
-      const sumSuffix = level <= 1 ? ` / ${RAND_SUM_MAX}` : `（Lv${level}）`;
+      const sumSuffix = level <= 1 ? ` / ${RAND_SUM_MAX}` : ` (${t('pet.totalSum')} Lv${level})`;
 
       const diffs = [];
       for (const k of OBS_STAT_KEYS) {
@@ -1716,22 +1743,30 @@
         }
       }
 
+      const worstPart = confidence.worstLabel
+        ? t('pet.maxFitWorst', {
+          label: confidence.worstLabel,
+          sign: confidence.worstDiff >= 0 ? '+' : '',
+          diff: confidence.worstDiff,
+        })
+        : '';
       const fitSummary = confidence.maxFitErr > 0
-        ? `最大偏差 ±${confidence.maxFitErr}${confidence.worstLabel ? `（${confidence.worstLabel}${confidence.worstDiff >= 0 ? '+' : ''}${confidence.worstDiff}）` : ''}`
-        : '七圍吻合';
+        ? t('pet.maxFitErr', { err: confidence.maxFitErr, worst: worstPart })
+        : t('pet.sevenStatMatch');
 
       el.style.display = 'block';
       el.className = 'rand-quality-result';
       el.innerHTML = [
-        `<div class="rand-quality-badge ${tierClass}">${quality.emoji} 判定：<strong>${quality.label}</strong>（${quality.title}）</div>`,
-        `<div class="rand-breakdown">總隨機檔：${formatRandBreakdown(best.rand)}｜總和 <strong>${best.sum}</strong>${sumSuffix}</div>`,
+        `<div class="rand-quality-badge ${tierClass}">${quality.emoji} ${t('pet.qualityVerdict')}<strong>${quality.label}</strong>（${quality.title}）</div>`,
+        `<div class="rand-breakdown">${t('pet.totalRand')}${formatRandBreakdown(best.rand)}｜${t('pet.totalSum')} <strong>${best.sum}</strong>${sumSuffix}</div>`,
         `<div class="hint">${quality.desc}</div>`,
-        diffs.length ? `<div class="hint">擬合誤差：${diffs.join('、')}</div>` : '<div class="hint">✅ 七圍吻合</div>',
+        diffs.length ? `<div class="hint">${t('pet.fitError')}${diffs.join('、')}</div>` : `<div class="hint">${t('pet.fitMatchOk')}</div>`,
         `<div class="hint">${fitSummary}</div>`,
         `<span class="confidence-tag ${confidence.level}">${confidence.text}</span>`,
         confidence.issues.length ? `<div class="hint" style="margin-top:8px">${confidence.issues.map(i => `⚠️ ${i}`).join('<br>')}</div>` : '',
         best.manualHint ? `<div class="hint">${best.manualHint}</div>` : '',
       ].filter(Boolean).join('');
+      lastReverseDisplay = { best, solvedData, observed, confidence };
     }
 
     function runReverseEval(data, observed, { lockManual = false } = {}) {
@@ -1755,7 +1790,9 @@
           const result = scoreReverseCandidate(data, manual, filled, rand);
           if (!best || result.score < best.score) {
             const hint = manual.some((v, i) => v !== manualCapped[i])
-              ? `配點假設：${manual.map((v, i) => v > 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ') || '全 0'}`
+              ? t('pet.manualHint', {
+                alloc: manual.map((v, i) => v > 0 ? `${v}${statName(i)}` : '').filter(Boolean).join(' ') || t('pet.manualAllZero'),
+              })
               : '';
             best = { rand, manualTrial: manual, manualHint: hint, ...result };
           }
@@ -1783,11 +1820,14 @@
         qualityTier: quality.tier,
         confidenceLevel: confidence.level,
         confidenceText: confidence.text,
+        confidenceMsgKey: confidence.msgKey,
         fitErr: confidence.maxFitErr,
         fitWorstLabel: confidence.worstLabel,
         fitWorstDiff: confidence.worstDiff,
-        lostLabel: data.lost.map((v, i) => v !== 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' '),
-        allocLabel: evalManualCapped.map((v, i) => v > 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' '),
+        lostLabel: data.lost.map((v, i) => v !== 0 ? `${v}${statName(i)}` : '').filter(Boolean).join(' '),
+        allocLabel: buildAllocLabelFromArray(evalManualCapped),
+        lost: [...data.lost],
+        alloc: [...evalManualCapped],
       };
     }
 
@@ -1796,13 +1836,17 @@
       const observed = getObservedInputs();
       const statusEl = document.getElementById('reverseStatus');
       lastReverseEval = null;
+      lastReverseDisplay = null;
       document.getElementById('addReverseEvalBtn').disabled = true;
 
       const missing = OBS_STAT_KEYS.filter(k => observed[k] == null);
       if (missing.length) {
         statusEl.style.display = 'block';
         statusEl.className = 'hint';
-        statusEl.textContent = `⚠️ 請輸入完整七圍：${missing.map(k => OBS_STAT_LABELS[k]).join('、')}（建議小數第 2 位）`;
+        statusEl.textContent = t('pet.reverseMissing', {
+          stats: missing.map(k => OBS_STAT_LABELS[k]).join('、'),
+        });
+        lastReverseDisplay = null;
         return;
       }
 
@@ -1811,7 +1855,8 @@
       if (!result) {
         statusEl.style.display = 'block';
         statusEl.className = 'hint';
-        statusEl.textContent = '⚠️ 反推失敗，請確認七圍與反推區參數是否正確';
+        statusEl.textContent = t('pet.reverseFailed');
+        lastReverseDisplay = null;
         return;
       }
 
@@ -1841,26 +1886,29 @@
       const randWarn = document.getElementById('randWarn');
       const q = randQualityInfo(randSum, data.level);
       if (isReversedRand) {
-        suffixEl.textContent = data.level <= 1 ? ` / ${RAND_SUM_MAX}` : `（Lv${data.level} 總隨機檔）`;
-        randWarn.textContent = `✅ 評估 ${q.label}（${q.title}，總和 ${randSum}${data.level <= 1 ? `/${RAND_SUM_MAX}` : ''}）`;
+        suffixEl.textContent = data.level <= 1 ? ` / ${RAND_SUM_MAX}` : t('pet.randLvSuffix', { level: data.level });
+        randWarn.textContent = t('pet.randEvalOk', {
+          label: q.label,
+          title: q.title,
+          sum: randSum,
+          suffix: data.level <= 1 ? `/${RAND_SUM_MAX}` : '',
+        });
         randWarn.style.display = 'inline';
       } else {
         suffixEl.textContent = ` / ${RAND_SUM_MAX}`;
-        randWarn.textContent = !isInnateRandValid(data.rand)
-          ? '⚠️ 試算隨機檔總和超過 10（僅 Lv1 天生上限）'
-          : '';
+        randWarn.textContent = !isInnateRandValid(data.rand) ? t('pet.randOver10') : '';
         randWarn.style.display = !isInnateRandValid(data.rand) ? 'inline' : 'none';
       }
 
       const pointDisplay = document.getElementById('pointDisplay');
-      pointDisplay.textContent = `${currentUsed} / ${totalLimit}（剩餘 ${remaining}）`;
+      pointDisplay.textContent = formatPointsDisplay(currentUsed, totalLimit);
       pointDisplay.style.color = currentUsed > totalLimit ? 'var(--danger)' : '';
       document.getElementById('pointWarn').style.display = currentUsed > totalLimit ? 'inline' : 'none';
 
       const overs = [];
       for (let i = 0; i < manualCapped.length; i++) {
         if (data.manual[i] >= perStatMaxBP[i] && perStatMaxBP[i] >= 0) {
-          overs.push(`${STAT_NAMES[i]}上限 ${perStatMaxBP[i]}`);
+          overs.push(t('pet.statCap', { stat: statName(i), cap: perStatMaxBP[i] }));
         }
       }
       const manualWarn = document.getElementById('manualWarn');
@@ -1917,7 +1965,7 @@
     function populateFilters() {
       const races = [...new Set(allPets.map(p => p.race).filter(Boolean))].sort();
       document.getElementById('raceFilter').innerHTML =
-        '<option value="">全部</option>' + races.map(r => `<option value="${r}">${r}</option>`).join('');
+        `<option value="">${t('common.all')}</option>` + races.map(r => `<option value="${r}">${StarCG_I18N.displayRace(r)}</option>`).join('');
     }
 
     function populatePetSelect() {
@@ -1932,8 +1980,8 @@
 
       const sel = document.getElementById('petSelect');
       const prevIdx = parseInt(sel.value, 10);
-      sel.innerHTML = '<option value="">請選擇</option>' +
-        filteredPets.map((p, i) => `<option value="${i}">${p.name}（${p.cardType} · 總${p.total}）</option>`).join('');
+      sel.innerHTML = `<option value="">${t('pet.pleaseSelect')}</option>` +
+        filteredPets.map((p, i) => `<option value="${i}">${escapeHtml(gn(p.name))}${t('pet.catalogSuffix', { cardType: StarCG_I18N.displayCardTier(p.cardType), total: p.total })}</option>`).join('');
       if (!Number.isNaN(prevIdx) && prevIdx < filteredPets.length) {
         sel.value = String(prevIdx);
         updatePetPortrait(filteredPets[prevIdx]);
@@ -1961,10 +2009,10 @@
         starStatus.style.display = 'block';
         if (missing === 0 || isMaxStar) {
           starStatus.className = 'hint status ok';
-          starStatus.textContent = '✨ 天生滿星';
+          starStatus.textContent = t('pet.starBornMax');
         } else {
           starStatus.className = 'hint status err';
-          starStatus.textContent = `⚠️ 缺少 ${missing} 星${isMaxStar ? '' : '（可開 ⭐ 一鍵滿星）'}`;
+          starStatus.textContent = t('pet.starMissing', { missing }) + (isMaxStar ? '' : t('pet.starMissingHint'));
         }
       } else {
         starStatus.style.display = 'none';
@@ -2016,7 +2064,7 @@
     function batchReverseEval() {
       const text = document.getElementById('batchObsInput').value.trim();
       if (!text) {
-        alert('請貼上至少一行七圍資料');
+        alert(t('pet.batchNoData'));
         return;
       }
       const data = getReverseInputs();
@@ -2058,8 +2106,8 @@
         renderReverseEvalComparison();
       }
       alert(added > 0
-        ? `已加入 ${added} 筆${skipped ? `，略過 ${skipped} 筆` : ''}`
-        : `無有效資料（略過 ${skipped} 筆）`);
+        ? t('pet.batchAdded', { added }) + (skipped ? t('pet.batchSkipped', { skipped }) : '')
+        : t('pet.batchNoValid', { skipped }));
     }
 
     function moveReverseEvalItem(id, direction) {
@@ -2139,12 +2187,12 @@
         const tierClass = `tier-${item.qualityTier || 'fair'}`;
         const fitDetail = item.fitErr > 0
           ? `±${item.fitErr}${item.fitWorstLabel ? ` (${item.fitWorstLabel}${item.fitWorstDiff >= 0 ? '+' : ''}${item.fitWorstDiff})` : ''}`
-          : '吻合';
+          : t('pet.fitMatch');
         const confClass = item.confidenceLevel === 'high' ? 'high' : item.confidenceLevel === 'medium' ? 'medium' : 'low';
         const metaParts = [];
-        if (item.gameScore != null) metaParts.push(`${item.gameScore}分`);
-        if (item.lostLabel) metaParts.push(`掉：${item.lostLabel}`);
-        if (item.allocLabel) metaParts.push(`配：${item.allocLabel}`);
+        if (item.gameScore != null) metaParts.push(t('pet.metaScore', { n: item.gameScore }));
+        if (item.lostLabel) metaParts.push(t('pet.metaLost', { label: item.lostLabel }));
+        if (item.allocLabel) metaParts.push(t('pet.metaAlloc', { label: item.allocLabel }));
         tr.innerHTML = `
           <td style="text-align:left">
             <span class="base-dot ${item.id === reverseEvalBaseId ? 'active' : ''}"></span>
@@ -2158,10 +2206,10 @@
           <td style="font-size:0.82rem">${fitDetail}<br><span class="confidence-tag ${confClass}" style="margin-top:4px">${escapeHtml(item.confidenceText)}</span></td>
           <td>
             <div class="compare-ops">
-              <span class="drag-handle" draggable="true" title="拖曳調整順序">⋮⋮</span>
-              <button type="button" class="secondary icon-btn" data-re-move-up="${item.id}" title="上移" ${index === 0 ? 'disabled' : ''}>▲</button>
-              <button type="button" class="secondary icon-btn" data-re-move-down="${item.id}" title="下移" ${index === reverseEvalList.length - 1 ? 'disabled' : ''}>▼</button>
-              <button type="button" class="secondary" data-re-remove="${item.id}">移除</button>
+              <span class="drag-handle" draggable="true" title="${t('pet.dragReorder')}">⋮⋮</span>
+              <button type="button" class="secondary icon-btn" data-re-move-up="${item.id}" title="${t('pet.moveUp')}" ${index === 0 ? 'disabled' : ''}>▲</button>
+              <button type="button" class="secondary icon-btn" data-re-move-down="${item.id}" title="${t('pet.moveDown')}" ${index === reverseEvalList.length - 1 ? 'disabled' : ''}>▼</button>
+              <button type="button" class="secondary" data-re-remove="${item.id}">${t('pet.remove')}</button>
             </div>
           </td>
         `;
@@ -2224,12 +2272,16 @@
 
     function downloadReverseEvalCSV() {
       if (!reverseEvalList.length) {
-        alert('評估清單為空');
+        alert(t('pet.revCompareEmpty'));
         return;
       }
-      const rows = [['名稱', '等級', '判定', '標題', '總和', '總隨機檔', '擬合誤差', '最大偏差項', '可信度', '掉檔', '配點']];
+      const rows = [[
+        t('pet.csv.name'), t('pet.csv.level'), t('pet.csv.rating'), t('pet.csv.title'),
+        t('pet.csv.sum'), t('pet.csv.totalRand'), t('pet.csv.fitErr'), t('pet.csv.worstFit'),
+        t('pet.csv.confidence'), t('pet.csv.lost'), t('pet.csv.points'),
+      ]];
       reverseEvalList.forEach(p => {
-        const displayName = p.gameScore != null ? `${p.name}（${p.gameScore}分）` : p.name;
+        const displayName = p.gameScore != null ? `${p.name}（${t('pet.metaScore', { n: p.gameScore })}）` : p.name;
         rows.push([
           displayName, p.level, p.qualityLabel, p.qualityTitle, p.randSum, p.randBreakdown,
           p.fitErr,
@@ -2261,14 +2313,14 @@
     }
 
     function buildLostLabelFromArray(lostArr) {
-      return (lostArr || []).map((v, i) => v !== 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ');
+      return (lostArr || []).map((v, i) => v !== 0 ? `${v}${statName(i)}` : '').filter(Boolean).join(' ');
     }
 
     function lostTotalFromLabel(lostLabel) {
       if (!lostLabel) return 0;
       let sum = 0;
-      for (const ch of STAT_NAMES) {
-        const m = lostLabel.match(new RegExp(`(\\d+)${ch}`));
+      for (let i = 0; i < STAT_NAME_KEYS.length; i++) {
+        const m = lostLabel.match(new RegExp(`(\\d+)${statName(i)}`));
         if (m) sum += Number(m[1]);
       }
       return sum;
@@ -2283,30 +2335,48 @@
           : lostTotalFromLabel(pet.lostLabel);
       const lostDetail = pet.lostLabel || (lostArr ? buildLostLabelFromArray(lostArr) : '');
       const lostText = lostTotal === 0
-        ? '滿檔'
+        ? t('pet.perfectGrade')
         : lostDetail
-          ? `掉${lostTotal}檔（${lostDetail}）`
-          : `掉${lostTotal}檔`;
+          ? t('pet.lostDetail', { n: lostTotal, detail: lostDetail })
+          : t('pet.lostNSimple', { n: lostTotal });
       return { lostTotal, lostText };
     }
 
-    function formatCompareAllocLabel(allocLabel) {
-      return allocLabel ? `配 ${allocLabel}` : '配 0';
+    function formatCompareAllocLabel(allocLabel, allocArr) {
+      const label = allocArr ? buildAllocLabelFromArray(allocArr) : allocLabel;
+      return label ? t('pet.allocFmt', { label }) : t('pet.allocZero');
     }
 
     function getCompareModMeta(pet) {
-      const text = pet.modInfo
-        ?? (pet.modGrade != null && pet.cardRank > 0 ? `${pet.modGrade}改` : null)
-        ?? '無';
-      if (text === '無') return { modText: '無改', modClass: 'mod-none' };
-      return { modText: text, modClass: 'mod' };
+      const modText = formatModText(pet.modGrade ?? 0, pet.cardRank);
+      if (modText === t('pet.modNoneShort')) return { modText, modClass: 'mod-none' };
+      return { modText, modClass: 'mod' };
+    }
+
+    function refreshComparisonLabels() {
+      comparisonList.forEach(pet => {
+        if (pet.lost) pet.lostLabel = buildLostLabelFromArray(pet.lost);
+        if (pet.alloc) pet.allocLabel = buildAllocLabelFromArray(pet.alloc);
+      });
+    }
+
+    function refreshReverseEvalLabels() {
+      reverseEvalList.forEach(item => {
+        const q = randQualityInfo(item.randSum, item.level);
+        item.qualityLabel = q.label;
+        item.qualityTitle = q.title;
+        item.randBreakdown = formatRandBreakdown(item.rand);
+        if (item.lost) item.lostLabel = buildLostLabelFromArray(item.lost);
+        if (item.alloc) item.allocLabel = buildAllocLabelFromArray(item.alloc);
+        if (item.confidenceMsgKey) item.confidenceText = t(item.confidenceMsgKey);
+      });
     }
 
     function addToComparison() {
       const data = getInputs();
       const { stats, manualCapped } = calculateStats(data, false);
-      const allocLabel = manualCapped.map((v, i) => v > 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ');
-      const lostLabel = data.lost.map((v, i) => v !== 0 ? `${v}${STAT_NAMES[i]}` : '').filter(Boolean).join(' ');
+      const allocLabel = buildAllocLabelFromArray(manualCapped);
+      const lostLabel = data.lost.map((v, i) => v !== 0 ? `${v}${statName(i)}` : '').filter(Boolean).join(' ');
       const lostTotal = sumLostStats(data.lost);
       const idx = parseInt(document.getElementById('petSelect').value, 10);
       const catalogPet = !Number.isNaN(idx) ? filteredPets[idx] : findCatalogPetByName(data.name);
@@ -2317,7 +2387,6 @@
         name: data.name,
         level: data.level,
         stats,
-        modInfo: data.cardRank > 0 ? `${data.modGrade}改` : '無',
         modGrade: data.modGrade,
         cardRank: data.cardRank,
         catalogTotal: catalogPet?.total ?? null,
@@ -2327,6 +2396,7 @@
         starIsMax,
         lost: [...data.lost],
         lostTotal,
+        alloc: manualCapped.slice(),
         allocLabel,
         lostLabel,
       });
@@ -2432,7 +2502,7 @@
         const { lostTotal, lostText } = getCompareLostMeta(pet);
         const { starText, starIsMax } = getCompareStarMeta(pet);
         const { modText, modClass } = getCompareModMeta(pet);
-        const allocText = formatCompareAllocLabel(pet.allocLabel);
+        const allocText = formatCompareAllocLabel(pet.allocLabel, pet.alloc);
         const gradeClass = lostTotal === 0 ? 'perfect' : 'lost';
         const starClass = starIsMax ? 'star-max' : 'star';
         const starHtml = starText
@@ -2442,7 +2512,7 @@
         tr.innerHTML = `
           <td style="text-align:left">
             <span class="base-dot ${pet.id === basePetId ? 'active' : ''}"></span>
-            <strong>${escapeHtml(pet.name)}</strong>
+            <strong>${escapeHtml(gn(pet.name))}</strong>
             <span class="compare-meta">
               <span class="compare-grade ${modClass}">${escapeHtml(modText)}</span>
               · <span class="compare-grade ${gradeClass}">${escapeHtml(lostText)}</span>${starHtml}
@@ -2465,10 +2535,10 @@
           </td>
           <td>
             <div class="compare-ops">
-              <span class="drag-handle" draggable="true" title="拖曳調整順序">⋮⋮</span>
-              <button type="button" class="secondary icon-btn" data-move-up="${pet.id}" title="上移" ${index === 0 ? 'disabled' : ''}>▲</button>
-              <button type="button" class="secondary icon-btn" data-move-down="${pet.id}" title="下移" ${index === comparisonList.length - 1 ? 'disabled' : ''}>▼</button>
-              <button type="button" class="secondary" data-remove="${pet.id}">移除</button>
+              <span class="drag-handle" draggable="true" title="${t('pet.dragReorder')}">⋮⋮</span>
+              <button type="button" class="secondary icon-btn" data-move-up="${pet.id}" title="${t('pet.moveUp')}" ${index === 0 ? 'disabled' : ''}>▲</button>
+              <button type="button" class="secondary icon-btn" data-move-down="${pet.id}" title="${t('pet.moveDown')}" ${index === comparisonList.length - 1 ? 'disabled' : ''}>▼</button>
+              <button type="button" class="secondary" data-remove="${pet.id}">${t('pet.remove')}</button>
             </div>
           </td>
         `;
@@ -2525,10 +2595,14 @@
 
     function downloadCSV() {
       if (!comparisonList.length) {
-        alert('比較清單為空');
+        alert(t('pet.compareEmpty'));
         return;
       }
-      const rows = [['名稱', '等級', 'HP', 'MP', '攻擊', '防禦', '敏捷', '回復', '精神', '改造', '檔次', '星數', '配點']];
+      const rows = [[
+        t('pet.csv.name'), t('pet.csv.level'), 'HP', 'MP',
+        t('stat.atk'), t('stat.def'), t('stat.agi'), t('stat.rec'), t('stat.spt'),
+        t('pet.csv.mod'), t('pet.csv.grade'), t('pet.csv.stars'), t('pet.csv.points'),
+      ]];
       comparisonList.forEach(p => {
         const { lostText } = getCompareLostMeta(p);
         const { starText } = getCompareStarMeta(p);
@@ -2536,10 +2610,10 @@
           p.name, p.level,
           fmtStat(p.stats.hp), fmtStat(p.stats.mp), fmtStat(p.stats.atk), fmtStat(p.stats.def),
           fmtStat(p.stats.agi), fmtStat(p.stats.rec), fmtStat(p.stats.spt),
-          p.modInfo,
+          formatModText(p.modGrade ?? 0, p.cardRank),
           lostText,
           starText || '',
-          p.allocLabel || '0',
+          p.alloc ? buildAllocLabelFromArray(p.alloc) : (p.allocLabel || '0'),
         ]);
       });
       const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
@@ -2582,7 +2656,7 @@
           lastErr = err;
         }
       }
-      throw lastErr || new Error('遠端載入失敗');
+      throw lastErr || new Error(t('pet.loadRemoteFail'));
     }
 
     function applyPetDataOverrides() {
@@ -2596,12 +2670,12 @@
 
     function applyPetsData(raw) {
       const list = normalizePetList(raw);
-      if (!list?.length) throw new Error('圖鑑資料格式錯誤');
+      if (!list?.length) throw new Error(t('pet.loadFormatErr'));
       allPets = list.map(adaptPet);
       applyPetDataOverrides();
       const bar = document.getElementById('loadBar');
       bar.className = 'load-bar status ok';
-      bar.textContent = `✅ 圖鑑已就緒，共 ${allPets.length} 隻寵物`;
+      bar.textContent = t('pet.catalogReady', { n: allPets.length });
       populateFilters();
       populatePetSelect();
     }
@@ -2629,11 +2703,9 @@
       const bar = document.getElementById('loadBar');
       bar.className = 'load-bar status err';
       bar.innerHTML = [
-        `⚠️ 無法載入寵物圖鑑：${lastErr?.message || '未知錯誤'}。`,
-        isFileProtocol
-          ? '請勿直接雙擊開啟此頁面；改用 Live Server，或點下方按鈕手動選擇圖鑑資料。'
-          : 'GitHub Pages 請確認同目錄已上傳 <code>pets-local.json</code> 或 <code>pets.json</code>；或點下方按鈕手動選擇。',
-        '<button type="button" class="secondary" id="pickPetsBtn">📂 選擇圖鑑資料</button>',
+        t('pet.loadFail', { msg: lastErr?.message || t('pet.loadRemoteFail') }),
+        isFileProtocol ? t('pet.loadFailFile') : t('pet.loadFailWeb'),
+        `<button type="button" class="secondary" id="pickPetsBtn">${t('pet.catalogPickBtn')}</button>`,
       ].join('<br>');
       document.getElementById('pickPetsBtn').addEventListener('click', () => {
         document.getElementById('petsFileInput').click();
@@ -2673,9 +2745,7 @@
 
     document.getElementById('maxStarBtn').addEventListener('click', () => {
       isMaxStar = !isMaxStar;
-      const btn = document.getElementById('maxStarBtn');
-      btn.textContent = isMaxStar ? '⭐ 一鍵滿星：ON' : '⭐ 一鍵滿星：OFF';
-      btn.classList.toggle('active', isMaxStar);
+      updateMaxStarBtn();
       const idx = parseInt(document.getElementById('petSelect').value, 10);
       if (!Number.isNaN(idx)) applyPetToInputs(filteredPets[idx]);
     });
@@ -2695,10 +2765,37 @@
         await loadPetsFromFile(file);
       } catch (err) {
         document.getElementById('loadBar').className = 'load-bar status err';
-        document.getElementById('loadBar').textContent = `⚠️ 讀檔失敗：${err.message}`;
+        document.getElementById('loadBar').textContent = t('pet.fileReadErr', { msg: err.message });
       }
       e.target.value = '';
     });
+
+    function applyPetLang() {
+      StarCG_I18N.apply(document.body);
+      document.querySelectorAll('#preview .k[data-k]').forEach(el => {
+        el.textContent = StarCG_I18N.stat(el.dataset.k);
+      });
+      refreshPetDropdowns();
+      updateMaxStarBtn();
+      if (allPets.length) {
+        populateFilters();
+        populatePetSelect();
+      }
+      refreshComparisonLabels();
+      refreshReverseEvalLabels();
+      calculateCurrent();
+      updateReversePointDisplay();
+      if (lastReverseDisplay) {
+        const { best, solvedData, observed } = lastReverseDisplay;
+        const confidence = assessReverseConfidence(solvedData, observed, best);
+        showReverseStatus(best, solvedData, observed, confidence);
+      }
+      renderComparison();
+      renderReverseEvalComparison();
+    }
+
+    refreshPetDropdowns();
+    StarCG_I18N.init({ titleKey: 'pet.docTitle', onChange: applyPetLang });
 
     loadLockManualPref();
     loadReverseParams();

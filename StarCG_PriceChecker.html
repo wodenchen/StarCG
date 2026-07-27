@@ -2766,35 +2766,30 @@
 <div class="container">
     <!-- Header -->
     <div class="header">
-        <h1>⭐ 星詠魔力 市場查價器</h1>
+        <h1 data-i18n="price.title">⭐ 星詠魔力 市場查價器</h1>
         <span class="badge">v2.0</span>
-        <nav class="header-nav" aria-label="相關連結">
-            <a href="StarCG_PetCalculator.html" class="header-link">🐾 寵物成長模擬</a>
-            <a href="StarCG_CharacterCalculator.html" class="header-link">⚔️ 角色能力計算</a>
-            <a href="https://www.starcg.net/" target="_blank" rel="noopener noreferrer" class="header-link">🌐 官網</a>
-            <a href="https://guide.starcg.net/" target="_blank" rel="noopener noreferrer" class="header-link">📖 官方攻略網</a>
+        <nav class="header-nav" data-i18n-aria="nav.aria">
+            <a href="StarCG_PetCalculator.html" class="header-link" data-i18n="nav.pet">🐾 寵物成長模擬</a>
+            <a href="StarCG_CharacterCalculator.html" class="header-link" data-i18n="nav.char">⚔️ 角色能力計算</a>
+            <a href="https://www.starcg.net/" target="_blank" rel="noopener noreferrer" class="header-link" data-i18n="nav.site">🌐 官網</a>
+            <a href="https://guide.starcg.net/" target="_blank" rel="noopener noreferrer" class="header-link" data-i18n="nav.guide">📖 官方攻略網</a>
         </nav>
     </div>
 
     <!-- Search Panel -->
     <div class="search-panel">
-        <div id="fileProtocolWarning" class="file-protocol-warning" style="display:none;">
-            ⚠️ 偵測到直接用檔案開啟（<code>file://</code>），瀏覽器會擋住 API 請求。
-            請在資料夾執行 <code>python proxy.py</code>，再用
-            <a href="http://localhost:8000/StarCG_PriceChecker.html">http://localhost:8000/StarCG_PriceChecker.html</a> 開啟。
-            或部署到 GitHub Pages 使用公開網址。
-        </div>
+        <div id="fileProtocolWarning" class="file-protocol-warning" style="display:none;" data-i18n-html="price.fileProtocolWarn"></div>
         <!-- 第一行：搜尋框 + 主要按鈕 -->
         <div class="search-row">
             <div class="form-group grow">
-                <label>🔍 搜尋物品/寵物名稱</label>
-                <input type="text" id="searchInput" placeholder="輸入名稱關鍵字...">
+                <label data-i18n="price.searchLabel">🔍 搜尋物品/寵物名稱</label>
+                <input type="text" id="searchInput" data-i18n-placeholder="price.searchPh" placeholder="輸入名稱關鍵字...">
             </div>
             <div class="form-group">
                 <label>&nbsp;</label>
                 <div class="search-actions">
-                    <button id="searchBtn">🔍 搜尋市場</button>
-                    <button id="petScanBtn" type="button" class="secondary" title="掃描全場寵物攤位（可勾選滿檔/滿星/滿技篩選；搜尋框可填名稱縮小範圍）">🐾 全場寵掃描</button>
+                    <button id="searchBtn" data-i18n="price.searchBtn">🔍 搜尋市場</button>
+                    <button id="petScanBtn" type="button" class="secondary" data-i18n-title="price.petScanTip" data-i18n="price.petScan">🐾 全場寵掃描</button>
                 </div>
             </div>
         </div>
@@ -2803,108 +2798,108 @@
         <div class="search-row filter-row">
             <div class="filter-toolbar">
             <div class="form-group bounty-group">
-                <button id="bountyBtn" type="button">📋 快捷清單</button>
-                <button id="procurementBtn" type="button">🛒 懸賞採購清單</button>
-                <button id="trackedBtn" type="button">⭐ 追蹤清單 <span id="trackedCountBadge"></span></button>
+                <button id="bountyBtn" type="button" data-i18n="price.bounty">📋 快捷清單</button>
+                <button id="procurementBtn" type="button" data-i18n="price.procurement">🛒 懸賞採購清單</button>
+                <button id="trackedBtn" type="button"><span data-i18n="price.tracked">⭐ 追蹤清單</span> <span id="trackedCountBadge"></span></button>
             </div>
             <div class="form-group">
-                <label title="改造圖">📜 改造圖</label>
+                <label data-i18n-title="price.gradeFilterTip" data-i18n="price.gradeFilter">📜 改造圖</label>
                 <select id="gradeFilter">
-                    <option value="all" selected>全部</option>
-                    <option value="普通">普通</option>
-                    <option value="銀">銀</option>
-                    <option value="金">金</option>
+                    <option value="all" selected data-i18n-opt="common.all">全部</option>
+                    <option value="普通" data-i18n-opt="price.gradeNormal">普通</option>
+                    <option value="銀" data-i18n-opt="price.gradeSilver">銀</option>
+                    <option value="金" data-i18n-opt="price.gradeGold">金</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>🎖️ 英靈之誓</label>
+                <label data-i18n="price.soulFilter">🎖️ 英靈之誓</label>
                 <select id="soulColorFilter">
-                    <option value="all" selected>全部</option>
-                    <option value="藍">藍</option>
-                    <option value="紅">紅</option>
-                    <option value="黃">黃</option>
+                    <option value="all" selected data-i18n-opt="common.all">全部</option>
+                    <option value="藍" data-i18n-opt="price.soulBlue">藍</option>
+                    <option value="紅" data-i18n-opt="price.soulRed">紅</option>
+                    <option value="黃" data-i18n-opt="price.soulYellow">黃</option>
                 </select>
             </div>
             <div class="form-group seed-group">
-                <label class="seed-title">🌱重來種子</label>
+                <label class="seed-title" data-i18n="price.seedFilter">🌱重來種子</label>
                 <div class="seed-pair">
-                    <select id="seedPlusFilter" title="種子+">
-                        <option value="all" selected>+全</option>
-                        <option value="體">+體</option>
-                        <option value="攻">+攻</option>
-                        <option value="防">+防</option>
-                        <option value="敏">+敏</option>
-                        <option value="魔">+魔</option>
+                    <select id="seedPlusFilter" data-i18n-title="price.seedPlusTitle">
+                        <option value="all" selected data-i18n-opt="price.seedAllPlus">+全</option>
+                        <option value="體" data-i18n-opt="price.seedVit">+體</option>
+                        <option value="攻" data-i18n-opt="price.seedAtk">+攻</option>
+                        <option value="防" data-i18n-opt="price.seedDef">+防</option>
+                        <option value="敏" data-i18n-opt="price.seedAgi">+敏</option>
+                        <option value="魔" data-i18n-opt="price.seedMag">+魔</option>
                     </select>
-                    <select id="seedMinusFilter" title="種子-">
-                        <option value="all" selected>-全</option>
-                        <option value="體">-體</option>
-                        <option value="攻">-攻</option>
-                        <option value="防">-防</option>
-                        <option value="敏">-敏</option>
-                        <option value="魔">-魔</option>
+                    <select id="seedMinusFilter" data-i18n-title="price.seedMinusTitle">
+                        <option value="all" selected data-i18n-opt="price.seedAllMinus">-全</option>
+                        <option value="體" data-i18n-opt="price.seedVit">-體</option>
+                        <option value="攻" data-i18n-opt="price.seedAtk">-攻</option>
+                        <option value="防" data-i18n-opt="price.seedDef">-防</option>
+                        <option value="敏" data-i18n-opt="price.seedAgi">-敏</option>
+                        <option value="魔" data-i18n-opt="price.seedMag">-魔</option>
                     </select>
                 </div>
             </div>
             <div class="form-group exchange-rate-group">
-                <label class="exchange-rate-label">💱 匯率 (幣:晶)<span class="exchange-rate-hint" id="exchangeRateHint"></span></label>
+                <label class="exchange-rate-label">💱 <span data-i18n="price.exchange">匯率 (幣:晶)</span><span class="exchange-rate-hint" id="exchangeRateHint"></span></label>
                 <input type="number" id="exchangeRate" value="260" min="1">
             </div>
             <div class="filter-chips">
-                <label class="filter-chip" title="只留耐久全滿裝備">
+                <label class="filter-chip" data-i18n-title="price.durabilityTip">
                     <input type="checkbox" id="durabilityFullFilter">
-                    <span>🛡️ 耐久滿</span>
+                    <span data-i18n="price.durability">🛡️ 耐久滿</span>
                 </label>
-                <label class="filter-chip" title="名稱需完全符合">
+                <label class="filter-chip" data-i18n-title="price.exactTip">
                     <input type="checkbox" id="exactSearchFilter">
-                    <span>🎯 精確搜尋</span>
+                    <span data-i18n="price.exactSearch">🎯 精確搜尋</span>
                 </label>
             </div>
             </div>
             <div class="pet-filter-panel">
-                <div class="pet-filter-header">🐾 寵物篩選</div>
+                <div class="pet-filter-header" data-i18n="price.petFilters">🐾 寵物篩選</div>
                 <div class="pet-filter-grid">
                     <div class="pet-filter-section">
-                        <span class="pet-filter-label">等級</span>
-                        <label class="filter-chip" title="只顯示 1 等寵物">
+                        <span class="pet-filter-label" data-i18n="price.petLevel">等級</span>
+                        <label class="filter-chip" data-i18n-title="price.petBabyTip">
                             <input type="checkbox" id="babyOnlyFilter">
-                            <span>🍼 1等</span>
+                            <span data-i18n="price.babyOnly">🍼 1等</span>
                         </label>
-                        <div class="filter-chip filter-chip-lv" title="僅顯示達最低等級的寵物（留空不限）">
+                        <div class="filter-chip filter-chip-lv" data-i18n-tip="price.petMinLvTip">
                             <span>Lv≥</span>
                             <input type="number" id="petMinLvFilter" min="1" max="150" step="1" placeholder="—" inputmode="numeric">
                         </div>
                     </div>
                     <div class="pet-filter-section">
-                        <span class="pet-filter-label">級別</span>
-                        <select id="petCardFilter" title="寵物普卡/銀卡/金卡（依圖鑑）">
-                            <option value="all" selected>全部</option>
-                            <option value="普">普</option>
-                            <option value="銀">銀</option>
-                            <option value="金">金</option>
+                        <span class="pet-filter-label" data-i18n="price.petTier">級別</span>
+                        <select id="petCardFilter" data-i18n-title="price.petCardTip">
+                            <option value="all" selected data-i18n-opt="common.all">全部</option>
+                            <option value="普" data-i18n-opt="price.petCardNormal">普</option>
+                            <option value="銀" data-i18n-opt="price.petCardSilver">銀</option>
+                            <option value="金" data-i18n-opt="price.petCardGold">金</option>
                         </select>
                     </div>
                     <div class="pet-filter-section">
-                        <span class="pet-filter-label">種族</span>
-                        <select id="petRaceFilter" title="寵物種族（依圖鑑）"></select>
+                        <span class="pet-filter-label" data-i18n="price.petRace">種族</span>
+                        <select id="petRaceFilter" data-i18n-title="price.petRaceTip"></select>
                     </div>
                     <div class="pet-filter-section">
-                        <span class="pet-filter-label">改造</span>
-                        <select id="petTransFilter" title="寵物改造次數"></select>
+                        <span class="pet-filter-label" data-i18n="price.petTrans">改造</span>
+                        <select id="petTransFilter" data-i18n-title="price.petTransTip"></select>
                     </div>
                     <div class="pet-filter-section">
-                        <span class="pet-filter-label">檔次</span>
-                        <label class="filter-chip" title="僅顯示滿檔寵物（需圖鑑支援）">
+                        <span class="pet-filter-label" data-i18n="price.petAlloc">檔次</span>
+                        <label class="filter-chip" data-i18n-title="price.petFullTip">
                             <input type="checkbox" id="petFullOnlyFilter">
-                            <span>🧬 滿檔</span>
+                            <span data-i18n="price.petFullGrade">🧬 滿檔</span>
                         </label>
-                        <label class="filter-chip" title="僅顯示滿星寵物">
+                        <label class="filter-chip" data-i18n-title="price.petMaxStarTip">
                             <input type="checkbox" id="petMaxStarOnlyFilter">
-                            <span>⭐ 滿星</span>
+                            <span data-i18n="price.petMaxStar">⭐ 滿星</span>
                         </label>
-                        <label class="filter-chip" title="僅顯示滿星且技能格未掉（對照圖鑑 skillSlots）">
+                        <label class="filter-chip" data-i18n-title="price.petFullSkillTip">
                             <input type="checkbox" id="petFullSkillOnlyFilter">
-                            <span>🎯 滿技</span>
+                            <span data-i18n="price.petFullSkill">🎯 滿技</span>
                         </label>
                     </div>
                 </div>
@@ -2919,30 +2914,30 @@
     <div class="market-results-head" id="marketResultsHead">
         <div class="stats-grid" id="statsGrid" style="display: none;">
             <div class="stat-card">
-                <div class="label">📦 在售數量</div>
+                <div class="label" data-i18n="price.statOnSale">📦 在售數量</div>
                 <div class="value blue" id="statCount">0</div>
             </div>
             <div class="stat-card">
-                <div class="label">💰 最低價</div>
+                <div class="label" data-i18n="price.statMin">💰 最低價</div>
                 <div class="value green" id="statMinPrice">-</div>
             </div>
             <div class="stat-card">
-                <div class="label">📊 中位價</div>
+                <div class="label" data-i18n="price.statMedian">📊 中位價</div>
                 <div class="value gold" id="statAvgPrice">-</div>
             </div>
             <div class="stat-card">
-                <div class="label">📈 最高價</div>
+                <div class="label" data-i18n="price.statMax">📈 最高價</div>
                 <div class="value red" id="statMaxPrice">-</div>
             </div>
         </div>
 
         <div class="market-segment-bar" id="marketSegmentBar">
             <div class="segment-group">
-                <span class="segment-label">商品類型</span>
+                <span class="segment-label" data-i18n="price.segItemType">商品類型</span>
                 <div class="segment-pills" id="itemTypeSegments"></div>
             </div>
             <div class="segment-group">
-                <span class="segment-label">交易單位</span>
+                <span class="segment-label" data-i18n="price.segPriceUnit">交易單位</span>
                 <div class="segment-pills" id="priceUnitSegments"></div>
             </div>
         </div>
@@ -2950,17 +2945,17 @@
 
     <!-- Tabs -->
     <div class="tabs" id="tabsContainer" style="display: none;">
-        <div class="tab active" data-tab="market">🏪 市場攤位</div>
-        <div class="tab" data-tab="procurement" id="procurementTab" style="display:none;">🛒 採購路線</div>
-        <div class="tab" data-tab="history">📜 歷史成交</div>
+        <div class="tab active" data-tab="market" data-i18n="price.tabMarket">🏪 市場攤位</div>
+        <div class="tab" data-tab="procurement" id="procurementTab" style="display:none;" data-i18n="price.tabProcurement">🛒 採購路線</div>
+        <div class="tab" data-tab="history" data-i18n="price.tabHistory">📜 歷史成交</div>
     </div>
 
     <!-- Loading -->
     <div class="loading" id="loading" style="display: none;">
         <div class="spinner"></div>
-        <div id="loadingText">正在載入資料...</div>
+        <div id="loadingText" data-i18n="price.loadingDefault">正在載入資料...</div>
         <div class="loading-actions" id="loadingActions" style="display: none;">
-            <button type="button" class="secondary" id="cancelSearchBtn">✕ 取消</button>
+            <button type="button" class="secondary" id="cancelSearchBtn" data-i18n="price.cancel">✕ 取消</button>
         </div>
     </div>
 
@@ -2971,26 +2966,26 @@
                 <tr>
                     <th class="th-with-stat-sort">
                         <div class="th-item-header">
-                            <span class="th-sortable" data-sort="item">物品名稱</span>
+                            <span class="th-sortable" data-sort="item" data-i18n="price.thItemName">物品名稱</span>
                             <span class="stat-sort-group">
                                 <span class="stat-sort-wrap">
-                                    <select id="statSortFilter" class="stat-sort-select" title="依加成屬性排序">
-                                        <option value="" selected>屬性排序</option>
+                                    <select id="statSortFilter" class="stat-sort-select" data-i18n-title="price.statSortTip">
+                                        <option value="" selected data-i18n-opt="price.statSortDefault">屬性排序</option>
                                     </select>
                                 </span>
-                                <button type="button" id="statSortOrderBtn" class="stat-sort-order-btn" title="切換排序方向（高→低 / 低→高）" disabled>▼</button>
-                                <span class="stat-tag-hint" data-tip="裝備僅顯示浮動屬性，固定數值不列標籤；寵物若為起始星數與天生滿星不顯示標籤" tabindex="0" role="note" aria-label="僅顯示浮動屬性；固定數值不列標籤">ⓘ</span>
+                                <button type="button" id="statSortOrderBtn" class="stat-sort-order-btn" data-i18n-title="price.statSortPickFirst" disabled>▼</button>
+                                <span class="stat-tag-hint" data-i18n-tip="price.statTagHint" tabindex="0" role="note">ⓘ</span>
                             </span>
                         </div>
                     </th>
-                    <th data-sort="price">價格 <span class="sort-icon active">▲</span></th>
-                    <th>分流/地點</th>
-                    <th>攤位名稱</th>
-                    <th data-sort="durability">耐久</th>
-                    <th data-sort="attack">攻擊</th>
-                    <th data-sort="defence">防禦</th>
-                    <th data-sort="agility">敏捷</th>
-                    <th>數量</th>
+                    <th data-sort="price"><span data-i18n="price.thPrice">價格</span> <span class="sort-icon active">▲</span></th>
+                    <th data-i18n="price.thLocation">分流/地點</th>
+                    <th data-i18n="price.thStall">攤位名稱</th>
+                    <th data-sort="durability" data-i18n="price.thDurability">耐久</th>
+                    <th data-sort="attack" data-i18n="price.thAttack">攻擊</th>
+                    <th data-sort="defence" data-i18n="price.thDefence">防禦</th>
+                    <th data-sort="agility" data-i18n="price.thAgility">敏捷</th>
+                    <th data-i18n="price.thQty">數量</th>
                 </tr>
             </thead>
             <tbody id="marketBody"></tbody>
@@ -3000,23 +2995,23 @@
     <!-- Tracked Section -->
     <div id="trackedSection" style="display: none;">
         <div class="tracked-toolbar">
-            <button type="button" id="trackedRefreshAllBtn">🔄 更新全部成交價</button>
-            <p class="tracked-hint">⚠️ 歷史成交價可能受名稱相似物品影響（例如「壽喜鍋」會混入「一箱壽喜鍋」）。更新時各抓最近 3 頁、72 小時內成交。</p>
+            <button type="button" id="trackedRefreshAllBtn" data-i18n="price.trackedRefreshAll">🔄 更新全部成交價</button>
+            <p class="tracked-hint" data-i18n="price.trackedHint">⚠️ 歷史成交價可能受名稱相似物品影響（例如「壽喜鍋」會混入「一箱壽喜鍋」）。更新時各抓最近 3 頁、72 小時內成交。</p>
         </div>
         <div class="table-container">
             <table id="trackedTable">
                 <thead>
                     <tr>
-                        <th>類型</th>
-                        <th>名稱</th>
-                        <th>💰 最低</th>
-                        <th>💰 平均</th>
-                        <th>💎 最低</th>
-                        <th>💎 平均</th>
-                        <th>成交筆數</th>
-                        <th>上次更新</th>
-                        <th>走勢</th>
-                        <th>操作</th>
+                        <th data-i18n="price.thType">類型</th>
+                        <th data-i18n="common.name">名稱</th>
+                        <th data-i18n="price.thLowCoin">💰 最低</th>
+                        <th data-i18n="price.thAvgCoin">💰 平均</th>
+                        <th data-i18n="price.thLowCrystal">💎 最低</th>
+                        <th data-i18n="price.thAvgCrystal">💎 平均</th>
+                        <th data-i18n="price.thTrades">成交筆數</th>
+                        <th data-i18n="price.thUpdated">上次更新</th>
+                        <th data-i18n="price.thTrend">走勢</th>
+                        <th data-i18n="price.thActions">操作</th>
                     </tr>
                 </thead>
                 <tbody id="trackedBody"></tbody>
@@ -3024,8 +3019,8 @@
         </div>
         <div class="tracked-empty" id="trackedEmpty" style="display: none;">
             <div class="icon">⭐</div>
-            <div>尚無追蹤項目</div>
-            <div style="margin-top:8px;font-size:0.85rem;">在市場搜尋結果點 ⭐ 即可加入</div>
+            <div data-i18n="price.trackedEmpty">尚無追蹤項目</div>
+            <div style="margin-top:8px;font-size:0.85rem;" data-i18n="price.trackedEmptyHint">在市場搜尋結果點 ⭐ 即可加入</div>
         </div>
     </div>
 
@@ -3034,23 +3029,23 @@
         <div class="procurement-summary" id="procurementSummary"></div>
         <div class="procurement-layout">
             <div class="procurement-checklist">
-                <h4>📋 採購清單狀態</h4>
+                <h4 data-i18n="price.procChecklistTitle">📋 採購清單狀態</h4>
                 <div id="procurementChecklist"></div>
             </div>
             <div class="table-container">
                 <div class="procurement-route-header">
-                    <h3 id="procurementRouteTitle">🗺️ 建議採購路線</h3>
-                    <button type="button" id="procurementMapBtn">🗺️ 查看路線地圖</button>
+                    <h3 id="procurementRouteTitle" data-i18n="price.procRouteTitle">🗺️ 建議採購路線</h3>
+                    <button type="button" id="procurementMapBtn" data-i18n="price.procMapBtn">🗺️ 查看路線地圖</button>
                 </div>
                 <table id="procurementRouteTable">
                     <thead>
                         <tr>
-                            <th>順序</th>
-                            <th>分流</th>
-                            <th>座標</th>
-                            <th>攤位</th>
-                            <th>採購項目</th>
-                            <th>段距離</th>
+                            <th data-i18n="price.procThOrder">順序</th>
+                            <th data-i18n="price.procThChannel">分流</th>
+                            <th data-i18n="price.procThCoord">座標</th>
+                            <th data-i18n="price.procThStall">攤位</th>
+                            <th data-i18n="price.procThItems">採購項目</th>
+                            <th data-i18n="price.procThDist">段距離</th>
                         </tr>
                     </thead>
                     <tbody id="procurementRouteBody"></tbody>
@@ -3063,15 +3058,15 @@
     <div id="historySection" style="display: none;">
         <div class="history-filter-bar" id="historyFilterBar">
             <div class="segment-group">
-                <span class="segment-label">時間範圍</span>
+                <span class="segment-label" data-i18n="price.histRange">時間範圍</span>
                 <div class="segment-pills" id="historyRangeSegments"></div>
             </div>
             <div class="segment-group">
-                <span class="segment-label">貨幣</span>
+                <span class="segment-label" data-i18n="price.histCurrency">貨幣</span>
                 <div class="segment-pills" id="historyCurrencySegments"></div>
             </div>
             <div class="segment-group">
-                <span class="segment-label">排序</span>
+                <span class="segment-label" data-i18n="price.histSort">排序</span>
                 <div class="segment-pills" id="historySortSegments"></div>
             </div>
         </div>
@@ -3080,15 +3075,15 @@
         <div class="history-stats-grid" id="historySummary"></div>
 
         <div class="history-feed-header">
-            <span class="history-section-label">價格概覽</span>
+            <span class="history-section-label" data-i18n="price.histOverview">價格概覽</span>
             <div class="history-feed-header-actions">
                 <span id="historyExactHint" style="font-size:0.82rem;color:var(--text-secondary);"></span>
-                <button type="button" class="secondary" id="historyChartToggleBtn" disabled>📈 走勢圖</button>
+                <button type="button" class="secondary" id="historyChartToggleBtn" disabled data-i18n="price.histChart">📈 走勢圖</button>
             </div>
         </div>
         <div class="history-chart-body" id="historyChartBody" style="display:none;">
             <div class="inline-chart-container">
-                <div class="chart-title" id="historyChartTitle">📈 價格走勢</div>
+                <div class="chart-title" id="historyChartTitle" data-i18n="price.histChart">📈 價格走勢</div>
                 <div class="inline-chart-wrapper">
                     <canvas id="historyChartCanvas"></canvas>
                 </div>
@@ -3096,21 +3091,21 @@
         </div>
 
         <details class="history-group-details" id="historyGroupDetails" style="display: none;">
-            <summary>📊 品項統計</summary>
+            <summary data-i18n="price.histGroupStats">📊 品項統計</summary>
             <div class="table-container">
                 <div class="table-scroll">
                     <table id="historyTable">
                         <thead>
                             <tr>
-                                <th>物品名稱</th>
-                                <th>💰 最低</th>
-                                <th>💰 中位</th>
-                                <th>💰 最高</th>
-                                <th>💎 最低</th>
-                                <th>💎 中位</th>
-                                <th>💎 最高</th>
-                                <th>成交數</th>
-                                <th>走勢</th>
+                                <th data-i18n="price.histThItem">物品名稱</th>
+                                <th data-i18n="price.histThMinCoin">💰 最低</th>
+                                <th data-i18n="price.histThMedCoin">💰 中位</th>
+                                <th data-i18n="price.histThMaxCoin">💰 最高</th>
+                                <th data-i18n="price.histThMinCrystal">💎 最低</th>
+                                <th data-i18n="price.histThMedCrystal">💎 中位</th>
+                                <th data-i18n="price.histThMaxCrystal">💎 最高</th>
+                                <th data-i18n="price.histThCount">成交數</th>
+                                <th data-i18n="price.thTrend">走勢</th>
                             </tr>
                         </thead>
                         <tbody id="historyBody"></tbody>
@@ -3120,7 +3115,7 @@
         </details>
 
         <div class="history-feed-header history-feed-list-header">
-            <span id="historyFeedCount">成交紀錄</span>
+            <span id="historyFeedCount" data-i18n="price.histFeedTitle">成交紀錄</span>
         </div>
         <div class="history-feed" id="historyFeed"></div>
         <div class="history-pagination" id="historyPagination"></div>
@@ -3129,8 +3124,8 @@
     <!-- Empty State -->
     <div class="empty-state" id="emptyState">
         <div class="icon">🔍</div>
-        <div>輸入物品名稱開始搜尋</div>
-        <div style="margin-top: 8px; font-size: 0.85rem;">支援模糊搜尋，例如：面包、壽喜、生命藥</div>
+        <div data-i18n="price.emptySearch">輸入物品名稱開始搜尋</div>
+        <div style="margin-top: 8px; font-size: 0.85rem;" data-i18n="price.emptySearchHint">支援模糊搜尋，例如：面包、壽喜、生命藥</div>
     </div>
 </div>
 
@@ -3138,32 +3133,32 @@
 <div class="map-modal" id="procurementModal">
     <div class="map-dialog" style="width: 920px; max-width: 95vw;">
         <div class="map-dialog-header">
-            <h3>🛒 懸賞採購清單</h3>
-            <button class="map-dialog-close" id="procurementModalClose" title="關閉">✕</button>
+            <h3 data-i18n="price.procModalTitle">🛒 懸賞採購清單</h3>
+            <button class="map-dialog-close" id="procurementModalClose" data-i18n-title="price.mapClose">✕</button>
         </div>
         <div class="procurement-body">
-            <p class="procurement-hint">填寫物品名稱與數量，或從快捷清單點選加入</p>
+            <p class="procurement-hint" data-i18n="price.procHint">填寫物品名稱與數量，或從快捷清單點選加入</p>
             <div class="procurement-pick-row">
-                <button type="button" id="procurementPickBtn">📋 從快捷清單點選</button>
+                <button type="button" id="procurementPickBtn" data-i18n="price.procPickBtn">📋 從快捷清單點選</button>
             </div>
-            <div class="procurement-section-title">📦 採購物品</div>
+            <div class="procurement-section-title" data-i18n="price.procItemsTitle">📦 採購物品</div>
             <div class="procurement-item-rows" id="procurementItemRows"></div>
             <div id="procurementPickedSummary" class="procurement-picked-summary"></div>
-            <div class="procurement-section-title">🐾 懸賞寵物（選填）</div>
+            <div class="procurement-section-title" data-i18n="price.procPetsTitle">🐾 懸賞寵物（選填）</div>
             <div class="procurement-pet-rows" id="procurementPetRows"></div>
             <div class="procurement-footer">
                 <div class="procurement-settings">
                     <div class="form-group">
-                        <label>採購策略</label>
+                        <label data-i18n="price.procStrategyLabel">採購策略</label>
                         <select id="procurementStrategy">
-                            <option value="shortest" selected>最短路徑</option>
-                            <option value="cheapest">最便宜</option>
+                            <option value="shortest" selected data-i18n-opt="price.strategyShortest">最短路徑</option>
+                            <option value="cheapest" data-i18n-opt="price.strategyCheapest">最便宜</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>伺服器</label>
+                        <label data-i18n="price.procServerLabel">伺服器</label>
                         <select id="procurementServer">
-                            <option value="all" selected>全部</option>
+                            <option value="all" selected data-i18n-opt="common.all">全部</option>
                             <option value="1">S1</option>
                             <option value="2">S2</option>
                             <option value="3">S3</option>
@@ -3171,12 +3166,12 @@
                     </div>
                 </div>
                 <div class="procurement-start-section">
-                    <label>起點傳送石</label>
+                    <label data-i18n="price.procStartLabel">起點傳送石</label>
                     <div class="procurement-start-presets" id="procurementStartPresets"></div>
                 </div>
                 <div class="procurement-actions">
-                    <button type="button" id="procurementClearBtn">🗑️ 清除全部</button>
-                    <button type="button" id="procurementRunBtn">✅ 執行採購搜尋</button>
+                    <button type="button" id="procurementClearBtn" data-i18n="price.procClear">🗑️ 清除全部</button>
+                    <button type="button" id="procurementRunBtn" data-i18n="price.procRun">✅ 執行採購搜尋</button>
                 </div>
             </div>
         </div>
@@ -3187,15 +3182,15 @@
 <div class="map-modal" id="bountyModal">
     <div class="map-dialog bounty-dialog">
         <div class="map-dialog-header">
-            <h3 id="bountyModalTitle">📋 快捷清單快速查詢</h3>
-            <button class="map-dialog-close" id="bountyModalClose" title="關閉">✕</button>
+            <h3 id="bountyModalTitle" data-i18n="price.bountyTitle">📋 快捷清單快速查詢</h3>
+            <button class="map-dialog-close" id="bountyModalClose" data-i18n-title="price.mapClose">✕</button>
         </div>
-        <div class="bounty-pick-banner" id="bountyPickBanner">點選加入採購清單 · <strong>再點一次同色項目可取消</strong> · 完成後關閉視窗</div>
+        <div class="bounty-pick-banner" id="bountyPickBanner" data-i18n-html="price.bountyPickBanner">點選加入採購清單 · <strong>再點一次同色項目可取消</strong> · 完成後關閉視窗</div>
         <div class="bounty-tabs" id="commonTabs"></div>
         <div class="bounty-body" id="commonBody"></div>
         <div class="bounty-pick-footer" id="bountyPickFooter">
             <div id="bountyPickSummary" class="bounty-pick-summary"></div>
-            <button type="button" id="bountyPickClearBtn">🗑️ 清空已選</button>
+            <button type="button" id="bountyPickClearBtn" data-i18n="price.bountyPickClear">🗑️ 清空已選</button>
         </div>
     </div>
 </div>
@@ -3206,8 +3201,8 @@
 <div class="map-modal" id="mapModal">
     <div class="map-dialog">
         <div class="map-dialog-header">
-            <h3 id="mapModalTitle">攤位位置</h3>
-            <button class="map-dialog-close" id="mapModalClose" title="關閉">✕</button>
+            <h3 id="mapModalTitle" data-i18n="price.mapTitle">攤位位置</h3>
+            <button class="map-dialog-close" id="mapModalClose" data-i18n-title="price.mapClose">✕</button>
         </div>
         <div class="map-viewer">
             <canvas id="mapCanvas" class="map-canvas"></canvas>
@@ -3215,8 +3210,14 @@
     </div>
 </div>
 
+<script src="starcg_i18n.js"></script>
+<script src="starcg_game_names.js"></script>
+<script src="starcg_i18n_char_pet.js"></script>
+<script src="starcg_i18n_messages.js"></script>
 <script src="equipment_max_stats.js?v=20260703"></script>
 <script>
+function T(k, p) { return StarCG_I18N.t(k, p); }
+function gn(name) { return StarCG_I18N.displayGameName(name); }
 /* ========================================
    裝備頂值（helper 放 HTML，避免外部 js 未部署時搜尋失敗）
 ======================================== */
@@ -3277,35 +3278,29 @@ window.starcgDiag = starcgDiag;
 
 async function testMarketConnection() {
     diagLog('連線測試開始');
-    showLoading(true, '連線診斷中…', true);
+    showLoading(true, T('price.loading.diag'), true);
     try {
         const t0 = performance.now();
         const url = `${API_MARKET_BASE}?ajax=1&type=pet&server=all&exact=0&page=1&search=`;
         const text = await fetchWithProxy(url);
-        const data = parseJsonResponse(text, '連線測試');
+        const data = parseJsonResponse(text, 'conn');
         const ms = Math.round(performance.now() - t0);
         starcgDiag.lastFetchMs = ms;
         starcgDiag.lastProxy = currentProxyIndex;
         starcgDiag.lastError = null;
         const pets = Object.values(data.petsByCd || {}).flat().length;
         diagLog('連線測試成功', { ms, proxy: currentProxyIndex, totalFiltered: data.totalFiltered, pets });
-        alert(
-            `✅ 連線正常（${ms} ms）\n`
-            + `代理：#${currentProxyIndex} ${CORS_PROXIES[currentProxyIndex]?.prefix?.slice(0, 40) || ''}…\n`
-            + `寵物攤位：${data.totalFiltered} · 本頁 ${pets} 隻\n\n`
-            + `若掃描仍失敗，F12 → Console 輸入 starcgDiag 看詳情`
-        );
+        alert(T('price.alert.connOk', {
+            ms,
+            proxy: currentProxyIndex,
+            prefix: (CORS_PROXIES[currentProxyIndex]?.prefix?.slice(0, 40) || '') + '…',
+            total: data.totalFiltered,
+            pets
+        }));
     } catch (err) {
         starcgDiag.lastError = err.message;
         diagLog('連線測試失敗', err.message);
-        alert(
-            `❌ 連線失敗\n${err.message}\n\n`
-            + '常見原因：\n'
-            + '1. Cloudflare Worker 代理掛了（WORKER_URL）\n'
-            + '2. 用 file:// 開啟（需走 localhost 或 GitHub Pages）\n'
-            + '3. 網路/防火牆擋 fetch\n\n'
-            + 'F12 → Console 看 [StarCG] 或輸入 starcgDiag'
-        );
+        alert(T('price.alert.connFail', { msg: err.message }));
     } finally {
         showLoading(false);
     }
@@ -3349,7 +3344,7 @@ async function fetchWithTimeout(resource, options = {}, timeoutMs = FETCH_TIMEOU
         return await fetch(resource, { ...options, signal: controller.signal });
     } catch (err) {
         if (err.name === 'AbortError') {
-            throw new Error(`連線逾時（${Math.round(timeoutMs / 1000)} 秒）`);
+            throw new Error(T('price.fetchTimeout', { sec: Math.round(timeoutMs / 1000) }));
         }
         throw err;
     } finally {
@@ -3388,7 +3383,7 @@ async function fetchWithProxy(targetUrl) {
             starcgDiag.lastError = err.message;
         }
     }
-    const errMsg = '所有代理伺服器都無法連線，請稍後再試';
+    const errMsg = T('price.proxyAllFail');
     diagLog('proxy 全部失敗', lastError?.message);
     throw new Error(errMsg);
 }
@@ -3409,9 +3404,18 @@ let historyChartOpen = false;
 let historyChartUserDismissed = false;
 const EXCHANGE_RATE_DEFAULT = 260;
 const EXCHANGE_RATE_STORAGE_KEY = 'starcg_exchangeRate';
-const PET_SCAN_PLACEHOLDER = '【全場寵物】';
-let pinnedTags = JSON.parse(localStorage.getItem('starcg_pinnedTags')) || [];
-let quickTags = JSON.parse(localStorage.getItem('starcg_quickTags')) || [];
+const PET_SCAN_PLACEHOLDER_KEY = 'price.petScanPlaceholder';
+function getPetScanPlaceholder() { return T(PET_SCAN_PLACEHOLDER_KEY); }
+function loadJsonStorage(key, fallback) {
+    try {
+        const v = JSON.parse(localStorage.getItem(key));
+        return Array.isArray(v) ? v : fallback;
+    } catch {
+        return fallback;
+    }
+}
+let pinnedTags = loadJsonStorage('starcg_pinnedTags', []);
+let quickTags = loadJsonStorage('starcg_quickTags', []);
 let trackedItems = (() => {
     try {
         const raw = JSON.parse(localStorage.getItem('starcg_trackedItems') || '[]');
@@ -3431,25 +3435,28 @@ const chartInstances = {};
 /* ========================================
    初始化
 ======================================== */
-document.addEventListener('DOMContentLoaded', () => {
-    if (location.protocol === 'file:') {
-        document.getElementById('fileProtocolWarning').style.display = 'block';
-    }
-    loadPetProfilesFromGuide();
-    sanitizeQuickTags();
+function applyPriceLang() {
+    StarCG_I18N.apply(document.body);
+    updateExchangeRateHint();
+    updateStatSortStyle();
+    initStatSortFilter(true);
+    initPetRaceFilter();
+    initPetTransFilter();
+    syncPetLevelBabyFilters();
     renderQuickTags();
-    initEventListeners();
-    initStatSortFilter();
-    initMapModal();
-    initPeakFloatingTip();
-    initQuickTags();
-    initBounty();
-    initHistoryFilters();
-    initProcurement();
-    initTracked();
-    initMarketSegments();
-    updateTrackedCountBadge();
-});
+    renderHistoryFilterBar();
+    renderBounty();
+    initProcurementUi(true);
+    if (currentTab === 'market' && allMarketItems.length) applyFilters();
+    else if (currentTab === 'market') renderMarketSegmentBar(getMarketPanelFiltered());
+    if (currentTab === 'tracked') renderTrackedTable();
+    if (isHistoryTab(currentTab)) renderHistoryData();
+    if (procurementData) renderProcurementResults();
+    refreshMarketTrackButtons();
+    if (bountyPickMode) {
+        document.getElementById('bountyModalTitle').textContent = T('price.bountyPickTitle');
+    }
+}
 
 function updateStatSortStyle() {
     const sel = document.getElementById('statSortFilter');
@@ -3460,24 +3467,56 @@ function updateStatSortStyle() {
     btn.classList.toggle('active', hasStat);
     btn.textContent = statSortOrder === 'desc' ? '▼' : '▲';
     btn.title = hasStat
-        ? (statSortOrder === 'desc' ? '目前：高→低（點擊改為低→高）' : '目前：低→高（點擊改為高→低）')
-        : '請先選擇屬性';
+        ? (statSortOrder === 'desc' ? T('price.statSortOrderDesc') : T('price.statSortOrderAsc'))
+        : T('price.statSortPickFirst');
 }
 
-function initStatSortFilter() {
+function getPetStatSortDefs() {
+    return [
+        ['petFull', T('price.tagFullGradeShort')],
+        ['petMaxStar', T('price.tagMaxStarShort')],
+        ['petFullSkill', T('price.tagFullSkillShort')]
+    ];
+}
+
+function getMarketStatTagDefs() {
+    return [
+        ['ITEM_MODIFYCRITICAL', T('stat.crit'), 'st-crit'],
+        ['ITEM_MODIFYRECOVERY', T('stat.rec'), 'st-recov'],
+        ['ITEM_MODIFYAVOID', T('stat.dodge'), 'st-avoid'],
+        ['ITEM_ADM', T('stat.matk'), 'st-madm'],
+        ['ITEM_MODIFYMAGIC', T('stat.spt'), 'st-spirit'],
+        ['ITEM_MODIFYHITRATE', T('stat.hit'), 'st-hit'],
+        ['ITEM_MODIFYCOUNTER', T('stat.counter'), 'st-counter'],
+        ['ITEM_RSS', T('stat.amres'), 'st-mdef'],
+        ['ITEM_MODIFYHP', T('stat.hp'), 'st-hp'],
+        ['ITEM_MODIFYFORCEPOINT', T('stat.mp'), 'st-mp']
+    ];
+}
+
+function initStatSortFilter(rebuild = false) {
     const sel = document.getElementById('statSortFilter');
-    PET_STAT_SORT_DEFS.forEach(([key, label]) => {
-        const opt = document.createElement('option');
-        opt.value = key;
-        opt.textContent = label;
-        sel.appendChild(opt);
+    const cur = sel.value;
+    if (rebuild) {
+        sel.innerHTML = `<option value="" selected>${T('price.statSortDefault')}</option>`;
+    }
+    getPetStatSortDefs().forEach(([key, label]) => {
+        if (rebuild || !sel.querySelector(`option[value="${key}"]`)) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = label;
+            sel.appendChild(opt);
+        }
     });
-    MARKET_STAT_TAG_DEFS.forEach(([key, label]) => {
-        const opt = document.createElement('option');
-        opt.value = key;
-        opt.textContent = label;
-        sel.appendChild(opt);
+    getMarketStatTagDefs().forEach(([key, label]) => {
+        if (rebuild || !sel.querySelector(`option[value="${key}"]`)) {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = label;
+            sel.appendChild(opt);
+        }
     });
+    if (rebuild) sel.value = cur;
     updateStatSortStyle();
 }
 
@@ -3581,7 +3620,7 @@ function updateExchangeRateHint() {
     const display = Number.isInteger(crystal)
         ? crystal.toLocaleString()
         : crystal.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
-    document.getElementById('exchangeRateHint').textContent = `100萬魔幣=${display}魔晶`;
+    document.getElementById('exchangeRateHint').textContent = T('price.exchangeHint', { crystal: display });
 }
 
 function initEventListeners() {
@@ -3671,7 +3710,7 @@ function initEventListeners() {
    快速標籤
 ======================================== */
 function isNonPersistedSearchTag(tag) {
-    return tag === PET_SCAN_PLACEHOLDER;
+    return tag === getPetScanPlaceholder();
 }
 
 function sanitizeQuickTags() {
@@ -3694,9 +3733,9 @@ function tagHtml(tag, pinned) {
     const t = escapeHtml(tag);
     return `
         <div class="quick-tag${pinned ? ' pinned' : ''}" data-tag="${t}" data-pinned="${pinned ? 1 : 0}">
-            <span class="pin" data-act="pin" title="${pinned ? '取消釘選' : '釘選保留'}">${pinned ? '📌' : '📍'}</span>
+            <span class="pin" data-act="pin" title="${escapeAttr(pinned ? T('price.unpin') : T('price.pin'))}">${pinned ? '📌' : '📍'}</span>
             <span class="label" data-act="search">${t}</span>
-            <span class="remove" data-act="remove" title="移除">✕</span>
+            <span class="remove" data-act="remove" title="${escapeAttr(T('price.removeTag'))}">✕</span>
         </div>`;
 }
 
@@ -3705,7 +3744,7 @@ function renderQuickTags() {
     const pinnedHtml = pinnedTags.map(tag => tagHtml(tag, true)).join('');
     const historyHtml = quickTags.map(tag => tagHtml(tag, false)).join('');
     const clearBtn = quickTags.length > 0
-        ? `<button class="clear-tags" data-act="clear" title="清空非釘選的搜尋紀錄">🗑️ 清空紀錄</button>`
+        ? `<button class="clear-tags" data-act="clear" title="${escapeAttr(T('price.clearTagsTip'))}">${T('price.clearTags')}</button>`
         : '';
     container.innerHTML = pinnedHtml + historyHtml + clearBtn;
 }
@@ -3744,7 +3783,7 @@ function togglePin(tag, pinned) {
 
 function clearHistoryTags() {
     if (quickTags.length === 0) return;
-    if (!confirm('確定清空所有非釘選的搜尋紀錄？')) return;
+    if (!confirm(T('price.confirm.clearTags'))) return;
     quickTags = [];
     saveTags();
     renderQuickTags();
@@ -3777,7 +3816,7 @@ function resetMarketSearchSession() {
     if (historyChartBody) historyChartBody.style.display = 'none';
     const historyChartBtn = document.getElementById('historyChartToggleBtn');
     if (historyChartBtn) {
-        historyChartBtn.textContent = '📈 走勢圖';
+        historyChartBtn.textContent = T('price.histChart');
         historyChartBtn.disabled = true;
     }
 }
@@ -3795,7 +3834,9 @@ function countPetScanStats(items) {
 
 function formatPetScanProgress(items, page, totalPages) {
     const s = countPetScanStats(items);
-    return `掃描第 ${page}/${totalPages} 頁…（寵物 ${s.pets} · 滿檔 ${s.full} · 滿星 ${s.maxStar} · 滿技 ${s.fullSkill}）`;
+    return T('price.loading.petScanPage', {
+        page, total: totalPages, pets: s.pets, full: s.full, star: s.maxStar, skill: s.fullSkill
+    });
 }
 
 function releaseMarketSearchUi(token) {
@@ -3821,14 +3862,14 @@ async function loadPetProfilesWithTimeout(timeoutMs = PET_GUIDE_LOAD_TIMEOUT_MS)
     await Promise.race([
         loadPetProfilesFromGuide(),
         new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('寵物圖鑑載入逾時')), timeoutMs);
+            setTimeout(() => reject(new Error(T('price.petCatalogTimeout'))), timeoutMs);
         })
     ]);
 }
 
 async function searchMarket() {
     const keyword = document.getElementById('searchInput').value.trim();
-    if (!keyword) return alert('請輸入搜尋關鍵字');
+    if (!keyword) return alert(T('price.alert.needKeyword'));
 
     const token = ++marketSearchToken;
     const searchBtn = document.getElementById('searchBtn');
@@ -3838,7 +3879,7 @@ async function searchMarket() {
     lastSearchKeyword = keyword;
     lastMarketScanMode = 'normal';
 
-    showLoading(true, '正在連線搜尋…', true);
+    showLoading(true, T('price.loading.search'), true);
     hideAll();
     resetMarketSearchSession();
 
@@ -3854,7 +3895,7 @@ async function searchMarket() {
                 exact: exactSearch,
                 onProgress(page, totalPages, count) {
                     if (token !== marketSearchToken) return;
-                    showLoading(true, `載入第 ${page}/${totalPages} 頁…（已找到 ${count} 筆）`, true);
+                    showLoading(true, T('price.loading.page', { page, total: totalPages, count }), true);
                 },
                 onPartial(newItems) {
                     if (token !== marketSearchToken) return;
@@ -3881,16 +3922,14 @@ async function searchMarket() {
             }
             applyFilters();
         } else {
-            showEmpty('找不到符合的物品');
+            showEmpty(T('price.emptyNoMatch'));
         }
     } catch (err) {
         if (token !== marketSearchToken) return;
         console.error(err);
-        const hint = location.protocol === 'file:'
-            ? '\n\n你目前用 file:// 開啟，請改執行 python proxy.py 後用 http://localhost:8000/ 開啟。'
-            : '';
-        alert('搜尋失敗：' + (err.message || '請稍後再試') + hint);
-        showEmpty('搜尋失敗');
+        const hint = location.protocol === 'file:' ? T('price.alert.fileProtocolHint') : '';
+        alert(T('price.alert.searchFail', { msg: err.message || T('price.tryLater') }) + hint);
+        showEmpty(T('price.emptySearchFail'));
     } finally {
         releaseMarketSearchUi(token);
     }
@@ -3902,10 +3941,7 @@ async function scanPetMarket() {
     const maxStarOnly = document.getElementById('petMaxStarOnlyFilter')?.checked;
     const fullSkillOnly = document.getElementById('petFullSkillOnlyFilter')?.checked;
     if (!fullOnly && !maxStarOnly && !fullSkillOnly) {
-        const ok = confirm(
-            '未勾選滿檔/滿星/滿技，將列出掃描到的全部寵物（可能很多、較慢）。\n\n'
-            + '建議先勾選 🧬滿檔、⭐滿星 或 🎯滿技，或在搜尋框填寵物名稱縮小範圍。\n\n仍要繼續？'
-        );
+        const ok = confirm(T('price.confirm.petScanNoFilter'));
         if (!ok) return;
     }
 
@@ -3915,12 +3951,12 @@ async function scanPetMarket() {
     const petScanBtn = document.getElementById('petScanBtn');
     searchBtn.disabled = true;
     if (petScanBtn) petScanBtn.disabled = true;
-    lastSearchKeyword = keyword || PET_SCAN_PLACEHOLDER;
+    lastSearchKeyword = keyword || getPetScanPlaceholder();
     lastMarketScanMode = 'petScan';
     marketItemType = 'pet';
     marketPriceUnit = 'all';
 
-    showLoading(true, '正在載入寵物圖鑑…', true);
+    showLoading(true, T('price.loading.petCatalog'), true);
     hideAll();
     resetMarketSearchSession();
 
@@ -3936,7 +3972,7 @@ async function scanPetMarket() {
 
         allMarketItems = [];
         diagLog('開始抓取 market API', { type: 'pet', keyword: keyword || '' });
-        showLoading(true, '正在掃描全場寵物攤位…', true);
+        showLoading(true, T('price.loading.petScan'), true);
         await fetchMarketData(keyword, {
             marketType: 'pet',
             skipResultCap: true,
@@ -3974,18 +4010,18 @@ async function scanPetMarket() {
                 : '';
             console.info(`[寵掃] 寵物 ${stats.pets} · 滿檔 ${stats.full} · 滿星 ${stats.maxStar} · 滿技 ${stats.fullSkill} · 顯示 ${displayed}${partialHint}`);
         } else if (stats.pets > 0) {
-            showEmpty(`掃描到 ${stats.pets} 隻寵物，但篩選條件下無符合（滿檔 ${stats.full} · 滿星 ${stats.maxStar} · 滿技 ${stats.fullSkill}）`);
+            showEmpty(T('price.emptyNoFilterPets', { n: stats.pets, full: stats.full, star: stats.maxStar, skill: stats.fullSkill }));
         } else {
-            showEmpty('全場目前沒有寵物攤位');
+            showEmpty(T('price.emptyNoMarketPets'));
         }
     } catch (err) {
         if (token !== marketSearchToken) return;
         starcgDiag.lastError = err.message;
         diagLog('寵掃失敗', err.message);
         console.error(err);
-        showLoading(true, `失敗：${err.message}`, true);
-        alert('寵物掃描失敗：' + (err.message || '請稍後再試') + '\n\nF12 → Console 輸入 starcgDiag 查看詳情');
-        showEmpty(`寵物掃描失敗：${escapeHtml(err.message || '未知錯誤')}`);
+        showLoading(true, T('price.loading.fail', { msg: err.message }), true);
+        alert(T('price.alert.petScanFail', { msg: err.message || T('price.tryLater') }));
+        showEmpty(T('price.alert.petScanFailEmpty', { msg: escapeHtml(err.message || T('price.unknownError')) }));
     } finally {
         releaseMarketSearchUi(token);
     }
@@ -4011,36 +4047,22 @@ function encodeSearchParam(keyword) {
         .replace(/\)/g, '%29');
 }
 
-const PET_STAT_SORT_DEFS = [
-    ['petFull', '滿檔'],
-    ['petMaxStar', '滿星'],
-    ['petFullSkill', '滿技']
-];
-
-const MARKET_STAT_TAG_DEFS = [
-    ['ITEM_MODIFYCRITICAL', '必殺', 'st-crit'],
-    ['ITEM_MODIFYRECOVERY', '回復', 'st-recov'],
-    ['ITEM_MODIFYAVOID', '閃躲', 'st-avoid'],
-    ['ITEM_ADM', '魔攻', 'st-madm'],
-    ['ITEM_MODIFYMAGIC', '精神', 'st-spirit'],
-    ['ITEM_MODIFYHITRATE', '命中', 'st-hit'],
-    ['ITEM_MODIFYCOUNTER', '反擊', 'st-counter'],
-    ['ITEM_RSS', '魔抗', 'st-mdef'],
-    ['ITEM_MODIFYHP', '生命', 'st-hp'],
-    ['ITEM_MODIFYFORCEPOINT', '魔力', 'st-mp']
-];
 const MARKET_SOUL_COLORS = {
-    1007001: { label: '藍', cls: 'soul-blue' },
-    1007002: { label: '紅', cls: 'soul-red' },
-    1007003: { label: '黃', cls: 'soul-yellow' }
+    1007001: { label: '藍', labelKey: 'price.soulBlue', cls: 'soul-blue' },
+    1007002: { label: '紅', labelKey: 'price.soulRed', cls: 'soul-red' },
+    1007003: { label: '黃', labelKey: 'price.soulYellow', cls: 'soul-yellow' }
 };
+
+function soulColorDisplay(c) {
+    return c.labelKey ? T(c.labelKey) : c.label;
+}
 
 function resolveTagDefs(itemName, itemId) {
     const keys = getVariableStatKeys(itemName, itemId);
-    if (keys === null) return MARKET_STAT_TAG_DEFS;
+    if (keys === null) return getMarketStatTagDefs();
     if (keys.length === 0) return [];
     const keySet = new Set(keys);
-    return MARKET_STAT_TAG_DEFS.filter(([k]) => keySet.has(k));
+    return getMarketStatTagDefs().filter(([k]) => keySet.has(k));
 }
 
 function buildStatMods(rawItem, itemName, itemId) {
@@ -4067,7 +4089,7 @@ function compareMaxStats(rawItem, itemName, itemId) {
 }
 
 function formatPeakTipLines(list, kind) {
-    const prefix = kind === 'over' ? '破頂 ' : '頂 ';
+    const prefix = kind === 'over' ? T('price.tagBreakPrefix') : T('price.tagPeakPrefix');
     return list.map(d => (
         `${prefix}${d.label} ${kind === 'over' ? `${d.actual}>${d.max}` : `${d.actual}=${d.max}`}`
     ));
@@ -4086,12 +4108,12 @@ function buildPeakTags(rawItem, itemName, itemId) {
     if (top.length === 0 && over.length === 0) return { peakTag: '' };
     const tip = buildPeakTipText(top, over);
     if (top.length > 0 && over.length > 0) {
-        return { peakTag: buildPeakTagHtml('stat-peak-mix-tag', '頂·破頂', tip) };
+        return { peakTag: buildPeakTagHtml('stat-peak-mix-tag', T('price.tagPeakMix'), tip) };
     }
     if (top.length > 0) {
-        return { peakTag: buildPeakTagHtml('stat-peak-tag', '頂', tip) };
+        return { peakTag: buildPeakTagHtml('stat-peak-tag', T('price.tagPeak'), tip) };
     }
-    return { peakTag: buildPeakTagHtml('stat-break-tag', '破頂', tip) };
+    return { peakTag: buildPeakTagHtml('stat-break-tag', T('price.tagBreakPeak'), tip) };
 }
 
 function marketNameMatches(normalizedName, normalizedKeyword, exact) {
@@ -4121,7 +4143,17 @@ function sumPetStats(stats) {
 // 寵物基準（名稱→{ rarity, bornStar, perfect[5] }）；補上後可顯示扣檔、總星、上限
 const PET_RARITY_MAX_ALLOC = { '普': 125, '銀': 127, '金': 129 };
 const PET_RARITY_BASE_ALLOC = { '普': 100, '銀': 102, '金': 104 };
-const PET_RACE_OPTIONS = ['人形', '昆蟲', '植物', '特殊', '龍', '野獸', '飛行', '不死', '金屬'];
+const PET_RACE_KEYS = [
+    ['人形', 'price.race.humanoid'],
+    ['昆蟲', 'price.race.insect'],
+    ['植物', 'price.race.plant'],
+    ['特殊', 'price.race.special'],
+    ['龍', 'price.race.dragon'],
+    ['野獸', 'price.race.beast'],
+    ['飛行', 'price.race.flying'],
+    ['不死', 'price.race.undead'],
+    ['金屬', 'price.race.metal']
+];
 const PET_GUIDE_JSON_URL = 'https://guide.starcg.net/data/pets.json';
 const PET_REPO_RAW = 'https://raw.githubusercontent.com/wodenchen/StarCG/main/';
 const PET_JSON_URLS = [
@@ -4323,31 +4355,39 @@ function resolvePetRace(petName) {
 function initPetRaceFilter() {
     const el = document.getElementById('petRaceFilter');
     if (!el) return;
-    el.innerHTML = '<option value="all" selected>全部</option>'
-        + PET_RACE_OPTIONS.map(race => `<option value="${race}">${race}</option>`).join('');
+    const cur = el.value;
+    el.innerHTML = `<option value="all" selected>${T('common.all')}</option>`
+        + PET_RACE_KEYS.map(([race, key]) => `<option value="${race}">${T(key)}</option>`).join('');
+    if (cur) el.value = cur;
 }
 
 function initPetTransFilter() {
     const el = document.getElementById('petTransFilter');
     if (!el) return;
-    el.innerHTML = '<option value="all" selected>全部</option>'
-        + Array.from({ length: 7 }, (_, n) => `<option value="${n}">${n}改</option>`).join('');
+    const cur = el.value;
+    el.innerHTML = `<option value="all" selected>${T('common.all')}</option>`
+        + Array.from({ length: 7 }, (_, n) => `<option value="${n}">${T('price.petTransN', { n })}</option>`).join('');
+    if (cur) el.value = cur;
 }
 
 function buildPetRaceTag(petName) {
     const race = resolvePetRace(petName);
     if (!race) return '';
-    return `<span class="pet-race">${race}</span>`;
+    const key = PET_RACE_KEYS.find(([v]) => v === race)?.[1];
+    const label = key ? T(key) : race;
+    return `<span class="pet-race">${label}</span>`;
 }
 
 function buildPetCardTierTag(cardTier) {
-    if (cardTier === '普') return '<span class="pet-card-tier pet-card-normal">普卡</span>';
-    if (cardTier === '銀') return '<span class="pet-card-tier pet-card-silver">銀卡</span>';
-    if (cardTier === '金') return '<span class="pet-card-tier pet-card-gold">金卡</span>';
+    if (cardTier === '普') return `<span class="pet-card-tier pet-card-normal">${T('price.tagCardNormal')}</span>`;
+    if (cardTier === '銀') return `<span class="pet-card-tier pet-card-silver">${T('price.tagCardSilver')}</span>`;
+    if (cardTier === '金') return `<span class="pet-card-tier pet-card-gold">${T('price.tagCardGold')}</span>`;
     return '';
 }
 
 const PET_STAT_LABELS = ['體', '力', '強', '敏', '魔'];
+const PET_STAT_LABEL_KEYS = ['price.seedVit', 'price.seedAtk', 'price.seedDef', 'price.seedAgi', 'price.seedMag'];
+function petStatLabel(i) { return T(PET_STAT_LABEL_KEYS[i] || PET_STAT_LABELS[i]); }
 const PET_MAX_STAR = 25;
 
 function calcPetGradeDeficit(baseStats, perfect) {
@@ -4359,7 +4399,7 @@ function calcPetDeficitDetail(baseStats, perfect) {
     if (!perfect) return '';
     return PET_STAT_LABELS.map((label, i) => {
         const drop = perfect[i] - (baseStats[i] || 0);
-        return drop > 0 ? `${label}-${drop}` : null;
+        return drop > 0 ? `${petStatLabel(i)}-${drop}` : null;
     }).filter(Boolean).join(',');
 }
 
@@ -4368,11 +4408,11 @@ function buildPetGradeTag(petName, baseStats) {
     if (!profile?.perfect) return '';
     const deficit = calcPetGradeDeficit(baseStats, profile.perfect);
     if (deficit === 0) {
-        return '<span class="pet-grade pet-grade-full">滿檔</span>';
+        return `<span class="pet-grade pet-grade-full">${T('price.tagFullGradeShort')}</span>`;
     }
     const drop = -deficit;
     const detail = calcPetDeficitDetail(baseStats, profile.perfect);
-    return `<span class="pet-grade pet-grade-drop" data-tip="${escapeAttr(detail)}" tabindex="0" role="note" aria-label="${escapeAttr(detail)}">掉${drop}檔</span>`;
+    return `<span class="pet-grade pet-grade-drop" data-tip="${escapeAttr(detail)}" tabindex="0" role="note" aria-label="${escapeAttr(detail)}">${T('price.tagDropGrade', { n: drop })}</span>`;
 }
 
 function buildPetStarTag(petName, starStats) {
@@ -4382,16 +4422,16 @@ function buildPetStarTag(petName, starStats) {
     const totalStar = profile.bornStar + starUp;
     if (totalStar === profile.bornStar) return '';
     if (totalStar >= PET_MAX_STAR) {
-        return '<span class="pet-star pet-star-max">滿星</span>';
+        return `<span class="pet-star pet-star-max">${T('price.tagMaxStarShort')}</span>`;
     }
     return `<span class="pet-star">${totalStar}★</span>`;
 }
 
 function buildPetSkillTag(petMaxStar, petFullSkill, petSkillDrop) {
     if (!petMaxStar) return '';
-    if (petFullSkill) return '<span class="pet-skill pet-skill-full">滿技</span>';
+    if (petFullSkill) return `<span class="pet-skill pet-skill-full">${T('price.tagFullSkillShort')}</span>`;
     if (petSkillDrop != null && petSkillDrop > 0) {
-        return `<span class="pet-skill pet-skill-drop">掉${petSkillDrop}技</span>`;
+        return `<span class="pet-skill pet-skill-drop">${T('price.tagDropSkill', { n: petSkillDrop })}</span>`;
     }
     return '';
 }
@@ -4437,8 +4477,8 @@ function buildPetTags(petName, petLv, trans, slot, petAllocBase, petAllocStar) {
     let tags = buildPetCardTierTag(resolvePetCardTier(petName));
     tags += buildPetRaceTag(petName);
     tags += `<span class="pet-lv">Lv${petLv}</span>`;
-    tags += `<span class="pet-trans">${trans}改</span>`;
-    tags += `<span class="pet-slot">${slot}技</span>`;
+    tags += `<span class="pet-trans">${T('price.petTransN', { n: trans })}</span>`;
+    tags += `<span class="pet-slot">${T('price.petSkillN', { n: slot })}</span>`;
     if (petAllocBase) {
         const meta = computePetGradeMeta(petName, petAllocBase, petAllocStar || [0, 0, 0, 0, 0], slot);
         tags += buildPetGradeTag(petName, petAllocBase);
@@ -4500,9 +4540,9 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
                     let seedTag = '';
                     const itemLevel = item.ITEM_LEVEL || item.level || item.Level || item.ITEM_LV || item.lv || 0;
                     if (item.ITEM_TRUENAME.includes('改造圖') && itemLevel > 0) {
-                        if (itemLevel === 5) { gradeTag = '<span class="grade-normal">普通</span>'; grade = '普通'; }
-                        else if (itemLevel === 6) { gradeTag = '<span class="grade-silver">銀</span>'; grade = '銀'; }
-                        else if (itemLevel === 7) { gradeTag = '<span class="grade-gold">金</span>'; grade = '金'; }
+                        if (itemLevel === 5) { gradeTag = `<span class="grade-normal">${T('price.gradeNormal')}</span>`; grade = '普通'; }
+                        else if (itemLevel === 6) { gradeTag = `<span class="grade-silver">${T('price.gradeSilver')}</span>`; grade = '銀'; }
+                        else if (itemLevel === 7) { gradeTag = `<span class="grade-gold">${T('price.gradeGold')}</span>`; grade = '金'; }
                         else gradeTag = `<span class="grade-normal">Lv${itemLevel}</span>`;
                     }
                     
@@ -4510,16 +4550,16 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
                     let seedPlusStats = [];
                     let seedMinusStats = [];
                     if (item.ITEM_TRUENAME.includes('重來的種子') && item.ITEM_ARGUMENT) {
-                        const bpNames = ['體', '攻', '防', '敏', '魔'];
+                        const bpNames = PET_STAT_LABELS;
                         const bpValues = item.ITEM_ARGUMENT.split('|').map(Number);
                         let plusParts = [];
                         let minusParts = [];
                         bpValues.forEach((val, idx) => {
                             if (val > 0) {
-                                plusParts.push(`<span class="bp-plus">+${val}${bpNames[idx]}</span>`);
+                                plusParts.push(`<span class="bp-plus">+${val}${petStatLabel(idx)}</span>`);
                                 seedPlusStats.push(bpNames[idx]);
                             } else if (val < 0) {
-                                minusParts.push(`<span class="bp-minus">${val}${bpNames[idx]}</span>`);
+                                minusParts.push(`<span class="bp-minus">${val}${petStatLabel(idx)}</span>`);
                                 seedMinusStats.push(bpNames[idx]);
                             }
                         });
@@ -4536,7 +4576,7 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
                     if (MARKET_SOUL_COLORS[item.ITEM_ID]) {
                         const c = MARKET_SOUL_COLORS[item.ITEM_ID];
                         soulColor = c.label;
-                        colorTag = `<span class="soul-tag ${c.cls}">${c.label}</span>`;
+                        colorTag = `<span class="soul-tag ${c.cls}">${soulColorDisplay(c)}</span>`;
                     }
                     if (tagDefs.length > 0) {
                         const tags = buildStatTags(item, tagDefs);
@@ -4674,7 +4714,7 @@ async function fetchMarketData(keyword, callbacks = {}) {
     const first = await fetchMarketPage(keyword, 1, normalizedKeyword, exact, marketType);
     if (first.totalFiltered === 0) return [];
     if (!skipResultCap && !exact && first.totalFiltered > 300) {
-        alert('結果太多，請輸入更精確的關鍵字');
+        alert(T('price.alert.tooManyResults'));
         return [];
     }
 
@@ -4772,10 +4812,10 @@ function formatTrackedPrice(value) {
 function getTrackedUpdatedMeta(lastUpdated) {
     if (!lastUpdated) return { text: '-', cls: '' };
     const diffMins = Math.floor((Date.now() - lastUpdated) / 60000);
-    if (diffMins < 60) return { text: '1 小時內', cls: 'tracked-updated-fresh' };
+    if (diffMins < 60) return { text: T('price.within1h'), cls: 'tracked-updated-fresh' };
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return { text: `${diffHours} 小時前`, cls: 'tracked-updated-warn' };
-    return { text: '超過 1 天', cls: 'tracked-updated-stale' };
+    if (diffHours < 24) return { text: T('price.hoursAgo', { n: diffHours }), cls: 'tracked-updated-warn' };
+    return { text: T('price.over1day'), cls: 'tracked-updated-stale' };
 }
 
 async function fetchTrackedHistory(keyword, type = 'all', maxPages = TRACKED_HISTORY_PAGES, hours = TRACKED_HISTORY_HOURS) {
@@ -4856,7 +4896,7 @@ async function refreshAllTracked() {
     if (trackedItems.length === 0) return;
     const btn = document.getElementById('trackedRefreshAllBtn');
     if (btn) btn.disabled = true;
-    showLoading(true, '更新追蹤項目成交價…');
+    showLoading(true, T('price.loading.tracked'));
     try {
         for (const item of [...trackedItems]) {
             await refreshTrackedItem(item.name);
@@ -4905,7 +4945,7 @@ function refreshMarketTrackButtons() {
     document.querySelectorAll('#marketBody .track-btn').forEach(btn => {
         const tracked = isTracked(btn.dataset.trackName);
         btn.classList.toggle('tracked', tracked);
-        btn.title = tracked ? '取消追蹤' : '加入追蹤清單';
+        btn.title = tracked ? T('price.trackRemove') : T('price.trackAdd');
         btn.textContent = tracked ? '★' : '☆';
     });
 }
@@ -4939,8 +4979,9 @@ function renderTrackedTable() {
     tbody.innerHTML = trackedItems.map((item, index) => {
         const updated = getTrackedUpdatedMeta(item.lastUpdated);
         const updating = trackedUpdating.has(item.name);
-        const typeLabel = item.type === 'pet' ? '寵物' : '道具';
+        const typeLabel = item.type === 'pet' ? T('price.typePet') : T('price.typeItem');
         const hasChart = (item.historyLogs?.length || 0) > 0;
+        const chartTip = escapeAttr(T('price.chartNeedRefresh'));
         return `
         <tr data-track-name="${escapeAttr(item.name)}">
             <td>${typeLabel}</td>
@@ -4950,20 +4991,20 @@ function renderTrackedTable() {
             <td style="color:var(--accent-green)">${formatTrackedPrice(item.minCrystal)}</td>
             <td style="color:var(--accent-gold)">${formatTrackedPrice(item.avgCrystal)}</td>
             <td>${item.historyCount ?? 0}</td>
-            <td class="${updated.cls}">${updating ? '更新中…' : updated.text}</td>
-            <td><button type="button" class="secondary tracked-chart-btn" style="padding:6px 12px;font-size:0.8rem;" data-index="${index}" data-name="${escapeAttr(item.name)}" ${hasChart ? '' : 'disabled title="請先更新成交價"'}">📈</button></td>
+            <td class="${updated.cls}">${updating ? T('price.updating') : updated.text}</td>
+            <td><button type="button" class="secondary tracked-chart-btn" style="padding:6px 12px;font-size:0.8rem;" data-index="${index}" data-name="${escapeAttr(item.name)}" ${hasChart ? '' : `disabled title="${chartTip}"`}>📈</button></td>
             <td>
                 <div class="tracked-actions">
-                    <button type="button" class="secondary tracked-refresh-btn" data-name="${escapeAttr(item.name)}" ${updating ? 'disabled' : ''}>更新</button>
-                    <button type="button" class="secondary tracked-search-btn" data-name="${escapeAttr(item.name)}">搜尋</button>
-                    <button type="button" class="secondary tracked-remove-btn" data-name="${escapeAttr(item.name)}">刪除</button>
+                    <button type="button" class="secondary tracked-refresh-btn" data-name="${escapeAttr(item.name)}" ${updating ? 'disabled' : ''}>${T('price.btnRefresh')}</button>
+                    <button type="button" class="secondary tracked-search-btn" data-name="${escapeAttr(item.name)}">${T('price.btnSearch')}</button>
+                    <button type="button" class="secondary tracked-remove-btn" data-name="${escapeAttr(item.name)}">${T('price.btnDelete')}</button>
                 </div>
             </td>
         </tr>
         <tr id="trackedChartRow${index}" class="chart-row" style="display:none;">
             <td colspan="10" style="padding:0; background:var(--bg-dark);">
                 <div class="inline-chart-container">
-                    <div class="chart-title">📈 ${escapeHtml(item.name)} 價格走勢（72H）</div>
+                    <div class="chart-title">${T('price.histChartTracked', { name: escapeHtml(item.name) })}</div>
                     <div class="inline-chart-wrapper">
                         <canvas id="trackedChart${index}"></canvas>
                     </div>
@@ -5009,36 +5050,46 @@ function initTracked() {
         e.stopPropagation();
         toggleTracked(trackBtn.dataset.trackName, trackBtn.dataset.trackType);
         trackBtn.classList.toggle('tracked', isTracked(trackBtn.dataset.trackName));
-        trackBtn.title = isTracked(trackBtn.dataset.trackName) ? '取消追蹤' : '加入追蹤清單';
+        trackBtn.title = isTracked(trackBtn.dataset.trackName) ? T('price.trackRemove') : T('price.trackAdd');
         trackBtn.textContent = isTracked(trackBtn.dataset.trackName) ? '★' : '☆';
     });
 }
 
 function buildTrackBtnHtml(name, type) {
     const tracked = isTracked(name);
-    return `<button type="button" class="track-btn${tracked ? ' tracked' : ''}" data-track-name="${escapeAttr(name)}" data-track-type="${type}" title="${tracked ? '取消追蹤' : '加入追蹤清單'}">${tracked ? '★' : '☆'}</button>`;
+    const tip = tracked ? T('price.trackRemove') : T('price.trackAdd');
+    return `<button type="button" class="track-btn${tracked ? ' tracked' : ''}" data-track-name="${escapeAttr(name)}" data-track-type="${type}" title="${escapeAttr(tip)}">${tracked ? '★' : '☆'}</button>`;
 }
 
 /* ========================================
    歷史成交
 ======================================== */
 const HISTORY_RANGE_DAYS = { '3d': 3, '7d': 7, '30d': 30 };
-const HISTORY_RANGE_SEGS = [
-    ['3d', '3天'],
-    ['7d', '7天'],
-    ['30d', '30天']
-];
-const HISTORY_CURRENCY_SEGS = [
-    ['all', '全部'],
-    ['0', '魔幣'],
-    ['1', '魔晶']
-];
-const HISTORY_SORT_SEGS = [
-    ['time_desc', '成交時間（最新優先）'],
-    ['time_asc', '成交時間（最早優先）'],
-    ['price_desc', '單價（高→低，含匯率）'],
-    ['price_asc', '單價（低→高，含匯率）']
-];
+function getHistoryRangeSegs() {
+    return [
+        ['3d', T('price.hist3d')],
+        ['7d', T('price.hist7d')],
+        ['30d', T('price.hist30d')]
+    ];
+}
+function getHistoryCurrencySegs() {
+    return [
+        ['all', T('common.all')],
+        ['0', T('price.segCoin')],
+        ['1', T('price.segCrystal')]
+    ];
+}
+function getHistorySortSegs() {
+    return [
+        ['time_desc', T('price.histSortTimeDesc')],
+        ['time_asc', T('price.histSortTimeAsc')],
+        ['price_desc', T('price.histSortPriceDesc')],
+        ['price_asc', T('price.histSortPriceAsc')]
+    ];
+}
+function historyRangeLabel(val) {
+    return getHistoryRangeSegs().find(([v]) => v === val)?.[1] || val;
+}
 
 function getHistoryCacheKey(keyword) {
     return keyword;
@@ -5232,18 +5283,7 @@ function ensureHistoryLogTimestamps(logs) {
 }
 
 function initHistoryFilters() {
-    renderHistoryFilterPills('historyRangeSegments', HISTORY_RANGE_SEGS, historyRange, val => {
-        historyRange = val;
-        applyHistoryFiltersLocal();
-    });
-    renderHistoryFilterPills('historyCurrencySegments', HISTORY_CURRENCY_SEGS, historyCurrency, val => {
-        historyCurrency = val;
-        applyHistoryFiltersLocal();
-    });
-    renderHistoryFilterPills('historySortSegments', HISTORY_SORT_SEGS, historySort, val => {
-        historySort = val;
-        applyHistoryFiltersLocal();
-    });
+    renderHistoryFilterBar();
 
     document.getElementById('historyPagination')?.addEventListener('click', e => {
         const btn = e.target.closest('button[data-act]');
@@ -5267,6 +5307,21 @@ function initHistoryFilters() {
         const btn = e.target.closest('.history-group-chart-btn');
         if (!btn) return;
         toggleHistoryGroupChart(parseInt(btn.dataset.index, 10), btn.dataset.name);
+    });
+}
+
+function renderHistoryFilterBar() {
+    renderHistoryFilterPills('historyRangeSegments', getHistoryRangeSegs(), historyRange, val => {
+        historyRange = val;
+        applyHistoryFiltersLocal();
+    });
+    renderHistoryFilterPills('historyCurrencySegments', getHistoryCurrencySegs(), historyCurrency, val => {
+        historyCurrency = val;
+        applyHistoryFiltersLocal();
+    });
+    renderHistoryFilterPills('historySortSegments', getHistorySortSegs(), historySort, val => {
+        historySort = val;
+        applyHistoryFiltersLocal();
     });
 }
 
@@ -5306,27 +5361,27 @@ function getHistoryEmptyMessage() {
     const matchedAll = getHistoryKeywordMatchedLogs(allHistoryLogs);
     const matchedPool = filterByHistoryDisplayRange(matchedAll);
 
-    if (allHistoryLogs.length === 0) return '無法取得成交資料，請稍後再試';
+    if (allHistoryLogs.length === 0) return T('price.histEmptyFetch');
     if (matchedAll.length === 0) {
         const samples = [...new Set(allHistoryLogs.map(l => l.item).filter(Boolean))].slice(0, 4);
         const sampleHint = samples.length
-            ? `<br><span style="font-size:0.9em;opacity:0.85">資料池品名示例：${samples.map(s => escapeHtml(s)).join('、')}…</span>`
+            ? T('price.histSampleHint', { samples: samples.map(s => escapeHtml(s)).join('、') })
             : '';
         if (exact) {
-            return `「${escapeHtml(keyword)}」無同名成交（資料池 ${allHistoryLogs.length} 筆）${sampleHint}<br><span style="font-size:0.9em;opacity:0.85">可取消勾選「精確搜尋」改看關鍵字相符的成交</span>`;
+            return T('price.histEmptyExact', { kw: escapeHtml(keyword), pool: allHistoryLogs.length, samples: sampleHint });
         }
-        return `「${escapeHtml(keyword)}」無符合關鍵字的成交（資料池 ${allHistoryLogs.length} 筆）${sampleHint}`;
+        return T('price.histEmptyFuzzy', { kw: escapeHtml(keyword), pool: allHistoryLogs.length, samples: sampleHint });
     }
     if (matchedPool.length === 0) {
-        const label = HISTORY_RANGE_SEGS.find(([v]) => v === historyRange)?.[1] || historyRange;
-        const modeLabel = exact ? '同名' : '符合關鍵字';
-        return `近 ${label} 無${modeLabel}成交（30 天內共 ${matchedAll.length} 筆），可改選 7 天或 30 天`;
+        const label = historyRangeLabel(historyRange);
+        const modeLabel = exact ? T('price.histModeExact') : T('price.histModeFuzzy');
+        return T('price.histEmptyRange', { range: label, mode: modeLabel, total: matchedAll.length });
     }
     if (historyCurrency !== 'all') {
-        const unit = historyCurrency === '0' ? '魔幣' : '魔晶';
-        return `此時間範圍內無 ${unit} 成交紀錄`;
+        const unit = historyCurrency === '0' ? T('price.segCoin') : T('price.segCrystal');
+        return T('price.histEmptyCurrency', { unit });
     }
-    return '無符合條件的成交紀錄';
+    return T('price.histEmptyGeneric');
 }
 
 function getExchangeRate() {
@@ -5396,14 +5451,14 @@ function buildHistoryDeltaTag(log, logs) {
     const refPrice = getHistoryRefPriceByType(logs, log.pricetype);
     if (!refPrice) return '';
     const pct = Math.round((log.price - refPrice) / refPrice * 100);
-    if (pct >= 5) return `<span class="history-delta up">↑ 貴 ${pct}%</span>`;
-    if (pct <= -5) return `<span class="history-delta down">↓ 便宜 ${Math.abs(pct)}%</span>`;
-    return `<span class="history-delta flat">≈ 均價</span>`;
+    if (pct >= 5) return `<span class="history-delta up">${T('price.histDeltaUp', { pct })}</span>`;
+    if (pct <= -5) return `<span class="history-delta down">${T('price.histDeltaDown', { pct: Math.abs(pct) })}</span>`;
+    return `<span class="history-delta flat">${T('price.histDeltaFlat')}</span>`;
 }
 
 function buildHistoryPriceHtml(log) {
     const icon = log.pricetype === 0 ? '💰' : '💎';
-    const unit = log.pricetype === 0 ? '魔幣' : '魔晶';
+    const unit = log.pricetype === 0 ? T('price.segCoin') : T('price.segCrystal');
     const qtyText = log.quantity > 1 ? `×${log.quantity}` : '';
     const priceClass = log.pricetype === 0 ? 'coin' : 'crystal';
     let converted = '';
@@ -5425,12 +5480,12 @@ function formatRelativeTime(timeStr) {
     if (ts == null) return timeStr;
     const diff = Date.now() - ts;
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return '剛剛';
-    if (mins < 60) return `${mins} 分鐘前`;
+    if (mins < 1) return T('price.timeJustNow');
+    if (mins < 60) return T('price.timeMinsAgo', { n: mins });
     const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours} 小時前`;
+    if (hours < 24) return T('price.timeHoursAgo', { n: hours });
     const days = Math.floor(hours / 24);
-    if (days < 30) return `${days} 天前`;
+    if (days < 30) return T('price.timeDaysAgo', { n: days });
     return timeStr.slice(0, 16);
 }
 
@@ -5470,7 +5525,7 @@ async function loadHistoryTab(force = false) {
     }
 
     const token = ++historyLoadToken;
-    showLoading(true, '載入歷史成交…');
+    showLoading(true, T('price.loading.history'));
     document.getElementById('historySection').style.display = 'none';
     document.getElementById('emptyState').style.display = 'none';
 
@@ -5481,7 +5536,7 @@ async function loadHistoryTab(force = false) {
             maxPages: HISTORY_FETCH_INITIAL_PAGES,
             onProgress(page, totalPages, count) {
                 if (token !== historyLoadToken) return;
-                showLoading(true, `載入歷史第 ${page}/${totalPages} 頁…（${count} 筆）`);
+                showLoading(true, T('price.loading.historyPage', { page, total: totalPages, count }));
             },
             onPartial(logsSoFar) {
                 if (token !== historyLoadToken) return;
@@ -5512,13 +5567,13 @@ async function loadHistoryTab(force = false) {
             renderHistoryData();
             return true;
         }
-        showEmpty('找不到歷史成交記錄（近 30 天）');
+        showEmpty(T('price.emptyNoHistory30d'));
         return false;
     } catch (err) {
         if (token !== historyLoadToken) return false;
         console.error(err);
-        alert('搜尋失敗，請稍後再試或檢查網路連線');
-        showEmpty('搜尋歷史失敗');
+        alert(T('price.alert.searchFailGeneric'));
+        showEmpty(T('price.emptyHistoryFail'));
         return false;
     } finally {
         if (token === historyLoadToken) {
@@ -5531,7 +5586,7 @@ async function loadMoreHistory() {
     const keyword = document.getElementById('searchInput').value.trim();
     if (!keyword || historyApiExhausted) return;
 
-    showLoading(true, '載入更多成交紀錄…');
+    showLoading(true, T('price.loading.historyMore'));
     try {
         const before = allHistoryLogs.length;
         allHistoryLogs = await fetchHistoryData(keyword, { append: true, maxPages: HISTORY_FETCH_BATCH_PAGES });
@@ -5542,7 +5597,7 @@ async function loadMoreHistory() {
         renderHistoryData();
     } catch (err) {
         console.error(err);
-        alert('載入更多失敗，請稍後再試');
+        alert(T('price.alert.loadMoreFail'));
     } finally {
         showLoading(false);
     }
@@ -5669,26 +5724,26 @@ function renderHistorySummaryBar(logs) {
     }
 
     summaryEl.innerHTML = `
-        <div class="history-stat-card"><div class="label">📦 筆數</div><div class="value blue">${countText}</div></div>
-        <div class="history-stat-card"><div class="label">💰 最低</div><div class="value green">${minVal}</div></div>
-        <div class="history-stat-card"><div class="label">📊 中位</div><div class="value gold">${medVal}</div></div>
-        <div class="history-stat-card"><div class="label">📈 最高</div><div class="value red">${maxVal}</div></div>
+        <div class="history-stat-card"><div class="label">${T('price.histStatCount')}</div><div class="value blue">${countText}</div></div>
+        <div class="history-stat-card"><div class="label">${T('price.histStatMin')}</div><div class="value green">${minVal}</div></div>
+        <div class="history-stat-card"><div class="label">${T('price.histStatMed')}</div><div class="value gold">${medVal}</div></div>
+        <div class="history-stat-card"><div class="label">${T('price.histStatMax')}</div><div class="value red">${maxVal}</div></div>
     `;
 
     const coinRef = getHistoryRefPriceByType(logs, 0);
     const crystalRef = getHistoryRefPriceByType(logs, 1);
     const refParts = [];
-    if (historyCurrency !== '1' && coinRef > 0) refParts.push(`💰 魔幣 <strong>${coinRef.toLocaleString()}</strong>`);
-    if (historyCurrency !== '0' && crystalRef > 0) refParts.push(`💎 魔晶 <strong>${crystalRef.toLocaleString()}</strong>`);
+    if (historyCurrency !== '1' && coinRef > 0) refParts.push(`${T('price.histAvgCoin')} <strong>${coinRef.toLocaleString()}</strong>`);
+    if (historyCurrency !== '0' && crystalRef > 0) refParts.push(`${T('price.histAvgCrystal')} <strong>${crystalRef.toLocaleString()}</strong>`);
 
     if (refParts.length) {
         avgBar.style.display = 'block';
-        avgBar.innerHTML = `ℹ️ 均單價：${refParts.join('　·　')}　·　每筆「便宜 / 貴 X%」與<strong>同幣別</strong>均價比較`;
+        avgBar.innerHTML = T('price.histAvgBar', { parts: refParts.join('　·　') });
     } else if (allHistoryLogs.length > 0) {
         const matchedAll = getHistoryKeywordMatchedLogs(allHistoryLogs);
-        const modeLabel = isHistoryExactSearch() ? '同名' : '符合關鍵字';
+        const modeLabel = isHistoryExactSearch() ? T('price.histModeExact') : T('price.histModeFuzzy');
         avgBar.style.display = 'block';
-        avgBar.innerHTML = `ℹ️ 資料池 ${allHistoryLogs.length} 筆，${modeLabel} ${matchedAll.length} 筆；目前篩選條件下無統計，可調整時間或貨幣`;
+        avgBar.innerHTML = T('price.histPoolHint', { pool: allHistoryLogs.length, mode: modeLabel, matched: matchedAll.length });
     } else {
         avgBar.style.display = 'none';
     }
@@ -5706,9 +5761,14 @@ function renderHistoryFeed(logs) {
     const pageLogs = logs.slice(start, start + HISTORY_FEED_PAGE_SIZE);
 
     if (countEl) {
-        const rangeLabel = HISTORY_RANGE_SEGS.find(([v]) => v === historyRange)?.[1] || historyRange;
+        const rangeLabel = historyRangeLabel(historyRange);
         const matchedAll = getHistoryKeywordMatchedLogs(allHistoryLogs);
-        countEl.textContent = `近 ${rangeLabel} ${logs.length} 筆 / 關鍵字池 ${matchedAll.length} 筆${historyLastFetchedPage ? ` · 已抓 ${historyLastFetchedPage} 頁` : ''}`;
+        countEl.textContent = T('price.histFeedCount', {
+            range: rangeLabel,
+            count: logs.length,
+            pool: matchedAll.length,
+            pages: historyLastFetchedPage ? T('price.histPagesFetched', { n: historyLastFetchedPage }) : ''
+        });
     }
 
     if (pageLogs.length === 0) {
@@ -5736,10 +5796,10 @@ function renderHistoryFeed(logs) {
 
     if (pagEl) {
         pagEl.innerHTML = `
-            <button type="button" class="secondary" data-act="prev" ${historyDisplayPage <= 1 ? 'disabled' : ''}>◀ 上一頁</button>
-            <span class="page-info">第 ${historyDisplayPage} / ${totalPages} 頁</span>
-            <button type="button" class="secondary" data-act="next" ${historyDisplayPage >= totalPages ? 'disabled' : ''}>下一頁 ▶</button>
-            ${historyApiExhausted ? '' : '<button type="button" data-act="more">⬇ 載入更多（擴充 30 天資料池）</button>'}
+            <button type="button" class="secondary" data-act="prev" ${historyDisplayPage <= 1 ? 'disabled' : ''}>${T('price.histPrev')}</button>
+            <span class="page-info">${T('price.histPageInfo', { cur: historyDisplayPage, total: totalPages })}</span>
+            <button type="button" class="secondary" data-act="next" ${historyDisplayPage >= totalPages ? 'disabled' : ''}>${T('price.histNext')}</button>
+            ${historyApiExhausted ? '' : `<button type="button" data-act="more">${T('price.histLoadMore')}</button>`}
         `;
     }
 }
@@ -5790,7 +5850,7 @@ function renderHistoryGroupTable(logs) {
         <tr id="historyGroupChartRow${index}" class="chart-row" style="display:none;">
             <td colspan="9" style="padding:0; background:var(--bg-dark);">
                 <div class="inline-chart-container">
-                    <div class="chart-title">📈 ${escapeHtml(row.item)} 價格走勢</div>
+                    <div class="chart-title">${T('price.histChartTitleSimple', { name: escapeHtml(row.item) })}</div>
                     <div class="inline-chart-wrapper">
                         <canvas id="historyGroupChart${index}"></canvas>
                     </div>
@@ -5815,8 +5875,8 @@ function renderHistoryData() {
     const hintEl = document.getElementById('historyExactHint');
     if (hintEl) {
         hintEl.textContent = isHistoryExactSearch()
-            ? '🎯 精確搜尋：僅同名成交'
-            : '🔍 模糊搜尋：品名包含關鍵字';
+            ? T('price.histExactHint')
+            : T('price.histFuzzyHint');
     }
     renderHistorySummaryBar(logs);
     renderHistoryFeed(logs);
@@ -5833,7 +5893,7 @@ function updateHistoryChartUi(logs) {
         hideHistoryChart(false);
         if (btn) {
             btn.disabled = true;
-            btn.textContent = '📈 走勢圖';
+            btn.textContent = T('price.histChart');
         }
         return;
     }
@@ -5849,7 +5909,7 @@ function updateHistoryChartUi(logs) {
 
     if (btn) {
         btn.disabled = false;
-        btn.textContent = historyChartOpen ? '📈 收起走勢' : '📈 走勢圖';
+        btn.textContent = historyChartOpen ? T('price.histChartCollapse') : T('price.histChart');
     }
 }
 
@@ -5860,7 +5920,7 @@ function toggleHistoryChart() {
     }
     const logs = getFilteredHistoryLogs();
     if (!logs.length) {
-        alert('目前篩選條件下無成交資料');
+        alert(T('price.alert.noHistoryFiltered'));
         return;
     }
     historyChartUserDismissed = false;
@@ -5884,15 +5944,15 @@ function hideHistoryChart(markDismissed = false) {
 function closeHistoryChart() {
     hideHistoryChart(true);
     const btn = document.getElementById('historyChartToggleBtn');
-    if (btn) btn.textContent = '📈 走勢圖';
+    if (btn) btn.textContent = T('price.histChart');
 }
 
 function syncHistoryChart(logs = getFilteredHistoryLogs()) {
     const keyword = document.getElementById('searchInput').value.trim();
-    const rangeLabel = HISTORY_RANGE_SEGS.find(([v]) => v === historyRange)?.[1] || historyRange;
+    const rangeLabel = historyRangeLabel(historyRange);
     const titleEl = document.getElementById('historyChartTitle');
     if (titleEl) {
-        titleEl.textContent = `📈 ${keyword} 價格走勢（近 ${rangeLabel}，${logs.length} 筆）`;
+        titleEl.textContent = T('price.histChartTitle', { name: keyword, range: rangeLabel, count: logs.length });
     }
     renderPriceChart('history-main', 'historyChartCanvas', keyword, logs);
 }
@@ -5900,16 +5960,20 @@ function syncHistoryChart(logs = getFilteredHistoryLogs()) {
 /* ========================================
    篩選與排序
 ======================================== */
-const MARKET_ITEM_TYPE_SEGS = [
-    ['all', '全部'],
-    ['item', '僅道具'],
-    ['pet', '僅寵物']
-];
-const MARKET_PRICE_UNIT_SEGS = [
-    ['all', '全部'],
-    ['0', '魔幣'],
-    ['1', '魔晶']
-];
+function getMarketItemTypeSegs() {
+    return [
+        ['all', T('common.all')],
+        ['item', T('price.segItemsOnly')],
+        ['pet', T('price.segPetsOnly')]
+    ];
+}
+function getMarketPriceUnitSegs() {
+    return [
+        ['all', T('common.all')],
+        ['0', T('price.segCoin')],
+        ['1', T('price.segCrystal')]
+    ];
+}
 
 function initMarketSegments() {
     document.getElementById('itemTypeSegments')?.addEventListener('click', e => {
@@ -5953,17 +6017,13 @@ function syncPetLevelBabyFilters(changed) {
     babyEl.disabled = hasMinLv;
     babyChip?.classList.toggle('disabled', hasMinLv);
     if (babyChip) {
-        babyChip.title = hasMinLv
-            ? '已設最低等級，無法同時使用 1等'
-            : '只顯示 1 等寵物';
+        babyChip.title = hasMinLv ? T('price.petMinLvBlocked') : T('price.petBabyTip');
     }
 
     lvEl.disabled = babyOn;
     lvChip?.classList.toggle('disabled', babyOn);
     if (lvChip) {
-        lvChip.title = babyOn
-            ? '已勾選 1等，無法同時設最低等級'
-            : '僅顯示達最低等級的寵物（留空不限）';
+        lvChip.title = babyOn ? T('price.petBabyBlocked') : T('price.petMinLvTip');
     }
 }
 
@@ -6065,13 +6125,13 @@ function renderMarketSegmentBar(baseItems) {
         '1': afterType.filter(i => i.pricetype === 1).length
     };
 
-    typeEl.innerHTML = MARKET_ITEM_TYPE_SEGS.map(([value, label]) => {
+    typeEl.innerHTML = getMarketItemTypeSegs().map(([value, label]) => {
         const count = typeCounts[value] ?? 0;
         const active = marketItemType === value ? ' active' : '';
         return `<button type="button" class="segment-pill${active}" data-value="${value}">${label}(${count})</button>`;
     }).join('');
 
-    unitEl.innerHTML = MARKET_PRICE_UNIT_SEGS.map(([value, label]) => {
+    unitEl.innerHTML = getMarketPriceUnitSegs().map(([value, label]) => {
         const count = unitCounts[value] ?? 0;
         const active = marketPriceUnit === value ? ' active' : '';
         return `<button type="button" class="segment-pill${active}" data-value="${value}">${label}(${count})</button>`;
@@ -6177,7 +6237,7 @@ function renderMarketTable(items) {
     const tbody = document.getElementById('marketBody');
     
     if (items.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary);">無符合條件的物品</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary);">${T('price.emptyNoTableMatch')}</td></tr>`;
         document.getElementById('marketSection').style.display = 'block';
         return;
     }
@@ -6227,7 +6287,7 @@ function renderMarketTable(items) {
             <td>
                 <span class="server-badge s${item.server}">S${item.server}</span>
                 ${item.hasMap && item.mapX != null
-                    ? `<span class="location-link" data-x="${item.mapX}" data-y="${item.mapY}" title="點擊查看地圖">📍 ${escapeHtml(item.location)}</span>`
+                    ? `<span class="location-link" data-x="${item.mapX}" data-y="${item.mapY}" title="${escapeAttr(T('price.mapCoordTip'))}">📍 ${escapeHtml(item.location)}</span>`
                     : escapeHtml(item.location)}
             </td>
             <td>${escapeHtml(item.shopName)}</td>
@@ -6257,7 +6317,7 @@ function togglePriceChart(chartKey, rowId, canvasId, itemName, logs) {
     }
 
     if (!logs?.length) {
-        alert('尚無成交資料，請先按「更新」');
+        alert(T('price.alert.noHistoryData'));
         return;
     }
 
@@ -6273,7 +6333,7 @@ function renderPriceChart(chartKey, canvasId, itemName, logs) {
 
     const itemLogs = logs.filter(l => normalizeStr(l.item) === normalizeStr(itemName));
     if (itemLogs.length === 0) {
-        alert('沒有與名稱完全相符的成交紀錄');
+        alert(T('price.alert.noExactHistory'));
         return;
     }
 
@@ -6287,7 +6347,7 @@ function renderPriceChart(chartKey, canvasId, itemName, logs) {
     const datasets = [];
     if (coinData.length > 0) {
         datasets.push({
-            label: '魔幣 💰',
+            label: T('price.chartCoin'),
             data: coinData.map(d => ({ x: d.time, y: d.price })),
             borderColor: '#d4a024',
             backgroundColor: 'rgba(212, 160, 36, 0.15)',
@@ -6299,7 +6359,7 @@ function renderPriceChart(chartKey, canvasId, itemName, logs) {
     }
     if (crystalData.length > 0) {
         datasets.push({
-            label: '魔晶 💎',
+            label: T('price.chartCrystal'),
             data: crystalData.map(d => ({ x: d.time, y: d.price })),
             borderColor: '#9068b0',
             backgroundColor: 'rgba(144, 104, 176, 0.15)',
@@ -6449,7 +6509,7 @@ function updateStats(items) {
 ======================================== */
 async function switchTab(tab) {
     if (isHistoryTab(tab) && !document.getElementById('searchInput').value.trim()) {
-        alert('請先輸入搜尋關鍵字');
+        alert(T('price.alert.needKeyword'));
         tab = 'market';
     }
 
@@ -6538,7 +6598,7 @@ mapImg.onerror = () => {
     if (mapSrcIndex < MAP_IMAGE_SOURCES.length) {
         mapImg.src = MAP_IMAGE_SOURCES[mapSrcIndex];
     } else {
-        alert('地圖圖片載入失敗');
+        alert(T('price.alert.mapFail'));
     }
 };
 mapImg.src = MAP_IMAGE_SOURCES[mapSrcIndex];
@@ -6597,9 +6657,9 @@ function drawMapMarker(x, y) {
 
 function showMapModal(x, y) {
     const gx = Number(x), gy = Number(y);
-    if (isNaN(gx) || isNaN(gy)) return alert('無法解析座標');
+    if (isNaN(gx) || isNaN(gy)) return alert(T('price.alert.badCoords'));
 
-    document.getElementById('mapModalTitle').textContent = `攤位位置 (X: ${gx}, Y: ${gy})`;
+    document.getElementById('mapModalTitle').textContent = T('price.mapTitleCoord', { x: gx, y: gy });
     document.getElementById('mapModal').classList.add('open');
 
     mapPending = { x: gx, y: gy };
@@ -6617,13 +6677,14 @@ let procurementData = null;
 const PROCUREMENT_GRID_SIZE = 12;
 const PROCUREMENT_PET_ROWS = 6;
 const PROCUREMENT_START_PRESETS = [
-    { label: '東醫傳送石', x: 223, y: 78 },
-    { label: '銀行傳送石', x: 242, y: 100 },
-    { label: '西醫傳送石', x: 63, y: 79 },
-    { label: '陶歐傳送石', x: 72, y: 123 },
-    { label: '水池傳送石', x: 141, y: 148 },
-    { label: '寵店傳送石', x: 162, y: 130 }
+    { labelKey: 'price.tp.eastClinic', x: 223, y: 78 },
+    { labelKey: 'price.tp.bank', x: 242, y: 100 },
+    { labelKey: 'price.tp.westClinic', x: 63, y: 79 },
+    { labelKey: 'price.tp.taoou', x: 72, y: 123 },
+    { labelKey: 'price.tp.fountain', x: 141, y: 148 },
+    { labelKey: 'price.tp.petShop', x: 162, y: 130 }
 ];
+function procurementPresetLabel(p) { return T(p.labelKey); }
 let bountyPickMode = false;
 let bountyPickEntries = [];
 const PROCUREMENT_ITEM_DELAY_MS = 450;
@@ -6653,11 +6714,11 @@ function getSelectedProcurementStart() {
         return {
             startX: parseInt(active.dataset.x, 10),
             startY: parseInt(active.dataset.y, 10),
-            startLabel: active.dataset.label || ''
+            startLabel: active.dataset.label || active.textContent.trim()
         };
     }
     const def = PROCUREMENT_START_PRESETS[0];
-    return { startX: def.x, startY: def.y, startLabel: def.label };
+    return { startX: def.x, startY: def.y, startLabel: procurementPresetLabel(def) };
 }
 
 function getProcurementOptions() {
@@ -6671,12 +6732,12 @@ function getProcurementOptions() {
 }
 
 function describeProcurementSkip(r) {
-    if (r.error) return `查詢失敗：${r.error}`;
-    if ((r.total || 0) === 0) return '市場無此物品，已跳過路線規劃';
-    if (r.noMapCount > 0 && r.noMapCount === r.total) return '有攤販售但皆非法蘭城座標，已跳過';
-    if (r.qtyShortCount > 0) return `有攤販售但數量不足（需 ${r.request.qty}），已跳過`;
-    if (r.filteredCount > 0) return '有攤販售但不符合篩選條件（分流等），已跳過';
-    return '攤位無符合條件的販售，已跳過路線規劃';
+    if (r.error) return T('price.procSkipError', { msg: r.error });
+    if ((r.total || 0) === 0) return T('price.procSkipNoMarket');
+    if (r.noMapCount > 0 && r.noMapCount === r.total) return T('price.procSkipNoMap');
+    if (r.qtyShortCount > 0) return T('price.procSkipQty', { n: r.request.qty });
+    if (r.filteredCount > 0) return T('price.procSkipFilter');
+    return T('price.procSkipEmpty');
 }
 
 function analyzeProcurementMiss(items, req, options) {
@@ -6799,11 +6860,11 @@ function computeProcurementRoute(stops, start, strategy = 'shortest') {
 
 async function runProcurementSearch() {
     const requests = collectProcurementRequests();
-    if (!requests.length) return alert('請至少輸入一項採購需求');
+    if (!requests.length) return alert(T('price.alert.needProcItem'));
 
     const options = getProcurementOptions();
     closeProcurementModal();
-    showLoading(true, '準備採購搜尋…');
+    showLoading(true, T('price.loading.procPrepare'));
     hideAll();
 
     const itemResults = [];
@@ -6812,7 +6873,7 @@ async function runProcurementSearch() {
     try {
         for (let i = 0; i < requests.length; i++) {
             const req = requests[i];
-            showLoading(true, `採購搜尋 ${i + 1}/${requests.length}：${req.name}…`);
+            showLoading(true, T('price.loading.procItem', { cur: i + 1, total: requests.length, name: req.name }));
             try {
                 const items = await fetchMarketData(req.name, { exact: options.exact });
                 const picked = pickProcurementListings(items, req, options);
@@ -6853,8 +6914,8 @@ async function runProcurementSearch() {
         switchTab('procurement');
     } catch (err) {
         console.error(err);
-        alert('採購搜尋失敗：' + (err.message || '請稍後再試'));
-        showEmpty('採購搜尋失敗');
+        alert(T('price.alert.procFail', { msg: err.message || T('price.tryLater') }));
+        showEmpty(T('price.emptyProcFail'));
     } finally {
         showLoading(false);
     }
@@ -6863,46 +6924,46 @@ async function runProcurementSearch() {
 function renderProcurementResults() {
     if (!procurementData) return;
     const { itemResults, route, totalDist, totalCost, foundCount, skippedCount, requestCount, stopCount, options } = procurementData;
-    const strategyLabel = options.strategy === 'cheapest' ? '最便宜' : '最短路徑';
+    const strategyLabel = options.strategy === 'cheapest' ? T('price.strategyCheapest') : T('price.strategyShortest');
 
     document.getElementById('procurementRouteTitle').textContent =
-        options.strategy === 'cheapest' ? '🛒 採購路線（最便宜優先）' : '🗺️ 採購路線（最短路徑）';
+        options.strategy === 'cheapest' ? T('price.procRouteCheapest') : T('price.procRouteShortest');
 
     document.getElementById('procurementSummary').innerHTML = `
-        <div class="procurement-summary-card"><div class="label">採購項目</div><div class="value blue">${requestCount}</div></div>
-        <div class="procurement-summary-card"><div class="label">找到</div><div class="value green">${foundCount}</div></div>
-        <div class="procurement-summary-card"><div class="label">已跳過</div><div class="value red">${skippedCount}</div></div>
-        <div class="procurement-summary-card"><div class="label">攤位站數</div><div class="value gold">${stopCount}</div></div>
-        <div class="procurement-summary-card"><div class="label">預估總價</div><div class="value" style="font-size:1rem;">${totalCost.toLocaleString()}</div></div>
-        <div class="procurement-summary-card"><div class="label">路線距離</div><div class="value">${totalDist}</div></div>
-        <div class="procurement-summary-card"><div class="label">策略</div><div class="value" style="font-size:1rem;">${strategyLabel}</div></div>
+        <div class="procurement-summary-card"><div class="label">${T('price.procSummaryItems')}</div><div class="value blue">${requestCount}</div></div>
+        <div class="procurement-summary-card"><div class="label">${T('price.procSummaryFound')}</div><div class="value green">${foundCount}</div></div>
+        <div class="procurement-summary-card"><div class="label">${T('price.procSummarySkipped')}</div><div class="value red">${skippedCount}</div></div>
+        <div class="procurement-summary-card"><div class="label">${T('price.procSummaryStops')}</div><div class="value gold">${stopCount}</div></div>
+        <div class="procurement-summary-card"><div class="label">${T('price.procSummaryCost')}</div><div class="value" style="font-size:1rem;">${totalCost.toLocaleString()}</div></div>
+        <div class="procurement-summary-card"><div class="label">${T('price.procSummaryDist')}</div><div class="value">${totalDist}</div></div>
+        <div class="procurement-summary-card"><div class="label">${T('price.procSummaryStrategy')}</div><div class="value" style="font-size:1rem;">${strategyLabel}</div></div>
     `;
 
     const foundHtml = itemResults.filter(r => r.ok).map(r => {
         const stallNames = [...new Set(r.listings.map(l => l.shopName))].join('、');
-        return `<div class="procurement-check-item"><span class="status-ok">✓</span><div><div>${escapeHtml(r.request.name)} ×${r.request.qty}</div><div class="detail">已列入路線 · ${escapeHtml(stallNames)}</div></div></div>`;
+        return `<div class="procurement-check-item"><span class="status-ok">✓</span><div><div>${escapeHtml(r.request.name)} ×${r.request.qty}</div><div class="detail">${T('price.procCheckOk')} · ${escapeHtml(stallNames)}</div></div></div>`;
     }).join('');
     const skippedHtml = itemResults.filter(r => !r.ok).map(r =>
         `<div class="procurement-check-item skipped"><span class="status-fail">✗</span><div><div>${escapeHtml(r.request.name)} ×${r.request.qty}</div><div class="detail">${escapeHtml(describeProcurementSkip(r))}</div></div></div>`
     ).join('');
     document.getElementById('procurementChecklist').innerHTML =
-        (foundHtml || '<div class="detail" style="padding:8px 0;">尚無可採購項目</div>') +
-        (skippedHtml ? `<div class="procurement-skipped-title">已跳過（不列入路線）</div>${skippedHtml}` : '');
+        (foundHtml || `<div class="detail" style="padding:8px 0;">${T('price.procCheckNone')}</div>`) +
+        (skippedHtml ? `<div class="procurement-skipped-title">${T('price.procSkippedTitle')}</div>${skippedHtml}` : '');
 
     if (!route.length) {
         document.getElementById('procurementRouteBody').innerHTML =
-            '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-secondary);">無法規劃路線（沒有符合的法蘭城攤位）</td></tr>';
+            `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-secondary);">${T('price.procNoRoute')}</td></tr>`;
         return;
     }
 
-    const priceHeader = options.strategy === 'cheapest' ? '小計' : '段距離';
+    const priceHeader = options.strategy === 'cheapest' ? T('price.procThSubtotal') : T('price.procThDist');
     document.querySelector('#procurementRouteTable thead tr').innerHTML = `
-        <th>順序</th><th>分流</th><th>座標</th><th>攤位</th><th>採購項目</th><th>${priceHeader}</th>`;
+        <th>${T('price.procThOrder')}</th><th>${T('price.procThChannel')}</th><th>${T('price.procThCoord')}</th><th>${T('price.procThStall')}</th><th>${T('price.procThItems')}</th><th>${priceHeader}</th>`;
     document.getElementById('procurementRouteBody').innerHTML = route.map((stop, i) => {
         const itemsHtml = stop.items.map(it =>
             `<span class="route-item-line">${escapeHtml(it.name)} ×${it.qty}（${it.priceLabel}）</span>`
         ).join('');
-        const coordLink = `<span class="location-link" data-x="${stop.x}" data-y="${stop.y}" title="點擊查看地圖">[東${stop.x} 南${stop.y}]</span>`;
+        const coordLink = `<span class="location-link" data-x="${stop.x}" data-y="${stop.y}" title="${escapeAttr(T('price.mapCoordTip'))}">${T('price.coordEastSouth', { x: stop.x, y: stop.y })}</span>`;
         const lastCol = options.strategy === 'cheapest'
             ? stopTotalPrice(stop).toLocaleString()
             : stop.segmentDist;
@@ -6933,7 +6994,7 @@ function drawProcurementRoute(route, start) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(mapImg, 0, 0);
 
-    const points = [{ x: start.x, y: start.y, label: '起' }, ...route.map((s, i) => ({ x: s.x, y: s.y, label: String(i + 1) }))];
+    const points = [{ x: start.x, y: start.y, label: T('price.mapStartLabel') }, ...route.map((s, i) => ({ x: s.x, y: s.y, label: String(i + 1) }))];
     const pixels = points.map(p => ({ ...gameToPixel(p.x, p.y), label: p.label, gx: p.x, gy: p.y }));
 
     ctx.strokeStyle = 'rgba(212, 160, 36, 0.85)';
@@ -6965,14 +7026,14 @@ function drawProcurementRoute(route, start) {
 }
 
 function showProcurementMapModal() {
-    if (!procurementData?.route?.length) return alert('尚無可顯示的路線');
+    if (!procurementData?.route?.length) return alert(T('price.alert.noRoute'));
     const { route, options } = procurementData;
-    const strat = procurementData.options.strategy === 'cheapest' ? '最便宜' : '最短路徑';
+    const strat = options.strategy === 'cheapest' ? T('price.strategyCheapest') : T('price.strategyShortest');
     const startHint = options.startLabel
         ? `${options.startLabel}(${options.startX},${options.startY})`
-        : `起點(${options.startX},${options.startY})`;
+        : `(${options.startX},${options.startY})`;
     document.getElementById('mapModalTitle').textContent =
-        `採購路線 · ${strat} · ${startHint}（${route.length} 站 · 距離 ${procurementData.totalDist}）`;
+        T('price.mapRouteTitle', { strategy: strat, start: startHint, stops: route.length, dist: procurementData.totalDist });
     document.getElementById('mapModal').classList.add('open');
 
     const start = { x: options.startX, y: options.startY };
@@ -7007,7 +7068,7 @@ function clearProcurementForm() {
 function updateProcurementPickedSummary() {
     const requests = collectProcurementRequests();
     const text = requests.map(r => `${r.name}×${r.qty}`).join('、');
-    const html = text ? `<strong>已點選／已填：</strong>${escapeHtml(text)}` : '';
+    const html = text ? `<strong>${T('price.procPickedPrefix')}</strong>${escapeHtml(text)}` : '';
     ['procurementPickedSummary', 'bountyPickSummary'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -7023,17 +7084,39 @@ function updateProcurementPickedSummary() {
 
 function buildProcurementPetOptions() {
     const pets = (typeof BOUNTY_PETS !== 'undefined' && BOUNTY_PETS['全部']) || [];
-    const opts = ['<option value="">選擇寵物</option>'];
+    const opts = [`<option value="">${T('price.procPickPet')}</option>`];
     pets.forEach(([, name]) => {
-        opts.push(`<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`);
+        opts.push(`<option value="${escapeAttr(name)}">${escapeHtml(gn(name))}</option>`);
     });
     return opts.join('');
 }
 
+function initProcurementUi(rebuild = false) {
+    if (rebuild) {
+        const activePreset = document.querySelector('.procurement-start-preset.active');
+        const activeKey = activePreset?.dataset.labelKey;
+        document.getElementById('procurementStartPresets').innerHTML = PROCUREMENT_START_PRESETS.map((p, i) => {
+            const label = procurementPresetLabel(p);
+            const active = activeKey ? p.labelKey === activeKey : i === 0;
+            return `<button type="button" class="procurement-start-preset${active ? ' active' : ''}" data-x="${p.x}" data-y="${p.y}" data-label-key="${p.labelKey}" data-label="${escapeAttr(label)}">${escapeHtml(label)}<span class="coord">(${p.x}, ${p.y})</span></button>`;
+        }).join('');
+        const petOpts = buildProcurementPetOptions();
+        document.querySelectorAll('#procurementPetRows select').forEach(sel => {
+            const cur = sel.value;
+            sel.innerHTML = petOpts;
+            if (cur) sel.value = cur;
+        });
+    }
+
+    document.querySelectorAll('#procurementItemRows .procurement-item-name').forEach(el => { el.placeholder = T('price.procItemPh'); });
+    document.querySelectorAll('#procurementItemRows .procurement-item-qty, #procurementPetRows input[type="number"]').forEach(el => { el.title = T('price.procQtyTitle'); });
+}
+
 function initProcurement() {
-    document.getElementById('procurementStartPresets').innerHTML = PROCUREMENT_START_PRESETS.map((p, i) =>
-        `<button type="button" class="procurement-start-preset${i === 0 ? ' active' : ''}" data-x="${p.x}" data-y="${p.y}" data-label="${escapeAttr(p.label)}">${escapeHtml(p.label)}<span class="coord">(${p.x}, ${p.y})</span></button>`
-    ).join('');
+    document.getElementById('procurementStartPresets').innerHTML = PROCUREMENT_START_PRESETS.map((p, i) => {
+        const label = procurementPresetLabel(p);
+        return `<button type="button" class="procurement-start-preset${i === 0 ? ' active' : ''}" data-x="${p.x}" data-y="${p.y}" data-label-key="${p.labelKey}" data-label="${escapeAttr(label)}">${escapeHtml(label)}<span class="coord">(${p.x}, ${p.y})</span></button>`;
+    }).join('');
     document.getElementById('procurementStartPresets').addEventListener('click', e => {
         const btn = e.target.closest('.procurement-start-preset');
         if (!btn) return;
@@ -7043,8 +7126,8 @@ function initProcurement() {
 
     document.getElementById('procurementItemRows').innerHTML = Array.from({ length: PROCUREMENT_GRID_SIZE }, () =>
         `<div class="procurement-item-row">
-            <input type="text" class="procurement-item-name" placeholder="物品名稱">
-            <input type="number" class="procurement-item-qty" value="1" min="1" max="999" title="數量">
+            <input type="text" class="procurement-item-name" placeholder="${escapeAttr(T('price.procItemPh'))}">
+            <input type="number" class="procurement-item-qty" value="1" min="1" max="999" title="${escapeAttr(T('price.procQtyTitle'))}">
         </div>`
     ).join('');
     document.getElementById('procurementItemRows').addEventListener('input', updateProcurementPickedSummary);
@@ -7053,7 +7136,7 @@ function initProcurement() {
 
     const petOpts = buildProcurementPetOptions();
     document.getElementById('procurementPetRows').innerHTML = Array.from({ length: PROCUREMENT_PET_ROWS }, () =>
-        `<div class="procurement-pet-row"><select>${petOpts}</select><input type="number" value="1" min="1" max="20" title="數量"></div>`
+        `<div class="procurement-pet-row"><select>${petOpts}</select><input type="number" value="1" min="1" max="20" title="${escapeAttr(T('price.procQtyTitle'))}"></div>`
     ).join('');
 
     document.getElementById('procurementBtn').addEventListener('click', openProcurementModal);
@@ -7141,7 +7224,7 @@ function clearBountyPicks() {
 
 function openBountyPickMode() {
     bountyPickMode = true;
-    document.getElementById('bountyModalTitle').textContent = '📋 點選加入採購清單';
+    document.getElementById('bountyModalTitle').textContent = T('price.bountyPickTitle');
     document.getElementById('bountyPickBanner').classList.add('show');
     document.getElementById('bountyPickFooter').classList.add('show');
     updateProcurementPickedSummary();
@@ -7150,7 +7233,7 @@ function openBountyPickMode() {
 
 function resetBountyPickMode() {
     bountyPickMode = false;
-    document.getElementById('bountyModalTitle').textContent = '📋 快捷清單快速查詢';
+    document.getElementById('bountyModalTitle').textContent = T('price.bountyTitle');
     document.getElementById('bountyPickBanner').classList.remove('show');
     document.getElementById('bountyPickFooter').classList.remove('show');
 }
@@ -7306,55 +7389,94 @@ function pickGroups(cats) {
 
 // 分頁設定（要新增分頁，往這裡加一筆即可）
 const COMMON_TABS = [
-    { label: '武器', groups: pickGroups(['劍', '斧', '槍', '弓', '杖', '小刀', '回力鏢']) },
-    { label: '防具', groups: pickGroups(['盔', '帽', '鎧', '衣', '袍', '靴', '鞋', '盾']) },
-    { label: '系列裝', groups: pickGroups(['弗旦系列', '弗旦+系列', '水龍系列']) },
-    { label: '水料', groups: { ...COMMON_POTIONS, ...COMMON_FOODS } },
-    { label: '懸賞寵物', groups: BOUNTY_PETS },
-    { label: '採集材料', groups: COMMON_MATERIALS },
-    { label: '寶石', groups: COMMON_GEMS },
-    { label: '附魔石', groups: COMMON_ENCHANTS },
-    { label: '其他', groups: COMMON_ACCESSORIES }
+    { labelKey: 'price.bountyTab.weapon', groups: pickGroups(['劍', '斧', '槍', '弓', '杖', '小刀', '回力鏢']) },
+    { labelKey: 'price.bountyTab.armor', groups: pickGroups(['盔', '帽', '鎧', '衣', '袍', '靴', '鞋', '盾']) },
+    { labelKey: 'price.bountyTab.series', groups: pickGroups(['弗旦系列', '弗旦+系列', '水龍系列']) },
+    { labelKey: 'price.bountyTab.supplies', groups: { ...COMMON_POTIONS, ...COMMON_FOODS } },
+    { labelKey: 'price.bountyTab.pets', groups: BOUNTY_PETS },
+    { labelKey: 'price.bountyTab.materials', groups: COMMON_MATERIALS },
+    { labelKey: 'price.bountyTab.gems', groups: COMMON_GEMS },
+    { labelKey: 'price.bountyTab.enchants', groups: COMMON_ENCHANTS },
+    { labelKey: 'price.bountyTab.other', groups: COMMON_ACCESSORIES }
 ];
+
+/** 子分類顯示用 i18n（object key 維持中文，不影響 data-name 搜尋） */
+const BOUNTY_CAT_I18N = {
+    '劍': 'price.bountyCat.sword', '斧': 'price.bountyCat.axe', '槍': 'price.bountyCat.spear',
+    '弓': 'price.bountyCat.bow', '杖': 'price.bountyCat.staff', '小刀': 'price.bountyCat.dagger',
+    '回力鏢': 'price.bountyCat.boomerang',
+    '盔': 'price.bountyCat.helmet', '帽': 'price.bountyCat.hat', '鎧': 'price.bountyCat.plate',
+    '衣': 'price.bountyCat.clothes', '袍': 'price.bountyCat.robe', '靴': 'price.bountyCat.boots',
+    '鞋': 'price.bountyCat.shoes', '盾': 'price.bountyCat.shield',
+    '弗旦系列': 'price.bountyCat.fudan', '弗旦+系列': 'price.bountyCat.fudanPlus', '水龍系列': 'price.bountyCat.waterDragon',
+    '全部': 'price.bountyCat.all', '經常': 'price.bountyCat.common', '罕見': 'price.bountyCat.rare', '極少': 'price.bountyCat.veryRare',
+    '藥水(一包)': 'price.bountyCat.potionBag', '料理(一箱)': 'price.bountyCat.foodBox',
+    '藥水(單個)': 'price.bountyCat.potionSingle', '料理(單個)': 'price.bountyCat.foodSingle',
+    '狩獵(一袋)': 'price.bountyCat.huntBag', '挖掘(一袋)': 'price.bountyCat.mineBag', '伐木(一袋)': 'price.bountyCat.woodBag',
+    '狩獵(單個)': 'price.bountyCat.huntSingle', '挖掘(單個)': 'price.bountyCat.mineSingle', '伐木(單個)': 'price.bountyCat.woodSingle',
+    '石榴石': 'price.bountyCat.gemGarnet', '黃寶石': 'price.bountyCat.gemTopaz', '綠寶石': 'price.bountyCat.gemEmerald',
+    '藍寶石': 'price.bountyCat.gemSapphire', '冒險之星': 'price.bountyCat.gemAdventure', '紫水晶': 'price.bountyCat.gemAmethyst',
+    '騎士寶石': 'price.bountyCat.gemKnight', '珍珠': 'price.bountyCat.gemPearl',
+    '防禦（全身）': 'price.bountyCat.encDef', '敏捷（足部）': 'price.bountyCat.encAgi', '生命（全身）': 'price.bountyCat.encHp',
+    '魔力（頭部）': 'price.bountyCat.encMp', '攻擊（武器）': 'price.bountyCat.encAtk', '回復（防具）': 'price.bountyCat.encRec',
+    '精神（武器）': 'price.bountyCat.encSpi',
+    '飾品': 'price.bountyCat.accessory', '特殊': 'price.bountyCat.special', '任務道具': 'price.bountyCat.quest',
+    '寵書(普)': 'price.bountyCat.petBookN', '寵書(良)': 'price.bountyCat.petBookR', '寵書(優)': 'price.bountyCat.petBookSR',
+    '半魔(物攻)': 'price.bountyCat.halfAtk', '半魔(魔法)': 'price.bountyCat.halfMag', '半魔(輔助)': 'price.bountyCat.halfSup',
+    '半魔(狀態)': 'price.bountyCat.halfStatus',
+};
+
+function bountyCatLabel(catKey) {
+    const i18nKey = BOUNTY_CAT_I18N[catKey];
+    return i18nKey ? T(i18nKey) : catKey;
+}
+
+function bountyEmptyHtml() {
+    return `<div style="color:var(--text-secondary);padding:30px;text-align:center;">${T('price.bountyEmpty')}</div>`;
+}
 
 function renderItems(arr) {
     return arr.map(it => {
         const [lv, name] = Array.isArray(it)
             ? (it.length === 1 ? [null, it[0]] : it)
             : [null, it];
-        return `<span class="bounty-item" data-name="${escapeHtml(name)}">${lv ? `<span class="lv">${lv}</span>` : ''}${escapeHtml(name)}</span>`;
+        return `<span class="bounty-item" data-name="${escapeHtml(name)}">${lv ? `<span class="lv">${lv}</span>` : ''}${escapeHtml(gn(name))}</span>`;
     }).join('');
 }
 
 function renderGroups(groups) {
     const cats = Object.keys(groups);
     if (cats.length === 0) {
-        return '<div style="color:var(--text-secondary);padding:30px;text-align:center;">尚未設定項目（提供清單給我即可加入）</div>';
+        return bountyEmptyHtml();
     }
     // 無子分類（單一空 key）→ 直接顯示項目，不用左側選單
     if (cats.length === 1 && cats[0] === '') {
         return groups['']?.length
             ? `<div class="bounty-grid">${renderItems(groups[''])}</div>`
-            : '<div style="color:var(--text-secondary);padding:30px;text-align:center;">尚未設定項目（提供清單給我即可加入）</div>';
+            : bountyEmptyHtml();
     }
     const subTabs = cats.map((c, i) =>
-        `<div class="sub-tab${i === 0 ? ' active' : ''}" data-sub="${i}">${escapeHtml(c)}</div>`
+        `<div class="sub-tab${i === 0 ? ' active' : ''}" data-sub="${i}" data-cat="${escapeAttr(c)}">${escapeHtml(bountyCatLabel(c))}</div>`
     ).join('');
     const subPanels = cats.map((c, i) => {
         const body = groups[c]?.length
             ? `<div class="bounty-grid">${renderItems(groups[c])}</div>`
-            : '<div style="color:var(--text-secondary);padding:30px;text-align:center;">尚未設定項目（提供清單給我即可加入）</div>';
+            : bountyEmptyHtml();
         return `<div class="sub-panel" data-sub="${i}" style="display:${i === 0 ? 'block' : 'none'}">${body}</div>`;
     }).join('');
     return `<div class="sub-layout"><div class="sub-tabs">${subTabs}</div><div class="sub-content">${subPanels}</div></div>`;
 }
 
 function renderBounty() {
-    document.getElementById('commonTabs').innerHTML = COMMON_TABS.map((t, i) =>
-        `<div class="bounty-tab${i === 0 ? ' active' : ''}" data-idx="${i}">${escapeHtml(t.label)}</div>`
+    const tabsEl = document.getElementById('commonTabs');
+    const bodyEl = document.getElementById('commonBody');
+    if (!tabsEl || !bodyEl) return;
+    const prevActive = tabsEl.querySelector('.bounty-tab.active')?.dataset.idx ?? '0';
+    tabsEl.innerHTML = COMMON_TABS.map((t, i) =>
+        `<div class="bounty-tab${String(i) === prevActive ? ' active' : ''}" data-idx="${i}">${escapeHtml(T(t.labelKey))}</div>`
     ).join('');
-    document.getElementById('commonBody').innerHTML = COMMON_TABS.map((t, i) =>
-        `<div class="common-panel" data-idx="${i}" style="display:${i === 0 ? 'block' : 'none'}">${renderGroups(t.groups)}</div>`
+    bodyEl.innerHTML = COMMON_TABS.map((t, i) =>
+        `<div class="common-panel" data-idx="${i}" style="display:${String(i) === prevActive ? 'block' : 'none'}">${renderGroups(t.groups)}</div>`
     ).join('');
 }
 
@@ -7439,6 +7561,37 @@ function calcTrimmedAvg(arr) {
     const end = Math.ceil(sorted.length * 0.9);
     const trimmed = sorted.slice(start, end);
     return Math.floor(trimmed.reduce((a, b) => a + b, 0) / trimmed.length);
+}
+
+function bootPriceChecker() {
+    if (globalThis.__STarcg_I18N_MESSAGES) {
+        StarCG_I18N.registerMessages(globalThis.__STarcg_I18N_MESSAGES);
+        delete globalThis.__STarcg_I18N_MESSAGES;
+    }
+    StarCG_I18N.init({ titleKey: 'price.docTitle', onChange: applyPriceLang });
+    if (location.protocol === 'file:') {
+        document.getElementById('fileProtocolWarning').style.display = 'block';
+    }
+    loadPetProfilesFromGuide();
+    sanitizeQuickTags();
+    renderQuickTags();
+    initEventListeners();
+    initStatSortFilter();
+    initMapModal();
+    initPeakFloatingTip();
+    initQuickTags();
+    initBounty();
+    initHistoryFilters();
+    initProcurement();
+    initTracked();
+    initMarketSegments();
+    updateTrackedCountBadge();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootPriceChecker);
+} else {
+    bootPriceChecker();
 }
 </script>
 

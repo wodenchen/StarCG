@@ -237,66 +237,66 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>⚔️ 角色能力計算器</h1>
-    <nav class="header-nav" aria-label="相關連結">
-      <a href="StarCG_PriceChecker.html">⭐ 市場查價器</a>
-      <a href="StarCG_PetCalculator.html">🐾 寵物成長模擬</a>
-      <a href="https://www.starcg.net/" target="_blank" rel="noopener noreferrer">🌐 官網</a>
-      <a href="https://guide.starcg.net/" target="_blank" rel="noopener noreferrer">📖 官方攻略網</a>
+    <h1 data-i18n="char.title">⚔️ 角色能力計算器</h1>
+    <nav class="header-nav" data-i18n-aria="nav.aria">
+      <a href="StarCG_PriceChecker.html" data-i18n="nav.price">⭐ 市場查價器</a>
+      <a href="StarCG_PetCalculator.html" data-i18n="nav.pet">🐾 寵物成長模擬</a>
+      <a href="https://www.starcg.net/" target="_blank" rel="noopener noreferrer" data-i18n="nav.site">🌐 官網</a>
+      <a href="https://guide.starcg.net/" target="_blank" rel="noopener noreferrer" data-i18n="nav.guide">📖 官方攻略網</a>
     </nav>
   </header>
 
-  <div id="loadBar" class="load-bar">⏳ 載入裝備圖鑑…</div>
+  <div id="loadBar" class="load-bar" data-i18n="char.loadCatalog">⏳ 載入裝備圖鑑…</div>
   <input type="file" id="equipFileInput" accept=".json,application/json" hidden>
 
   <div class="grid">
     <section class="card">
-      <h2>參數設定</h2>
-      <p class="hint">單項上限為可配點數的一半。</p>
+      <h2 data-i18n="char.params">參數設定</h2>
+      <p class="hint" data-i18n="char.paramsHint">單項上限為可配點數的一半。</p>
       <div class="status">
-        <div class="status-item"><div class="k">可配點數</div><div class="v" id="pointsAvail">0</div></div>
-        <div class="status-item"><div class="k">已配點數</div><div class="v" id="pointsUsed">0</div></div>
-        <div class="status-item"><div class="k">剩餘</div><div class="v" id="pointsRemain">0</div></div>
-        <div class="status-item"><div class="k">單項最高</div><div class="v" id="singleMax">0</div></div>
+        <div class="status-item"><div class="k" data-i18n="char.pointsAvail">可配點數</div><div class="v" id="pointsAvail">0</div></div>
+        <div class="status-item"><div class="k" data-i18n="char.pointsUsed">已配點數</div><div class="v" id="pointsUsed">0</div></div>
+        <div class="status-item"><div class="k" data-i18n="char.pointsRemain">剩餘</div><div class="v" id="pointsRemain">0</div></div>
+        <div class="status-item"><div class="k" data-i18n="char.singleMax">單項最高</div><div class="v" id="singleMax">0</div></div>
       </div>
       <div class="stat-clear-all">
-        <button type="button" class="stat-shortcut-btn" id="clearAllStatsBtn">清空全配點</button>
+        <button type="button" class="stat-shortcut-btn" id="clearAllStatsBtn" data-i18n="char.clearStats">清空全配點</button>
       </div>
       <div class="field-row">
-        <div class="field"><label>預測等級</label><input type="number" id="level" value="120" min="1" max="200"></div>
+        <div class="field"><label data-i18n="char.level">預測等級</label><input type="number" id="level" value="120" min="1" max="200"></div>
       </div>
       <div class="field-row">
-        <div class="field"><div class="field-head"><label for="vit">體力</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="remain">剩餘</button></div></div><input type="number" id="vit" value="0" min="0"></div>
-        <div class="field"><div class="field-head"><label for="str">力量</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="remain">剩餘</button></div></div><input type="number" id="str" value="0" min="0"></div>
-        <div class="field"><div class="field-head"><label for="def">強度</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="remain">剩餘</button></div></div><input type="number" id="def" value="0" min="0"></div>
-        <div class="field"><div class="field-head"><label for="agi">速度</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="remain">剩餘</button></div></div><input type="number" id="agi" value="0" min="0"></div>
-        <div class="field"><div class="field-head"><label for="mag">魔法</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="remain">剩餘</button></div></div><input type="number" id="mag" value="0" min="0"></div>
+        <div class="field"><div class="field-head"><label for="vit" data-i18n="char.vit">體力</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="vit" value="0" min="0"></div>
+        <div class="field"><div class="field-head"><label for="str" data-i18n="char.str">力量</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="str" value="0" min="0"></div>
+        <div class="field"><div class="field-head"><label for="def" data-i18n="char.defStat">強度</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="def" value="0" min="0"></div>
+        <div class="field"><div class="field-head"><label for="agi" data-i18n="char.agiStat">速度</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="agi" value="0" min="0"></div>
+        <div class="field"><div class="field-head"><label for="mag" data-i18n="char.mag">魔法</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="mag" value="0" min="0"></div>
       </div>
       <div class="crystal-panel" id="crystalPanel">
-        <h3 class="crystal-title">水晶改造</h3>
-        <label class="crystal-enable"><input type="checkbox" id="crystalEnabled"> 計入水晶能力</label>
+        <h3 class="crystal-title" data-i18n="char.crystal">水晶改造</h3>
+        <label class="crystal-enable"><input type="checkbox" id="crystalEnabled"> <span data-i18n="char.crystalEnable">計入水晶能力</span></label>
         <div class="field-row crystal-fields">
-          <div class="field"><label for="crystalLevel">水晶等級</label><input type="number" id="crystalLevel" value="1" min="1" max="10"></div>
-          <div class="field"><label for="crystalRollMode">區間取値</label><select id="crystalRollMode">
-            <option value="random" selected>隨機</option>
-            <option value="min">最低</option>
-            <option value="avg">平均</option>
-            <option value="max">最高</option>
-            <option value="custom">自選</option>
+          <div class="field"><label for="crystalLevel" data-i18n="char.crystalLevel">水晶等級</label><input type="number" id="crystalLevel" value="1" min="1" max="10"></div>
+          <div class="field"><label for="crystalRollMode" data-i18n="char.crystalRollMode">區間取値</label><select id="crystalRollMode">
+            <option value="random" data-i18n-opt="common.random">隨機</option>
+            <option value="min" data-i18n-opt="common.min">最低</option>
+            <option value="avg" data-i18n-opt="common.avg">平均</option>
+            <option value="max" data-i18n-opt="common.maxVal">最高</option>
+            <option value="custom" data-i18n-opt="common.custom">自選</option>
           </select></div>
         </div>
         <div class="crystal-roll-actions">
-          <button type="button" class="stat-shortcut-btn" id="crystalRerollBtn">🎲 重骰改造</button>
-          <span class="hint" id="crystalRollHint" style="margin:0">變更等級時自動補骰缺少的級數</span>
+          <button type="button" class="stat-shortcut-btn" id="crystalRerollBtn" data-i18n="char.crystalReroll">🎲 重骰改造</button>
+          <span class="hint" id="crystalRollHint" style="margin:0" data-i18n="char.crystalHintRoll">變更等級時自動補骰缺少的級數</span>
         </div>
         <div id="crystalCustomPanel" class="crystal-custom-panel hidden">
-          <div class="crystal-custom-title">自選詞條（每級擇一，區間取平均）</div>
+          <div class="crystal-custom-title" data-i18n="char.crystalCustomTitle">自選詞條（每級擇一，區間取平均）</div>
           <div id="crystalCustomRows"></div>
         </div>
-        <div id="crystalStatPreview" class="equip-stat-preview">未計入水晶能力</div>
+        <div id="crystalStatPreview" class="equip-stat-preview" data-i18n="char.crystalNoRoll">未計入水晶能力</div>
         <div class="crystal-ref-wrap">
           <details id="crystalRefDetails">
-            <summary>升級詞條表（每級隨機擇一）</summary>
+            <summary data-i18n="char.crystalRefSummary">升級詞條表（每級隨機擇一）</summary>
             <div id="crystalRefTable" class="crystal-ref-table-wrap"></div>
           </details>
         </div>
@@ -306,33 +306,33 @@
     <section class="card">
       <div class="equip-layout">
         <div>
-          <h2>裝備模擬</h2>
-          <p class="hint">點擊欄位從圖鑑選裝備，能力自動帶入。</p>
+          <h2 data-i18n="char.equip">裝備模擬</h2>
+          <p class="hint" data-i18n="char.equipHint">點擊欄位從圖鑑選裝備，能力自動帶入。</p>
           <div class="equip-stage" id="equipStage"></div>
           <div class="equip-mode-rows">
             <div class="field-row stat-mode-row">
-              <div class="field"><label>一般屬性（攻防敏回精）</label><select id="statModeGeneral"></select></div>
-              <div class="field"><label>修正／抗性</label><select id="statModeMod"></select></div>
+              <div class="field"><label data-i18n="char.statModeGeneral">一般屬性（攻防敏回精）</label><select id="statModeGeneral"></select></div>
+              <div class="field"><label data-i18n="char.statModeMod">修正／抗性</label><select id="statModeMod"></select></div>
             </div>
             <div class="field-row stat-mode-row">
-              <div class="field"><label>寶石</label><select id="globalGemDecor"></select></div>
-              <div class="field"><label>附魔石</label><select id="globalEnchantMode"></select></div>
+              <div class="field"><label data-i18n="char.gem">寶石</label><select id="globalGemDecor"></select></div>
+              <div class="field"><label data-i18n="char.enchant">附魔石</label><select id="globalEnchantMode"></select></div>
             </div>
             <div class="equip-extra-options">
-              <button type="button" class="stat-shortcut-btn" id="clearAllEquipsBtn">清空全裝備</button>
-              <label><input type="checkbox" id="hyorikiToggle">百靈耐（玩家製作／水龍系列 攻防敏回精 +5%）</label>
+              <button type="button" class="stat-shortcut-btn" id="clearAllEquipsBtn" data-i18n="char.clearEquips">清空全裝備</button>
+              <label><input type="checkbox" id="hyorikiToggle"> <span data-i18n="char.hyoriki">百靈耐（玩家製作／水龍系列 攻防敏回精 +5%）</span></label>
             </div>
           </div>
-          <div id="equipStatPreview" class="equip-stat-preview">游標指向已裝備欄位或寶石／附魔石可預覽效果</div>
+          <div id="equipStatPreview" class="equip-stat-preview" data-i18n="char.equipPreviewHint">游標指向已裝備欄位或寶石／附魔石可預覽效果</div>
         </div>
         <div class="results-column">
-          <h2>能力結果</h2>
+          <h2 data-i18n="char.results">能力結果</h2>
           <div class="result-block">
-            <h3>基本值</h3>
+            <h3 data-i18n="char.basicResults">基本值</h3>
             <div class="result-list" id="basicResults"></div>
           </div>
           <div class="result-block">
-            <h3>修正與抗值</h3>
+            <h3 data-i18n="char.modResults">修正與抗值</h3>
             <div class="result-list mod" id="modResults"></div>
           </div>
           <div id="customStatPanel" class="custom-stat-panel hidden"></div>
@@ -342,19 +342,19 @@
   </div>
 
   <section class="card" style="margin-top:16px">
-    <h2>比較清單</h2>
+    <h2 data-i18n="char.compare">比較清單</h2>
     <div class="field-row">
-      <div class="field"><label>名稱</label><input type="text" id="buildName" placeholder="未命名"></div>
-      <div class="field" style="display:flex;align-items:flex-end"><button type="button" id="addBuildBtn">➕ 加入比較清單</button></div>
+      <div class="field"><label data-i18n="common.name">名稱</label><input type="text" id="buildName" data-i18n-placeholder="common.unnamed" placeholder="未命名"></div>
+      <div class="field" style="display:flex;align-items:flex-end"><button type="button" id="addBuildBtn" data-i18n="char.addCompare">➕ 加入比較清單</button></div>
     </div>
     <div class="compare-wrap">
       <table class="compare" id="compareTable">
         <thead><tr>
-          <th>名稱</th><th>Lv</th>
-          <th>生命</th><th>魔力</th>
-          <th>攻擊</th><th>防禦</th><th>敏捷</th><th>回復</th><th>精神</th><th>魔攻</th><th>魔抗</th>
-          <th>必殺</th><th>命中</th><th>反擊</th><th>閃躲</th>
-          <th>中毒</th><th>石化</th><th>酒醉</th><th>昏睡</th><th>混亂</th><th>遺忘</th><th></th>
+          <th data-i18n="common.name">名稱</th><th data-i18n="common.lv">Lv</th>
+          <th data-i18n="stat.hp">生命</th><th data-i18n="stat.mp">魔力</th>
+          <th data-i18n="stat.atk">攻擊</th><th data-i18n="stat.def">防禦</th><th data-i18n="stat.agi">敏捷</th><th data-i18n="stat.rec">回復</th><th data-i18n="stat.spt">精神</th><th data-i18n="stat.matk">魔攻</th><th data-i18n="stat.amres">魔抗</th>
+          <th data-i18n="stat.crit">必殺</th><th data-i18n="stat.hit">命中</th><th data-i18n="stat.counter">反擊</th><th data-i18n="stat.dodge">閃躲</th>
+          <th data-i18n="stat.poison">中毒</th><th data-i18n="stat.stone">石化</th><th data-i18n="stat.drunk">酒醉</th><th data-i18n="stat.sleep">昏睡</th><th data-i18n="stat.chaos">混亂</th><th data-i18n="stat.forget">遺忘</th><th></th>
         </tr></thead>
         <tbody></tbody>
       </table>
@@ -364,9 +364,9 @@
 
 <div id="pickerModal" class="modal hidden">
   <div class="modal-card picker-dialog">
-    <div class="modal-header" id="pickerTitle">選擇裝備</div>
+    <div class="modal-header" id="pickerTitle"></div>
     <div class="modal-body">
-      <p class="hint picker-hint" id="pickerHint">游標指向裝備可查看屬性（依「裝備數值」設定）。</p>
+      <p class="hint picker-hint" id="pickerHint" data-i18n="char.picker.hintEquip">游標指向裝備可查看屬性（依「裝備數值」設定）。</p>
       <div id="pickerStatPreview" class="picker-stat-preview">—</div>
       <div class="picker-layout">
         <div id="pickerSubTabs" class="picker-sub-tabs"></div>
@@ -374,12 +374,16 @@
       </div>
     </div>
     <div class="modal-actions">
-      <button type="button" class="secondary" id="pickerClearBtn">清除此欄</button>
-      <button type="button" class="secondary" id="pickerCloseBtn">關閉</button>
+      <button type="button" class="secondary" id="pickerClearBtn" data-i18n="char.picker.clearSlot">清除此欄</button>
+      <button type="button" class="secondary" id="pickerCloseBtn" data-i18n="char.picker.close">關閉</button>
     </div>
   </div>
 </div>
 
+<script src="starcg_i18n.js"></script>
+<script src="starcg_game_names.js"></script>
+<script src="starcg_i18n_char_pet.js"></script>
+<script src="starcg_i18n_messages.js"></script>
 <script src="gems_data.js"></script>
 <script src="equipment_catalog.js" async id="equipCatalogScript"></script>
 <script>
@@ -388,12 +392,15 @@ const GUIDE_EQUIP_URL = 'https://guide.starcg.net/equipment/';
 const GUIDE_IMAGE_BASE = 'https://guide.starcg.net';
 const CORS_PROXIES = ['https://corsproxy.io/?url=', 'https://api.allorigins.win/raw?url='];
 
-const CATEGORY_LABELS = {
-  sword:'劍', axe:'斧', spear:'槍', bow:'弓', staff:'杖', dagger:'小刀', boomerang:'回力鏢',
-  helmet:'盔', hat:'帽', armor:'鎧', clothes:'衣', robe:'袍',
-  boots:'靴', shoes:'鞋', shield:'盾', ring:'戒指', necklace:'項鍊', earring:'耳環',
-  bracelet:'手環', amulet:'護身符', headband:'頭帶', fudan:'弗旦', 'water-dragon':'水龍',
-};
+function t(key, params) { return StarCG_I18N.t(key, params); }
+function statLabel(k) { return StarCG_I18N.stat(k); }
+function gn(name) { return StarCG_I18N.displayGameName(name); }
+
+function getCategoryLabel(k) {
+  const key = 'char.cat.' + k;
+  const text = t(key);
+  return text === key ? k : text;
+}
 
 const SLOT_CATEGORY_ORDER = {
   weapon: ['sword','axe','spear','bow','staff','dagger','boomerang','super-artifact','forest','water-dragon'],
@@ -433,7 +440,7 @@ const PICKER_NAME_ORDER = (() => {
 
 function formatItemDisplayName(item) {
   if (!item) return '';
-  return escapeHtml(item.name);
+  return escapeHtml(gn(item.name));
 }
 
 function getPickerCategory(it) {
@@ -446,11 +453,7 @@ function pickerSortKey(it) {
   return PICKER_NAME_ORDER[`${cat}|${it.name}`] ?? PICKER_NAME_ORDER[`${it.categorySlug}|${it.name}`] ?? null;
 }
 
-const STAT_LABELS = {
-  hp:'生命', mp:'魔力', atk:'攻擊', def:'防禦', agi:'敏捷', spt:'精神', rec:'回復',
-  charm:'魅力', matk:'魔攻', amres:'魔抗', crit:'必殺', counter:'反擊', hit:'命中', dodge:'閃躲',
-  poison:'中毒', sleep:'昏睡', stone:'石化', drunk:'酒醉', chaos:'混亂', forget:'遺忘',
-};
+const STAT_LABELS = new Proxy({}, { get: (_, k) => statLabel(k) });
 
 const COMPARE_KEYS = ['hp','mp','atk','def','agi','rec','spt','matk','amres','crit','hit','counter','dodge','poison','stone','drunk','sleep','chaos','forget'];
 const COMPARE_FROM_SUM = new Set(['hp','mp','atk','def','agi','rec','spt','matk','amres']);
@@ -526,15 +529,12 @@ const CRYSTAL_UPGRADE_TIERS = [
 ];
 let crystalRolls = Array(9).fill(null);
 
-const CRYSTAL_REF_LABELS = {
-  hp: '血量', mp: '魔力', atk: '攻擊', def: '防禦', agi: '敏捷',
-  spt: '精神', rec: '回復', crit: '必殺', hit: '命中', dodge: '閃躲', counter: '反擊',
-};
+const CRYSTAL_REF_LABELS = new Proxy({}, { get: (_, k) => statLabel(k) });
 
 const CRYSTAL_STAT_GROUPS = [
-  { cls: 'crystal-grp-battle', label: '攻防敏', keys: ['atk', 'def', 'agi'] },
-  { cls: 'crystal-grp-vital', label: '血魔精回', keys: ['hp', 'mp', 'spt', 'rec'] },
-  { cls: 'crystal-grp-mod', label: '必反命閃', keys: ['crit', 'counter', 'hit', 'dodge'] },
+  { cls: 'crystal-grp-battle', labelKey: 'char.crystalGrpBattle', keys: ['atk', 'def', 'agi'] },
+  { cls: 'crystal-grp-vital', labelKey: 'char.crystalGrpVital', keys: ['hp', 'mp', 'spt', 'rec'] },
+  { cls: 'crystal-grp-mod', labelKey: 'char.crystalGrpMod', keys: ['crit', 'counter', 'hit', 'dodge'] },
 ];
 
 function getCrystalRollMode() {
@@ -577,30 +577,30 @@ function renderCrystalRefTable() {
   const el = document.getElementById('crystalRefTable');
   if (!el) return;
   const baseRow = renderCrystalRefRow(
-    '1<span class="crystal-ref-lvl-sub">起始</span>',
+    `1<span class="crystal-ref-lvl-sub">${t('char.crystalRefStart')}</span>`,
     Object.entries(CRYSTAL_BASE).map(([key, val]) => ({ key, min: val, max: val }))
   );
   const tierRows = CRYSTAL_UPGRADE_TIERS.map((tier, i) =>
     renderCrystalRefRow(`${i + 1}→${i + 2}`, tier)
   ).join('');
   el.innerHTML = `<table class="crystal-ref-table"><thead><tr>
-    <th>升級</th>
-    <th class="crystal-grp-battle">攻防敏</th>
-    <th class="crystal-grp-vital">血魔精回</th>
-    <th class="crystal-grp-mod">必反命閃</th>
+    <th>${t('char.crystalRefUpgrade')}</th>
+    <th class="crystal-grp-battle">${t('char.crystalGrpBattle')}</th>
+    <th class="crystal-grp-vital">${t('char.crystalGrpVital')}</th>
+    <th class="crystal-grp-mod">${t('char.crystalGrpMod')}</th>
   </tr></thead><tbody>${baseRow}${tierRows}</tbody></table>`;
 }
 
 const RESIST_KEYS = ['poison','sleep','stone','drunk','chaos','forget'];
 const CORRECT_KEYS = ['crit','counter','hit','dodge'];
 const PICKER_FLAT_CATEGORIES = new Set(['fudan', 'water-dragon', ...SLOT_CATEGORY_ORDER.acc]);
-const PICKER_STAT_GROUP_LABELS = { basic: '一般屬性', extra: '修正／抗性' };
+const PICKER_STAT_GROUP_LABELS = { basic: 'char.picker.basic', extra: 'char.picker.extra' };
 const STAT_MODE_OPTIONS = [
-  { value: 'max', label: '頂值', ratio: 1 },
-  { value: 'near', label: '近頂（90%）', ratio: 0.9 },
-  { value: 'high', label: '中上（80%）', ratio: 0.8 },
-  { value: 'avg', label: '平均（50%）', ratio: 0.5 },
-  { value: 'custom', label: '自訂（手動輸入）', ratio: null },
+  { value: 'max', labelKey: 'char.mode.max', ratio: 1 },
+  { value: 'near', labelKey: 'char.mode.near', ratio: 0.9 },
+  { value: 'high', labelKey: 'char.mode.high', ratio: 0.8 },
+  { value: 'avg', labelKey: 'char.mode.avg', ratio: 0.5 },
+  { value: 'custom', labelKey: 'char.mode.custom', ratio: null },
 ];
 const STAT_MODE_RATIOS = Object.fromEntries(STAT_MODE_OPTIONS.filter(o => o.ratio != null).map(o => [o.value, o.ratio]));
 const CATEGORY_MOD_IGNORE = {
@@ -621,16 +621,19 @@ const CONTRIB = {
 const BASE = { hp:20, mp:20, atk:20, def:20, agi:20, spt:100, rec:100 };
 
 const SLOTS = [
-  { id:'acc1', label:'飾品1', calcSlots:['acc'] },
-  { id:'hat', label:'帽子', calcSlots:['hat'] },
-  { id:'acc2', label:'飾品2', calcSlots:['acc'] },
-  { id:'weapon', label:'武器', calcSlots:['weapon'] },
-  { id:'shield', label:'盾牌', calcSlots:['shield'] },
-  { id:'body', label:'身體', calcSlots:['body'] },
-  { id:'shoes', label:'鞋子', calcSlots:['shoes'] },
+  { id:'acc1', labelKey:'char.slot.acc1', calcSlots:['acc'] },
+  { id:'hat', labelKey:'char.slot.hat', calcSlots:['hat'] },
+  { id:'acc2', labelKey:'char.slot.acc2', calcSlots:['acc'] },
+  { id:'weapon', labelKey:'char.slot.weapon', calcSlots:['weapon'] },
+  { id:'shield', labelKey:'char.slot.shield', calcSlots:['shield'] },
+  { id:'body', labelKey:'char.slot.body', calcSlots:['body'] },
+  { id:'shoes', labelKey:'char.slot.shoes', calcSlots:['shoes'] },
 ];
+function slotLabel(s) { return t(s.labelKey); }
 
 let catalog = [];
+let catalogLoadError = null;
+let loadBarPendingKey = 'char.loadCatalog';
 let equips = Object.fromEntries(SLOTS.map(s => [s.id, null]));
 let pickerSlot = null;
 let pickerMode = 'equip';
@@ -648,18 +651,18 @@ let slotDecorations = Object.fromEntries(SLOTS.map(s => [s.id, {
 const DECOR_SIDE = { hat: 'top', weapon: 'left', shield: 'right', body: 'bottom', shoes: 'bottom' };
 
 const GEM_MODE_OPTIONS = [
-  { value: 'max', label: '頂值 120%' },
-  { value: 'near', label: '近頂 116%' },
-  { value: 'high', label: '中上 112%' },
-  { value: 'avg', label: '平均 100%' },
-  { value: 'min', label: '最低 80%' },
+  { value: 'max', labelKey: 'char.gemMode.max' },
+  { value: 'near', labelKey: 'char.gemMode.near' },
+  { value: 'high', labelKey: 'char.gemMode.high' },
+  { value: 'avg', labelKey: 'char.gemMode.avg' },
+  { value: 'min', labelKey: 'char.gemMode.min' },
 ];
 
-const GLOBAL_GEM_OPTIONS = GEM_MODE_OPTIONS.map(o => ({ value: o.value, mode: o.value, label: o.label }));
+const GLOBAL_GEM_OPTIONS = GEM_MODE_OPTIONS.map(o => ({ value: o.value, mode: o.value, labelKey: o.labelKey }));
 
 function getGlobalGemSettings() {
   const opt = GLOBAL_GEM_OPTIONS.find(o => o.value === globalGemDecor) || GLOBAL_GEM_OPTIONS.find(o => o.value === 'avg');
-  return { gemApply: 'decorate', gemMode: opt.mode, label: opt.label };
+  return { gemApply: 'decorate', gemMode: opt.mode, label: t(opt.labelKey) };
 }
 
 function effectiveDecor(slotId) {
@@ -669,7 +672,9 @@ function effectiveDecor(slotId) {
 
 function getGlobalDecorHint(kind) {
   if (kind === 'gem') return getGlobalGemSettings().label;
-  return STAT_MODE_OPTIONS.find(o => o.value === globalEnchantMode)?.label || globalEnchantMode;
+  return STAT_MODE_OPTIONS.find(o => o.value === globalEnchantMode)?.labelKey
+    ? t(STAT_MODE_OPTIONS.find(o => o.value === globalEnchantMode).labelKey)
+    : globalEnchantMode;
 }
 
 function gd() { return window.GEMS_DATA; }
@@ -796,11 +801,11 @@ function getDecorBtnLabel(slotId, kind) {
   const decor = slotDecorations[slotId];
   if (kind === 'gem') {
     if (!decor.gemType) return '';
-    if (gd().isQuestGem(decor.gemType)) return gd().QUEST_GEMS[decor.gemType].label;
-    return `${gd().GEM_TYPE_LABELS[decor.gemType]} Lv${decor.gemLevel}`;
+    if (gd().isQuestGem(decor.gemType)) return gn(gd().QUEST_GEMS[decor.gemType].label);
+    return `${gn(gd().GEM_TYPE_LABELS[decor.gemType])} Lv${decor.gemLevel}`;
   }
   if (!decor.enchantType) return '';
-  const name = (gd().ENCHANT_TYPE_LABELS[decor.enchantType] || '').replace(/（.+）/, '');
+  const name = getEnchantCategoryLabel(decor.enchantType);
   return `${name} Lv${decor.enchantLevel}`;
 }
 
@@ -828,8 +833,8 @@ function setDecorEffectPreview(slotId, kind) {
   if (!preview) {
     el.classList.remove('active');
     el.textContent = equips[slotId]
-      ? (kind === 'gem' ? '尚未鑲嵌寶石（點小格選擇）' : '尚未鑲嵌附魔石（點小格選擇）')
-      : '請先在此欄位選擇裝備';
+      ? (kind === 'gem' ? t('char.decor.noGem') : t('char.decor.noEnchant'))
+      : t('char.decor.needEquip');
     return;
   }
   el.classList.add('active');
@@ -839,7 +844,7 @@ function setDecorEffectPreview(slotId, kind) {
 function renderDecorBtn(slotId, kind) {
   const decor = slotDecorations[slotId];
   const has = kind === 'gem' ? !!decor.gemType : !!decor.enchantType;
-  const title = kind === 'gem' ? '選擇寶石' : '選擇附魔石';
+  const title = kind === 'gem' ? t('char.picker.pickGem') : t('char.picker.pickEnchant');
   const url = getDecorSlotImageUrl(slotId, kind);
   const fallback = kind === 'gem' ? '💎' : '✨';
   const label = getDecorBtnLabel(slotId, kind);
@@ -899,12 +904,16 @@ function buildEnchantPickerItems(slotId) {
 }
 
 function getGemCategoryLabel(slug) {
-  if (slug === 'quest') return '任務寶石';
-  return gd().GEM_TYPE_LABELS[slug] || slug;
+  if (slug === 'quest') return t('char.questGem');
+  const key = 'char.gemType.' + slug;
+  const text = t(key);
+  return text === key ? (gd().GEM_TYPE_LABELS[slug] || slug) : text;
 }
 
 function getEnchantCategoryLabel(slug) {
-  return gd().ENCHANT_TYPE_LABELS[slug] || slug;
+  const key = 'char.enchantType.' + slug;
+  const text = t(key);
+  return text === key ? (gd().ENCHANT_TYPE_LABELS[slug] || slug) : text;
 }
 
 function getDecorPickerCategories() {
@@ -947,7 +956,7 @@ function renderDecorPickerGridItems(items) {
     return `<button type="button" class="picker-item decor-pick" data-id="${escapeHtml(it.id)}" title="${escapeHtml(stats)}">
       ${renderDecorPickerIcon(it)}
       <span class="lv">${it.level}</span>
-      <span class="name">${escapeHtml(it.name)}</span>
+      <span class="name">${escapeHtml(gn(it.name))}</span>
     </button>`;
   }).join('');
 }
@@ -965,15 +974,15 @@ function applyDecorPick(item) {
 }
 
 function initStatModeSelects() {
-  const opts = STAT_MODE_OPTIONS.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+  const opts = STAT_MODE_OPTIONS.map(o => `<option value="${o.value}">${t(o.labelKey)}</option>`).join('');
   document.getElementById('statModeGeneral').innerHTML = opts;
   document.getElementById('statModeMod').innerHTML = opts;
   document.getElementById('globalGemDecor').innerHTML = GLOBAL_GEM_OPTIONS.map(o =>
-    `<option value="${o.value}">${o.label}</option>`
+    `<option value="${o.value}">${t(o.labelKey)}</option>`
   ).join('');
   document.getElementById('globalGemDecor').value = globalGemDecor;
   const encOpts = STAT_MODE_OPTIONS.filter(o => o.value !== 'custom').map(o =>
-    `<option value="${o.value}">${o.label}</option>`
+    `<option value="${o.value}">${t(o.labelKey)}</option>`
   ).join('');
   document.getElementById('globalEnchantMode').innerHTML = encOpts;
   document.getElementById('globalEnchantMode').value = globalEnchantMode;
@@ -1069,7 +1078,7 @@ function renderCustomStatPanel() {
     return;
   }
   panel.classList.remove('hidden');
-  let html = '<p class="hint" style="margin-bottom:8px">自訂模式：手動輸入各欄位裝備數值</p>';
+  let html = `<p class="hint" style="margin-bottom:8px">${t('char.customPanelHint')}</p>`;
   let hasAny = false;
   for (const slot of SLOTS) {
     const item = equips[slot.id];
@@ -1080,14 +1089,14 @@ function renderCustomStatPanel() {
     if (mod === 'custom') keys.push(...itemRelevantKeys(item, 'mod'));
     if (!keys.length) continue;
     hasAny = true;
-    html += `<div class="custom-slot-block"><div class="custom-slot-label">${slot.label} · ${escapeHtml(item.name)}</div><div class="custom-stat-grid">`;
+    html += `<div class="custom-slot-block"><div class="custom-slot-label">${slotLabel(slot)} · ${escapeHtml(item.name)}</div><div class="custom-stat-grid">`;
     for (const k of keys) {
       const val = equipCustomStats[slot.id][k] ?? '';
       html += `<label>${STAT_LABELS[k]}<input type="number" data-slot="${slot.id}" data-stat="${k}" value="${val}"></label>`;
     }
     html += '</div></div>';
   }
-  panel.innerHTML = hasAny ? html : '<p class="hint">請先選擇裝備</p>';
+  panel.innerHTML = hasAny ? html : `<p class="hint">${t('char.customPanelEmpty')}</p>`;
   panel.querySelectorAll('input[data-slot]').forEach(inp => {
     inp.addEventListener('input', () => {
       const sid = inp.dataset.slot;
@@ -1158,7 +1167,7 @@ function setEquipStatPreview(item, slotId) {
   const el = document.getElementById('equipStatPreview');
   if (!item) {
     el.classList.remove('active');
-    el.textContent = '游標指向已裝備欄位或寶石／附魔石可預覽效果';
+    el.textContent = t('char.equipPreviewHint');
     return;
   }
   el.classList.add('active');
@@ -1285,7 +1294,7 @@ function buildCrystalTierSelectHtml(t, selectedIdx) {
     const opts = items.map(({ o, idx }) =>
       `<option value="${idx}"${idx === selectedIdx ? ' selected' : ''}>${escapeHtml(formatCrystalRefOption(o))}</option>`
     ).join('');
-    return `<optgroup label="${g.label}">${opts}</optgroup>`;
+    return `<optgroup label="${t(g.labelKey)}">${opts}</optgroup>`;
   }).join('');
 }
 
@@ -1300,7 +1309,7 @@ function renderCrystalCustomPanel() {
 
   const lvl = Math.min(10, Math.max(1, getNum('crystalLevel') || 1));
   if (lvl <= 1) {
-    rows.innerHTML = '<p class="hint" style="margin:0">Lv.1 無升級詞條</p>';
+    rows.innerHTML = `<p class="hint" style="margin:0">${t('char.crystalNoTier')}</p>`;
     return;
   }
   rows.innerHTML = Array.from({ length: lvl - 1 }, (_, t) => {
@@ -1363,9 +1372,7 @@ function updateCrystalPanelState() {
   document.getElementById('crystalRerollBtn')?.classList.toggle('hidden', mode === 'custom');
   const hint = document.getElementById('crystalRollHint');
   if (hint) {
-    hint.textContent = mode === 'custom'
-      ? '自選模式下請於下方挑選各級詞條'
-      : '變更等級時自動補骰缺少的級數';
+    hint.textContent = mode === 'custom' ? t('char.crystalHintCustom') : t('char.crystalHintRoll');
   }
   renderCrystalCustomPanel();
 }
@@ -1376,13 +1383,13 @@ function updateCrystalPreview() {
   if (!el) return;
   if (!document.getElementById('crystalEnabled')?.checked) {
     el.classList.remove('active');
-    el.textContent = '未計入水晶能力';
+    el.textContent = t('char.crystalNoRoll');
     return;
   }
   const c = getCrystalStats();
   el.classList.add('active');
   const line = formatCrystalStatLine(c);
-  el.innerHTML = `<span class="crystal-preview-label">水晶能力：</span><span class="crystal-preview-stats">${line}</span>`;
+  el.innerHTML = `<span class="crystal-preview-label">${t('char.crystalPreview')}</span><span class="crystal-preview-stats">${line}</span>`;
 }
 
 function recalc(refreshCustomPanel = true) {
@@ -1448,9 +1455,9 @@ function renderEquipStage() {
     const side = DECOR_SIDE[s.id];
     const img = item && itemImageUrl(item) ? `<img class="equip-thumb" src="${escapeHtml(itemImageUrl(item))}" alt="" loading="lazy">` : '';
     const equipBtn = `<button type="button" class="equip-btn" data-slot="${s.id}">
-      <span class="slot-label">${s.label}</span>
+      <span class="slot-label">${slotLabel(s)}</span>
       ${img}
-      <span class="item-name ${item ? '' : 'empty'}">${item ? formatItemDisplayName(item) : '＋ 選擇'}</span>
+      <span class="item-name ${item ? '' : 'empty'}">${item ? formatItemDisplayName(item) : escapeHtml(t('char.slot.pick'))}</span>
     </button>`;
     const decorCol = side
       ? `<div class="decor-col decor-${side}">${renderDecorBtn(s.id, 'gem')}${renderDecorBtn(s.id, 'enchant')}</div>`
@@ -1592,7 +1599,7 @@ function setPickerDecorPreview(item) {
     return;
   }
   el.classList.add('active');
-  el.innerHTML = `<span class="name">${escapeHtml(item.name)}</span>${escapeHtml(formatDecorPickerPreview(item, pickerSlot))}`;
+  el.innerHTML = `<span class="name">${escapeHtml(gn(item.name))}</span>${escapeHtml(formatDecorPickerPreview(item, pickerSlot))}`;
 }
 
 function renderPickerGroupedGrid(items, categorySlug) {
@@ -1605,11 +1612,11 @@ function renderPickerGroupedGrid(items, categorySlug) {
   const showHeaders = basic.length > 0 && extra.length > 0;
   let html = '';
   if (basic.length) {
-    if (showHeaders) html += `<h5 class="picker-stat-group-title">${PICKER_STAT_GROUP_LABELS.basic}</h5>`;
+    if (showHeaders) html += `<h5 class="picker-stat-group-title">${t(PICKER_STAT_GROUP_LABELS.basic)}</h5>`;
     html += `<div class="picker-grid">${renderPickerGridItems(basic, { badgeGroup: sortedAll })}</div>`;
   }
   if (extra.length) {
-    if (showHeaders) html += `<h5 class="picker-stat-group-title">${PICKER_STAT_GROUP_LABELS.extra}</h5>`;
+    if (showHeaders) html += `<h5 class="picker-stat-group-title">${t(PICKER_STAT_GROUP_LABELS.extra)}</h5>`;
     html += `<div class="picker-grid">${renderPickerGridItems(extra, { badgeGroup: sortedAll })}</div>`;
   }
   return html;
@@ -1625,7 +1632,7 @@ function renderPickerGridItems(items, { badgeGroup = null } = {}) {
     return `<button type="button" class="picker-item" data-id="${escapeHtml(it.id)}" title="${escapeHtml(stats)}">
       ${renderPickerIcon(it)}
       ${lv}
-      <span class="name">${escapeHtml(it.name)}</span>
+      <span class="name">${escapeHtml(gn(it.name))}</span>
     </button>`;
   }).join('');
 }
@@ -1649,22 +1656,45 @@ function renderPickerSubTabs(categories, activeCat, labelFn) {
   });
 }
 
+function updatePickerModalLabels() {
+  if (!pickerSlot) return;
+  const slot = SLOTS.find(s => s.id === pickerSlot);
+  document.getElementById('pickerCloseBtn').textContent = t('char.picker.close');
+  if (pickerMode === 'equip') {
+    document.getElementById('pickerTitle').textContent = t('char.picker.equip', { slot: slotLabel(slot) });
+    document.getElementById('pickerHint').textContent = t('char.picker.hintEquip');
+    document.getElementById('pickerClearBtn').textContent = t('char.picker.clearSlot');
+  } else if (pickerMode === 'gem') {
+    document.getElementById('pickerTitle').textContent = t('char.picker.gem', { slot: slotLabel(slot) });
+    document.getElementById('pickerHint').textContent = t('char.picker.hintGem');
+    document.getElementById('pickerClearBtn').textContent = t('char.picker.clearGem');
+  } else {
+    document.getElementById('pickerTitle').textContent = t('char.picker.enchant', { slot: slotLabel(slot) });
+    document.getElementById('pickerHint').textContent = t('char.picker.hintEnchant');
+    document.getElementById('pickerClearBtn').textContent = t('char.picker.clearEnchant');
+  }
+}
+
+function refreshPickerModalI18n() {
+  const modal = document.getElementById('pickerModal');
+  if (modal.classList.contains('hidden') || !pickerSlot) return;
+  updatePickerModalLabels();
+  renderPickerList();
+}
+
 function openPicker(slotId) {
   pickerMode = 'equip';
   pickerSlot = slotId;
   pickerActiveCat = getSlotCategories(slotId)[0] || null;
-  const slot = SLOTS.find(s => s.id === slotId);
-  document.getElementById('pickerTitle').textContent = `選擇裝備：${slot.label}`;
-  document.getElementById('pickerHint').textContent = '游標指向裝備可查看屬性（依「裝備數值」設定）。';
-  document.getElementById('pickerClearBtn').textContent = '清除此欄';
   setPickerStatPreview(null);
+  updatePickerModalLabels();
   renderPickerList();
   document.getElementById('pickerModal').classList.remove('hidden');
 }
 
 function openDecorPicker(slotId, kind) {
   if (!equips[slotId]) {
-    alert('請先在此欄位選擇裝備');
+    alert(t('char.decor.needEquip'));
     return;
   }
   if (kind === 'gem' && !canGemSlot(slotId)) return;
@@ -1673,21 +1703,15 @@ function openDecorPicker(slotId, kind) {
   if (decor.enchantType && !getValidEnchants(slotId).includes(decor.enchantType)) decor.enchantType = '';
   pickerMode = kind;
   pickerSlot = slotId;
-  const slot = SLOTS.find(s => s.id === slotId);
   if (kind === 'gem') {
     pickerActiveCat = decor.gemType
       ? (gd().isQuestGem(decor.gemType) ? 'quest' : decor.gemType)
       : gd().GEM_TYPE_IDS[0];
-    document.getElementById('pickerTitle').textContent = `選擇寶石：${slot.label}`;
-    document.getElementById('pickerHint').textContent = '左側分類、右側選等級；「寶石」下拉可調鑲嵌效果。';
-    document.getElementById('pickerClearBtn').textContent = '清除寶石';
   } else {
     pickerActiveCat = decor.enchantType || getValidEnchants(slotId)[0];
-    document.getElementById('pickerTitle').textContent = `選擇附魔石：${slot.label}`;
-    document.getElementById('pickerHint').textContent = '左側分類、右側選等級；「附魔石」下拉可調數值模式。';
-    document.getElementById('pickerClearBtn').textContent = '清除附魔';
   }
   setPickerStatPreview(null);
+  updatePickerModalLabels();
   renderPickerList();
   document.getElementById('pickerModal').classList.remove('hidden');
 }
@@ -1707,7 +1731,7 @@ function renderPickerList() {
     const items = getDecorPickerItems();
     if (!items.length) {
       document.getElementById('pickerSubTabs').innerHTML = '';
-      grid.innerHTML = '<p class="hint">無可用選項</p>';
+      grid.innerHTML = `<p class="hint">${t('char.picker.noOptions')}</p>`;
       pickerListCache = [];
       return;
     }
@@ -1724,7 +1748,7 @@ function renderPickerList() {
         <div class="picker-grid">${renderDecorPickerGridItems(group)}</div>
       </section>`;
     }).join('');
-    grid.innerHTML = sections || '<p class="hint">無可用選項</p>';
+    grid.innerHTML = sections || `<p class="hint">${t('char.picker.noOptions')}</p>`;
     const visibleItems = items.filter(it => it.category === pickerActiveCat);
     bindPickerItems(visibleItems);
     return;
@@ -1734,26 +1758,26 @@ function renderPickerList() {
 
   if (!slotItems.length) {
     document.getElementById('pickerSubTabs').innerHTML = '';
-    grid.innerHTML = '<p class="hint">無符合裝備</p>';
+    grid.innerHTML = `<p class="hint">${t('char.picker.noMatch')}</p>`;
     pickerListCache = [];
     return;
   }
 
   const categories = getSlotCategories(pickerSlot);
   if (!pickerActiveCat || !categories.includes(pickerActiveCat)) pickerActiveCat = categories[0];
-  renderPickerSubTabs(categories, pickerActiveCat, slug => CATEGORY_LABELS[slug] || slug);
+  renderPickerSubTabs(categories, pickerActiveCat, slug => getCategoryLabel(slug));
 
   const sections = categories.map(slug => {
     const group = sortPickerItems(slotItems.filter(it => getPickerCategory(it) === slug));
     if (!group.length) return '';
     const visible = slug === pickerActiveCat;
     return `<section class="picker-section" data-cat="${escapeHtml(slug)}" style="display:${visible ? 'block' : 'none'}">
-      <h4 class="picker-cat-title">${escapeHtml(CATEGORY_LABELS[slug] || slug)}</h4>
+      <h4 class="picker-cat-title">${escapeHtml(getCategoryLabel(slug))}</h4>
       ${renderPickerGroupedGrid(group, slug)}
     </section>`;
   }).join('');
 
-  grid.innerHTML = sections || '<p class="hint">無符合裝備</p>';
+  grid.innerHTML = sections || `<p class="hint">${t('char.picker.noMatch')}</p>`;
   const visibleItems = sortPickerItems(slotItems.filter(it => getPickerCategory(it) === pickerActiveCat));
   bindPickerItems(visibleItems);
 }
@@ -1769,7 +1793,7 @@ function currentBuild() {
   add(vit, CONTRIB.vit); add(str, CONTRIB.str); add(def, CONTRIB.def); add(agi, CONTRIB.agi); add(mag, CONTRIB.mag);
   for (const k of BASIC_KEYS) sum[k] = Math.floor((sum[k] || 0) + (eq[k] || 0));
   return {
-    name: document.getElementById('buildName').value.trim() || '未命名',
+    name: document.getElementById('buildName').value.trim() || t('common.unnamed'),
     lvl,
     stats: Object.fromEntries(COMPARE_KEYS.map(k => [k, COMPARE_FROM_SUM.has(k) ? (sum[k] || 0) : (eq[k] || 0)])),
   };
@@ -1780,7 +1804,7 @@ function renderCompare() {
   tbody.innerHTML = compareList.map((b, i) => `<tr>
     <td style="text-align:left">${escapeHtml(b.name)}</td><td>${b.lvl}</td>
     ${COMPARE_KEYS.map(k => `<td>${b.stats[k] ?? 0}</td>`).join('')}
-    <td><button type="button" class="secondary" data-i="${i}">刪除</button></td>
+    <td><button type="button" class="secondary" data-i="${i}">${escapeHtml(t('char.compare.delete'))}</button></td>
   </tr>`).join('');
   tbody.querySelectorAll('button[data-i]').forEach(btn => {
     btn.addEventListener('click', () => { compareList.splice(Number(btn.dataset.i), 1); renderCompare(); });
@@ -1800,7 +1824,7 @@ async function fetchText(url, useProxy = false, timeoutMs = 8000) {
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       return resp.text();
     } catch (e) {
-      lastErr = e.name === 'AbortError' ? new Error('載入逾時') : e;
+      lastErr = e.name === 'AbortError' ? new Error(t('char.loadTimeout')) : e;
     }
   }
   throw lastErr || new Error('fetch failed');
@@ -1820,18 +1844,22 @@ function waitForCatalogScript(timeoutMs = 15000) {
   });
 }
 
-function setLoadBarPending(msg) {
+function setLoadBarPending(key) {
+  loadBarPendingKey = key;
+  catalogLoadError = null;
   const bar = document.getElementById('loadBar');
   bar.className = 'load-bar';
-  bar.textContent = msg;
+  bar.textContent = t(key);
 }
 
 function applyCatalog(data) {
   catalog = data.items || data;
-  if (!catalog.length) throw new Error('空資料');
+  if (!catalog.length) throw new Error(t('char.loadEmpty'));
+  catalogLoadError = null;
+  loadBarPendingKey = null;
   const bar = document.getElementById('loadBar');
   bar.className = 'load-bar ok';
-  bar.textContent = `✅ 裝備圖鑑已就緒：${catalog.length} 件`;
+  bar.textContent = t('char.loadReady', { count: catalog.length });
 }
 
 async function loadCatalogFromFile(file) {
@@ -1841,15 +1869,15 @@ async function loadCatalogFromFile(file) {
 }
 
 function showCatalogLoadError(lastErr) {
+  catalogLoadError = lastErr;
+  loadBarPendingKey = null;
   const isFileProtocol = location.protocol === 'file:';
   const bar = document.getElementById('loadBar');
   bar.className = 'load-bar err';
   bar.innerHTML = [
-    `⚠️ 無法載入裝備圖鑑：${lastErr?.message || '未知錯誤'}。`,
-    isFileProtocol
-      ? '直接雙擊開啟時，請確認同目錄有 <code>equipment_catalog.js</code>；或點下方按鈕手動選擇 <code>equipment.json</code>。'
-      : '請確認同目錄已上傳 <code>equipment.json</code> / <code>equipment_catalog.js</code>，或執行 <code>scripts/build-equipment-catalog.ps1</code> 更新。',
-    '<button type="button" class="secondary" id="pickEquipBtn">📂 選擇 equipment.json</button>',
+    t('char.loadError', { msg: lastErr?.message || t('char.loadUnknownError') }),
+    t(isFileProtocol ? 'char.loadErrorFile' : 'char.loadErrorWeb'),
+    `<button type="button" class="secondary" id="pickEquipBtn">${t('char.loadPickBtn')}</button>`,
   ].join('<br>');
   document.getElementById('pickEquipBtn').addEventListener('click', () => {
     document.getElementById('equipFileInput').click();
@@ -1868,24 +1896,24 @@ async function loadCatalog() {
 
   const localJson = new URL('equipment.json', location.href).href;
   try {
-    setLoadBarPending('⏳ 載入 equipment.json…');
+    setLoadBarPending('char.loadJson');
     tryApply(JSON.parse(await fetchText(localJson, false, 6000)), localJson);
     return;
   } catch (e) {
     console.warn('local json fail', e);
   }
 
-  setLoadBarPending('⏳ 載入 equipment_catalog.js…');
+  setLoadBarPending('char.loadCatalogJs');
   await waitForCatalogScript(20000);
   if (window.EQUIPMENT_CATALOG?.items?.length) {
     try { tryApply(window.EQUIPMENT_CATALOG, 'equipment_catalog.js'); return; } catch (e) { console.warn('catalog js fail', e); }
   }
 
   const urls = [REPO_RAW + 'equipment.json'];
-  let lastErr = new Error('找不到裝備圖鑑');
+  let lastErr = new Error(t('char.loadNotFound'));
   for (const url of urls) {
     try {
-      setLoadBarPending('⏳ 載入遠端圖鑑…');
+      setLoadBarPending('char.loadRemote');
       const useProxy = !url.includes('raw.githubusercontent.com');
       tryApply(JSON.parse(await fetchText(url, useProxy, 10000)), url);
       return;
@@ -1973,14 +2001,50 @@ document.getElementById('equipFileInput').addEventListener('change', async (e) =
   e.target.value = '';
 });
 
+function refreshLoadBarI18n() {
+  const bar = document.getElementById('loadBar');
+  if (bar.classList.contains('ok') && catalog.length) {
+    bar.textContent = t('char.loadReady', { count: catalog.length });
+  } else if (bar.classList.contains('err') && catalogLoadError) {
+    showCatalogLoadError(catalogLoadError);
+  } else if (loadBarPendingKey) {
+    bar.textContent = t(loadBarPendingKey);
+  }
+}
+
+function applyCharLang() {
+  const modes = getStatModes();
+  StarCG_I18N.apply(document.body);
+  initStatModeSelects();
+  document.getElementById('statModeGeneral').value = modes.general;
+  document.getElementById('statModeMod').value = modes.mod;
+  document.getElementById('globalGemDecor').value = globalGemDecor;
+  document.getElementById('globalEnchantMode').value = globalEnchantMode;
+  refreshLoadBarI18n();
+  refreshPickerModalI18n();
+  renderEquipStage();
+  renderCrystalRefTable();
+  updateCrystalPanelState();
+  customPanelSignature = '';
+  renderCustomStatPanelIfNeeded();
+  renderCompare();
+  recalc(false);
+}
+
 function boot() {
+  StarCG_I18N.init({ titleKey: 'char.docTitle', onChange: applyCharLang });
   initStatModeSelects();
   renderCrystalRefTable();
   updateCrystalPanelState();
   renderEquipStage();
   recalc();
   loadCatalog()
-    .then(() => { renderEquipStage(); recalc(); })
+    .then(() => {
+      renderEquipStage();
+      recalc();
+      const modal = document.getElementById('pickerModal');
+      if (pickerSlot && modal && !modal.classList.contains('hidden')) renderPickerList();
+    })
     .catch(err => showCatalogLoadError(err));
 }
 
