@@ -1,4 +1,4 @@
-[
+window.PETS_DATA = [
   {
     "id": 1,
     "name": "赤焰年獸",
@@ -11024,4 +11024,4 @@
       "url": "https://www.starcg.net/pkevent2/202606S2.html"
     }
   }
-]
+];

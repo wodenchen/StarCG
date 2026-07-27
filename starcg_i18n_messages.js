@@ -338,6 +338,9 @@
     'price.emptySearchFail': tr('搜尋失敗', 'Search failed', '검색 실패'),
     'price.emptyNoMarketPets': tr('全場目前沒有寵物攤位', 'No pet stalls right now', '현재 펫 노점 없음'),
     'price.emptyNoFilterPets': tr('掃描到 {n} 隻寵物，但篩選條件下無符合（滿檔 {full} · 滿星 {star} · 滿技 {skill}）', 'Found {n} pets, none match filters (full {full} · star {star} · skill {skill})', '{n}마리 발견, 필터 불일치 (만땅 {full} · 만별 {star} · 만기 {skill})'),
+    'price.emptyPetCatalogMissing': tr('⚠️ 寵物圖鑑未載入，無法判定滿檔/滿星。請確認同目錄已部署 <code>pets-data.js</code> 或 <code>pets.json</code>，並 Ctrl+F5 強刷。', '⚠️ Pet catalog not loaded. Deploy <code>pets-data.js</code> or <code>pets.json</code> beside this page, then hard-refresh.', '⚠️ 펫 도감 미로드. <code>pets-data.js</code> 또는 <code>pets.json</code> 배포 후 새로고침.'),
+    'price.emptyPetAllocMissing': tr('⚠️ 市場資料缺少 AllocPoint，無法計算檔次。可能是代理回應異常，請稍後重試或換時段掃描。', '⚠️ Market data has no AllocPoint; grade stats unavailable. Proxy issue — retry later.', '⚠️ AllocPoint 없음. 프록시/응답 문제 — 나중에 재시도.'),
+    'price.emptyPetScanNoMatchHint': tr('圖鑑 {profiles} 隻 · 有檔次資料 {alloc} 隻 · 圖鑑對上 {matched} 隻。若已勾滿檔/滿星，可能本場確實沒有；可先取消篩選確認。', 'Catalog {profiles} · with alloc {alloc} · name matched {matched}. If filters are on, try clearing them.', '도감 {profiles} · 배분 {alloc} · 이름 일치 {matched}. 필터 해제 후 확인.'),
     'price.emptyNoTableMatch': tr('無符合條件的物品', 'No items match filters', '조건에 맞는 항목 없음'),
     'price.petScanPlaceholder': tr('【全場寵物】', '[All pets]', '[전체 펫]'),
 
