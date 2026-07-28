@@ -4137,6 +4137,110 @@ function soulColorDisplay(c) {
     return c.labelKey ? T(c.labelKey) : c.label;
 }
 
+const EQUIPMENT_STAT_I18N = {
+    ITEM_MODIFYATTACK: 'stat.atk',
+    ITEM_MODIFYDEFENCE: 'stat.def',
+    ITEM_MODIFYAGILITY: 'stat.agi',
+    ITEM_MODIFYHP: 'stat.hp',
+    ITEM_MODIFYFORCEPOINT: 'stat.mp',
+    ITEM_MODIFYMAGIC: 'stat.spt',
+    ITEM_MODIFYCRITICAL: 'stat.crit',
+    ITEM_MODIFYRECOVERY: 'stat.rec',
+    ITEM_MODIFYCOUNTER: 'stat.counter',
+    ITEM_MODIFYHITRATE: 'stat.hit',
+    ITEM_MODIFYAVOID: 'stat.dodge',
+    ITEM_ADM: 'stat.matk',
+    ITEM_RSS: 'stat.amres'
+};
+
+function equipmentStatLabel(key) {
+    const i18nKey = EQUIPMENT_STAT_I18N[key];
+    if (i18nKey) return T(i18nKey);
+    return (typeof EQUIPMENT_STAT_LABELS !== 'undefined' && EQUIPMENT_STAT_LABELS[key]) || key;
+}
+
+function pickMarketItemStatRaw(rawItem) {
+    const keys = new Set([
+        ...getMarketStatTagDefs().map(([k]) => k),
+        ...(typeof EQUIPMENT_STAT_LABELS !== 'undefined' ? Object.keys(EQUIPMENT_STAT_LABELS) : [])
+    ]);
+    const o = {};
+    keys.forEach(k => { o[k] = Number(rawItem[k]) || 0; });
+    return o;
+}
+
+function formatStatModValue(v) {
+    return v > 0 ? `+${v}` : String(v);
+}
+
+function buildItemStatTags(statRaw, itemName, itemId) {
+    const tagDefs = resolveTagDefs(itemName, itemId);
+    if (!tagDefs.length) return '';
+    return tagDefs
+        .map(([k, lbl, sc]) => [statRaw[k] || 0, lbl, sc])
+        .filter(([v]) => v !== 0)
+        .map(([v, lbl, sc]) => `<span class="soul-stat ${sc}">${lbl}${formatStatModValue(v)}</span>`)
+        .join(' ');
+}
+
+function buildItemGradeTag(itemName, itemLevel) {
+    if (!itemName.includes('改造圖') || itemLevel <= 0) return '';
+    if (itemLevel === 5) return `<span class="grade-normal">${T('price.gradeNormal')}</span>`;
+    if (itemLevel === 6) return `<span class="grade-silver">${T('price.gradeSilver')}</span>`;
+    if (itemLevel === 7) return `<span class="grade-gold">${T('price.gradeGold')}</span>`;
+    return `<span class="grade-normal">Lv${itemLevel}</span>`;
+}
+
+function buildItemSeedTag(itemName, itemArgument) {
+    if (!itemName.includes('重來的種子') || !itemArgument) return '';
+    const bpValues = String(itemArgument).split('|').map(Number);
+    const plusParts = [];
+    const minusParts = [];
+    bpValues.forEach((val, idx) => {
+        if (val > 0) plusParts.push(`<span class="bp-plus">+${val}${petStatLabel(idx)}</span>`);
+        else if (val < 0) minusParts.push(`<span class="bp-minus">${val}${petStatLabel(idx)}</span>`);
+    });
+    const allParts = [...plusParts, ...minusParts];
+    return allParts.length > 0 ? allParts.join(' ') : '';
+}
+
+function buildItemColorTag(itemId) {
+    const c = MARKET_SOUL_COLORS[itemId];
+    if (!c) return { colorTag: '', soulColor: '' };
+    return {
+        colorTag: `<span class="soul-tag ${c.cls}">${soulColorDisplay(c)}</span>`,
+        soulColor: c.label
+    };
+}
+
+function refreshItemTagsOnItems(items) {
+    if (!items?.length) return;
+    for (const item of items) {
+        if (item.isPet) continue;
+        const itemName = item.item;
+        const itemId = item.marketItemId;
+        const statRaw = item.marketStatRaw;
+        if (statRaw && itemId != null) {
+            item.statTag = buildItemStatTags(statRaw, itemName, itemId);
+            item.peakTag = buildPeakTags(statRaw, itemName, itemId).peakTag;
+            item.statMods = {};
+            resolveTagDefs(itemName, itemId).forEach(([key]) => {
+                const v = statRaw[key] || 0;
+                if (v !== 0) item.statMods[key] = v;
+            });
+        }
+        if (itemId != null && MARKET_SOUL_COLORS[itemId]) {
+            const { colorTag, soulColor } = buildItemColorTag(itemId);
+            item.colorTag = colorTag;
+            item.soulColor = soulColor;
+        }
+        item.gradeTag = buildItemGradeTag(itemName, item.itemLevel || 0);
+        if (item.seedArgument != null) {
+            item.seedTag = buildItemSeedTag(itemName, item.seedArgument);
+        }
+    }
+}
+
 function resolveTagDefs(itemName, itemId) {
     const keys = getVariableStatKeys(itemName, itemId);
     if (keys === null) return getMarketStatTagDefs();
@@ -4161,7 +4265,7 @@ function compareMaxStats(rawItem, itemName, itemId) {
     if (!profile) return { top, over };
     Object.entries(profile).forEach(([key, maxVal]) => {
         const actual = Number(rawItem[key]) || 0;
-        const label = (typeof EQUIPMENT_STAT_LABELS !== 'undefined' && EQUIPMENT_STAT_LABELS[key]) || key;
+        const label = equipmentStatLabel(key);
         if (actual === maxVal) top.push({ key, label, actual, max: maxVal });
         else if (actual > maxVal) over.push({ key, label, actual, max: maxVal });
     });
@@ -4753,12 +4857,6 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
     const items = [];
     const itemsMap = data.itemsByCd || {};
     const petsMap = data.petsByCd || {};
-    const formatStatValue = v => (v > 0 ? `+${v}` : String(v));
-    const buildStatTags = (item, defs) => defs
-        .map(([k, lbl, sc]) => [item[k] || 0, lbl, sc])
-        .filter(([v]) => v !== 0)
-        .map(([v, lbl, sc]) => `<span class="soul-stat ${sc}">${lbl}${formatStatValue(v)}</span>`)
-        .join(' ');
 
     (data.stalls || []).forEach(stall => {
             const cdkey = stall.cdkey;
@@ -4767,68 +4865,48 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
             (itemsMap[cdkey] || []).forEach(item => {
                 const normalizedItemName = normalizeStr(item.ITEM_TRUENAME);
                 if (marketNameMatches(normalizedItemName, normalizedKeyword, exact)) {
-                    // 處理改造圖等級區分（嘗試多種可能的欄位名）
-                    let displayName = item.ITEM_TRUENAME;
-                    let gradeTag = '';
-                    let grade = '';
-                    let seedTag = '';
+                    const displayName = item.ITEM_TRUENAME;
                     const itemLevel = item.ITEM_LEVEL || item.level || item.Level || item.ITEM_LV || item.lv || 0;
-                    if (item.ITEM_TRUENAME.includes('改造圖') && itemLevel > 0) {
-                        if (itemLevel === 5) { gradeTag = `<span class="grade-normal">${T('price.gradeNormal')}</span>`; grade = '普通'; }
-                        else if (itemLevel === 6) { gradeTag = `<span class="grade-silver">${T('price.gradeSilver')}</span>`; grade = '銀'; }
-                        else if (itemLevel === 7) { gradeTag = `<span class="grade-gold">${T('price.gradeGold')}</span>`; grade = '金'; }
-                        else gradeTag = `<span class="grade-normal">Lv${itemLevel}</span>`;
-                    }
-                    
-                    // 處理重來的種子 BP 配點顯示
-                    let seedPlusStats = [];
-                    let seedMinusStats = [];
-                    if (item.ITEM_TRUENAME.includes('重來的種子') && item.ITEM_ARGUMENT) {
-                        const bpNames = PET_STAT_LABELS;
-                        const bpValues = item.ITEM_ARGUMENT.split('|').map(Number);
-                        let plusParts = [];
-                        let minusParts = [];
-                        bpValues.forEach((val, idx) => {
-                            if (val > 0) {
-                                plusParts.push(`<span class="bp-plus">+${val}${petStatLabel(idx)}</span>`);
-                                seedPlusStats.push(bpNames[idx]);
-                            } else if (val < 0) {
-                                minusParts.push(`<span class="bp-minus">${val}${petStatLabel(idx)}</span>`);
-                                seedMinusStats.push(bpNames[idx]);
-                            }
-                        });
-                        // 固定順序：+1在前，-1在後
-                        const allParts = [...plusParts, ...minusParts];
-                        if (allParts.length > 0) seedTag = allParts.join(' ');
-                    }
-                    
-                    // 英靈之誓：用 ITEM_ID 區分顏色變體
-                    let colorTag = '';
-                    let statTag = '';
-                    let soulColor = '';
-                    const tagDefs = resolveTagDefs(displayName, item.ITEM_ID);
-                    if (MARKET_SOUL_COLORS[item.ITEM_ID]) {
-                        const c = MARKET_SOUL_COLORS[item.ITEM_ID];
-                        soulColor = c.label;
-                        colorTag = `<span class="soul-tag ${c.cls}">${soulColorDisplay(c)}</span>`;
-                    }
-                    if (tagDefs.length > 0) {
-                        const tags = buildStatTags(item, tagDefs);
-                        if (tags) statTag = tags;
+                    const itemId = item.ITEM_ID;
+                    const statRaw = pickMarketItemStatRaw(item);
+                    let grade = '';
+                    if (displayName.includes('改造圖') && itemLevel > 0) {
+                        if (itemLevel === 5) grade = '普通';
+                        else if (itemLevel === 6) grade = '銀';
+                        else if (itemLevel === 7) grade = '金';
                     }
 
-                    const { peakTag } = buildPeakTags(item, displayName, item.ITEM_ID);
+                    let seedPlusStats = [];
+                    let seedMinusStats = [];
+                    const seedArgument = item.ITEM_ARGUMENT;
+                    if (displayName.includes('重來的種子') && seedArgument) {
+                        const bpNames = PET_STAT_LABELS;
+                        const bpValues = String(seedArgument).split('|').map(Number);
+                        bpValues.forEach((val, idx) => {
+                            if (val > 0) seedPlusStats.push(bpNames[idx]);
+                            else if (val < 0) seedMinusStats.push(bpNames[idx]);
+                        });
+                    }
+
+                    const { colorTag, soulColor } = buildItemColorTag(itemId);
+                    const gradeTag = buildItemGradeTag(displayName, itemLevel);
+                    const seedTag = buildItemSeedTag(displayName, seedArgument);
+                    const statTag = buildItemStatTags(statRaw, displayName, itemId);
+                    const { peakTag } = buildPeakTags(statRaw, displayName, itemId);
                     
                     items.push({
                         item: displayName,
-                        gradeTag: gradeTag,
-                        grade: grade,
-                        seedTag: seedTag,
-                        colorTag: colorTag,
-                        statTag: statTag,
-                        peakTag: peakTag,
-                        statMods: buildStatMods(item, displayName, item.ITEM_ID),
-                        soulColor: soulColor,
+                        marketItemId: itemId,
+                        marketStatRaw: statRaw,
+                        seedArgument,
+                        gradeTag,
+                        grade,
+                        seedTag,
+                        colorTag,
+                        statTag,
+                        peakTag,
+                        statMods: buildStatMods(item, displayName, itemId),
+                        soulColor,
                         isSeed: seedPlusStats.length > 0 || seedMinusStats.length > 0,
                         seedPlusStats: seedPlusStats,
                         seedMinusStats: seedMinusStats,
@@ -6383,7 +6461,8 @@ function applyFilters() {
     filtered = filterByMarketPriceUnit(filtered);
 
     filtered = sortItems(filtered);
-    refreshPetAllocTagsOnItems(filtered);
+    refreshPetAllocTagsOnItems(allMarketItems);
+    refreshItemTagsOnItems(allMarketItems);
     updateStats(filtered);
     renderMarketTable(filtered);
 }
