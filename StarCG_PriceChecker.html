@@ -2351,6 +2351,47 @@
             flex: 1;
             min-width: 0;
         }
+        .bounty-pet-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #fffaf5, #f8f0e8);
+        }
+        .bounty-pet-toolbar[hidden] { display: none !important; }
+        .bounty-pet-toolbar-label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-right: 4px;
+        }
+        .bounty-pet-card-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .bounty-pet-card-chip {
+            padding: 5px 14px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.15s;
+        }
+        .bounty-pet-card-chip:hover {
+            border-color: #c49a6c;
+            background: var(--bg-card-hover);
+        }
+        .bounty-pet-card-chip.active {
+            background: var(--accent-gold);
+            color: #fff;
+            border-color: var(--accent-gold);
+        }
         @media (max-width: 600px) {
             .sub-layout {
                 flex-direction: column;
@@ -2842,7 +2883,7 @@
                 </div>
             </div>
             <div class="form-group exchange-rate-group">
-                <label class="exchange-rate-label">💱 <span data-i18n="price.exchange">匯率 (幣:晶)</span><span class="exchange-rate-hint" id="exchangeRateHint"></span></label>
+                <label class="exchange-rate-label"><span data-i18n="price.exchange">匯率 (幣:晶)</span><span class="exchange-rate-hint" id="exchangeRateHint"></span></label>
                 <input type="number" id="exchangeRate" value="260" min="1">
             </div>
             <div class="filter-chips">
@@ -3187,6 +3228,10 @@
         </div>
         <div class="bounty-pick-banner" id="bountyPickBanner" data-i18n-html="price.bountyPickBanner">點選加入採購清單 · <strong>再點一次同色項目可取消</strong> · 完成後關閉視窗</div>
         <div class="bounty-tabs" id="commonTabs"></div>
+        <div class="bounty-pet-toolbar" id="bountyPetToolbar" hidden>
+            <span class="bounty-pet-toolbar-label" data-i18n="price.bountyPetCard">卡等</span>
+            <div class="bounty-pet-card-chips" id="bountyPetCardChips"></div>
+        </div>
         <div class="bounty-body" id="commonBody"></div>
         <div class="bounty-pick-footer" id="bountyPickFooter">
             <div id="bountyPickSummary" class="bounty-pick-summary"></div>
@@ -3752,7 +3797,7 @@ function renderQuickTags() {
 
 function quickSearch(tag, exact = false) {
     document.getElementById('searchInput').value = tag;
-    marketItemType = BOUNTY_PET_NAMES.includes(tag) ? 'pet' : 'all';
+    marketItemType = isKnownPetName(tag) ? 'pet' : 'all';
     marketPriceUnit = 'all';
     document.getElementById('exactSearchFilter').checked = exact;
     searchMarket();
@@ -4230,7 +4275,16 @@ const PET_JSON_URLS = [
     PET_REPO_RAW + 'pets.json',
 ];
 const PET_PROFILES = {};
-const PET_NAME_ALIASES = { '碧瀾龍舟': '碧藍龍舟' }; // 市場名 → 圖鑑名
+const PET_NAME_CHAR_VARIANTS = [
+    ['蝎', '蠍'],
+    ['巖', '岩'],
+    ['兇', '凶'],
+    ['鉤', '鈎']
+];
+const PET_NAME_ALIASES = {
+    '碧瀾龍舟': '碧藍龍舟',
+    '熾焰龍舟': '熾炎龍舟'
+}; // 市場名 → 圖鑑名（異體字組無法安全泛化時手動維護）
 /** 官方圖鑑勘誤（本地載入後強制覆寫） */
 const PET_PROFILE_OVERRIDES = {
     '碧藍龍舟': { cardTier: '銀' }
@@ -4259,6 +4313,7 @@ function mergePetGuideEntries(pets, sourceLabel) {
         const name = String(p?.name ?? '').trim();
         if (!name) return;
         PET_PROFILES[name] = buildPetProfileFromGuide({ ...p, name });
+        registerPetLookupAliases(name);
         n++;
     });
     if (n > 0) console.info(`[寵物圖鑑] +${n} 筆（${sourceLabel}）`);
@@ -4305,6 +4360,7 @@ function mergePetProfileOverrides(overrides, sourceLabel) {
             name,
             cardTier: patch.cardTier ?? patch.rarity ?? prev.cardTier
         });
+        registerPetLookupAliases(name);
         n++;
     });
     if (n > 0) console.info(`[寵物圖鑑] 覆寫 ${n} 筆（${sourceLabel}）`);
@@ -4338,6 +4394,7 @@ function mergePetGuideEntriesFillOnly(pets, sourceLabel) {
         const name = String(p?.name ?? '').trim();
         if (!name || PET_PROFILES[name]) return;
         PET_PROFILES[name] = buildPetProfileFromGuide({ ...p, name });
+        registerPetLookupAliases(name);
         n++;
     });
     if (n > 0) console.info(`[寵物圖鑑] 補 ${n} 筆（${sourceLabel}，不覆寫本地）`);
@@ -4396,6 +4453,7 @@ async function loadPetProfilesFromGuide() {
             const count = Object.keys(PET_PROFILES).length;
             console.info(`[寵物圖鑑] 合計 ${count} 隻（有效合併 ${total} 筆）`);
             if (count === 0) petProfilesLoadPromise = null;
+            invalidateAllPetCatalogCache();
             if (count > 0 && allMarketItems.length > 0) {
                 refreshPetAllocTagsOnItems(allMarketItems);
                 if (lastMarketScanMode === 'petScan') finalizePetScanResults();
@@ -4415,17 +4473,115 @@ function resolvePetProfileName(name) {
     return PET_NAME_ALIASES[name] || name;
 }
 
-function getPetProfile(name) {
+/** 小死神 [紅] ↔ 小死神(紅)、未淨化的怨念 (魔) ↔ 未淨化的怨念(魔) */
+function normalizePetLookupName(name) {
+    return normalizeStr(name)
+        .replace(/\[/g, '(')
+        .replace(/\]/g, ')')
+        .replace(/\s+\(/g, '(')
+        .replace(/\(\s+/g, '(')
+        .replace(/\s+\)/g, ')');
+}
+
+/** 圖鑑名 → 市場名（手動別名，異體字組無法安全泛化時） */
+const PET_MARKET_MANUAL = {
+    '碧藍龍舟': '碧瀾龍舟',
+    '熾炎龍舟': '熾焰龍舟'
+};
+
+/** 快捷清單／搜尋用：圖鑑名轉市場慣用寫法（蠍、括號格式等） */
+function toMarketPetName(name) {
     const raw = String(name ?? '').trim();
-    if (!raw) return null;
-    const normalized = normalizeStr(raw);
-    const aliasKey = resolvePetProfileName(raw);
-    const aliasNorm = resolvePetProfileName(normalized);
-    return PET_PROFILES[aliasKey]
-        || PET_PROFILES[raw]
-        || PET_PROFILES[normalized]
-        || PET_PROFILES[aliasNorm]
-        || null;
+    if (!raw) return raw;
+    const canonical = resolvePetProfileName(raw);
+    if (PET_MARKET_MANUAL[canonical]) return PET_MARKET_MANUAL[canonical];
+    let out = canonical;
+    for (const [enc, market] of PET_NAME_CHAR_VARIANTS) {
+        out = out.replaceAll(enc, market);
+    }
+    return normalizePetLookupName(out);
+}
+
+/** 列表顯示：寵物用市場名；非 zh-TW 時雙語（譯名 · 中文） */
+function displaySearchItemName(rawName) {
+    const raw = String(rawName ?? '').trim();
+    if (!raw) return raw;
+    const lang = StarCG_I18N.getLang();
+    const market = isKnownPetName(raw) ? toMarketPetName(raw) : raw;
+    if (lang === 'zh-TW') return market;
+    const lookupKeys = isKnownPetName(raw)
+        ? [...new Set([raw, market, resolvePetProfileName(raw), ...petNameLookupVariants(raw)])]
+        : [raw, normalizePetLookupName(raw)];
+    for (const key of lookupKeys) {
+        if (!key) continue;
+        const bilingual = gn(key);
+        if (bilingual !== key) {
+            if (market !== key && bilingual.includes(' · ')) {
+                return `${bilingual.split(' · ')[0]} · ${market}`;
+            }
+            return bilingual;
+        }
+    }
+    return market;
+}
+
+function applyPetCharVariants(name) {
+    const variants = new Set([name]);
+    for (const [a, b] of PET_NAME_CHAR_VARIANTS) {
+        const next = [];
+        for (const v of variants) {
+            if (v.includes(a)) next.push(v.replaceAll(a, b));
+            if (v.includes(b)) next.push(v.replaceAll(b, a));
+        }
+        next.forEach(v => variants.add(v));
+    }
+    return [...variants];
+}
+
+function registerPetLookupAliases(canonicalName) {
+    const canonical = String(canonicalName ?? '').trim();
+    if (!canonical) return;
+    const seeds = new Set([
+        canonical,
+        normalizePetLookupName(canonical),
+        ...applyPetCharVariants(canonical),
+        ...applyPetCharVariants(normalizePetLookupName(canonical))
+    ]);
+    for (const alias of seeds) {
+        if (alias && alias !== canonical) PET_NAME_ALIASES[alias] = canonical;
+    }
+}
+
+/** 市場名 vs 圖鑑名：異體字、括號格式、手動別名 */
+function petNameLookupVariants(name) {
+    const raw = String(name ?? '').trim();
+    if (!raw) return [];
+    const seen = new Set();
+    const out = [];
+    const push = v => {
+        const s = String(v ?? '').trim();
+        if (!s || seen.has(s)) return;
+        seen.add(s);
+        out.push(s);
+    };
+    const seeds = [raw, normalizeStr(raw), normalizePetLookupName(raw)];
+    for (const s of seeds) {
+        push(s);
+        push(resolvePetProfileName(s));
+        for (const v of applyPetCharVariants(s)) {
+            push(v);
+            push(resolvePetProfileName(v));
+        }
+    }
+    for (const v of [...out]) push(resolvePetProfileName(v));
+    return out;
+}
+
+function getPetProfile(name) {
+    for (const key of petNameLookupVariants(name)) {
+        if (PET_PROFILES[key]) return PET_PROFILES[key];
+    }
+    return null;
 }
 
 function resolvePetCardTier(petName) {
@@ -5078,7 +5234,7 @@ function renderTrackedTable() {
         return `
         <tr data-track-name="${escapeAttr(item.name)}">
             <td>${typeLabel}</td>
-            <td><strong>${escapeHtml(item.name)}</strong></td>
+            <td><strong>${escapeHtml(displaySearchItemName(item.name))}</strong></td>
             <td style="color:var(--accent-green)">${formatTrackedPrice(item.minCoin)}</td>
             <td style="color:var(--accent-gold)">${formatTrackedPrice(item.avgCoin)}</td>
             <td style="color:var(--accent-green)">${formatTrackedPrice(item.minCrystal)}</td>
@@ -5097,7 +5253,7 @@ function renderTrackedTable() {
         <tr id="trackedChartRow${index}" class="chart-row" style="display:none;">
             <td colspan="10" style="padding:0; background:var(--bg-dark);">
                 <div class="inline-chart-container">
-                    <div class="chart-title">${T('price.histChartTracked', { name: escapeHtml(item.name) })}</div>
+                    <div class="chart-title">${T('price.histChartTracked', { name: escapeHtml(displaySearchItemName(item.name)) })}</div>
                     <div class="inline-chart-wrapper">
                         <canvas id="trackedChart${index}"></canvas>
                     </div>
@@ -5872,7 +6028,7 @@ function renderHistoryFeed(logs) {
             <div class="history-feed-card">
                 <div class="history-feed-main">
                     <div class="history-feed-name">
-                        <strong>${escapeHtml(log.item)}</strong>
+                        <strong>${escapeHtml(displaySearchItemName(log.item))}</strong>
                     </div>
                     <div class="history-feed-meta">
                         ${buildHistoryDeltaTag(log, logs)}
@@ -5930,7 +6086,7 @@ function renderHistoryGroupTable(logs) {
     detailsEl.style.display = '';
     tbody.innerHTML = stats.map((row, index) => `
         <tr>
-            <td><strong>${escapeHtml(row.item)}</strong></td>
+            <td><strong>${escapeHtml(displaySearchItemName(row.item))}</strong></td>
             <td style="color:var(--accent-green)">${row.minCoin ? row.minCoin.toLocaleString() : '-'}</td>
             <td style="color:var(--accent-gold)">${row.medCoin ? row.medCoin.toLocaleString() : '-'}</td>
             <td style="color:var(--accent-red)">${row.maxCoin ? row.maxCoin.toLocaleString() : '-'}</td>
@@ -5943,7 +6099,7 @@ function renderHistoryGroupTable(logs) {
         <tr id="historyGroupChartRow${index}" class="chart-row" style="display:none;">
             <td colspan="9" style="padding:0; background:var(--bg-dark);">
                 <div class="inline-chart-container">
-                    <div class="chart-title">${T('price.histChartTitleSimple', { name: escapeHtml(row.item) })}</div>
+                    <div class="chart-title">${T('price.histChartTitleSimple', { name: escapeHtml(displaySearchItemName(row.item)) })}</div>
                     <div class="inline-chart-wrapper">
                         <canvas id="historyGroupChart${index}"></canvas>
                     </div>
@@ -6372,7 +6528,7 @@ function renderMarketTable(items) {
         
         return `
         <tr>
-            <td><div class="item-name-row"><strong>${escapeHtml(item.item)}</strong>${buildTrackBtnHtml(item.item, item.isPet ? 'pet' : 'item')}<span class="item-tag-head">${item.colorTag || ''}${item.peakTag || ''}${item.gradeTag || ''}${item.transTag || ''}</span><span class="item-tag-extra">${item.statTag || ''}${item.seedTag || ''}</span></div></td>
+            <td><div class="item-name-row"><strong>${escapeHtml(displaySearchItemName(item.item))}</strong>${buildTrackBtnHtml(item.item, item.isPet ? 'pet' : 'item')}<span class="item-tag-head">${item.colorTag || ''}${item.peakTag || ''}${item.gradeTag || ''}${item.transTag || ''}</span><span class="item-tag-extra">${item.statTag || ''}${item.seedTag || ''}</span></div></td>
             <td>
                 <span class="price ${item.pricetype === 0 ? 'coin' : 'crystal'}">
                     ${item.pricetype === 0 ? '💰' : '💎'} ${item.price.toLocaleString()}
@@ -7178,10 +7334,11 @@ function updateProcurementPickedSummary() {
 }
 
 function buildProcurementPetOptions() {
-    const pets = (typeof BOUNTY_PETS !== 'undefined' && BOUNTY_PETS['全部']) || [];
+    const pets = getAllPetCatalogEntries();
     const opts = [`<option value="">${T('price.procPickPet')}</option>`];
-    pets.forEach(([, name]) => {
-        opts.push(`<option value="${escapeAttr(name)}">${escapeHtml(gn(name))}</option>`);
+    pets.forEach(p => {
+        const marketName = toMarketPetName(p.name);
+        opts.push(`<option value="${escapeAttr(marketName)}">${escapeHtml(gn(marketName))}</option>`);
     });
     return opts.join('');
 }
@@ -7361,6 +7518,7 @@ const BOUNTY_EQUIPMENT = {
     '弗旦+系列': ['弗旦頭盔+','弗旦帽+','弗旦鎧+','弗旦衣+','弗旦之袍+','弗旦靴+','弗旦鞋+','弗旦之盾+','弗旦之戒+'],
     '水龍系列': ['水龍之劍','水龍之斧','水龍之槍','水龍之弓','水龍之杖','水龍的小刀','冰龍','水龍之盔','水龍之帽','水龍鎧甲','水龍之衣','水龍法袍','水龍之靴','水龍之鞋','水龍之盾']
 };
+const BOUNTY_PET_DELIVERY_KEY = '懸賞';
 const BOUNTY_PET_RARITY = {
     '經常': [
         ['Lv1','大地鼠'],['Lv1','迷你蝙蝠'],['Lv1','哥布林'],['Lv1','紅帽哥布林'],['Lv1','火焰鼠']
@@ -7372,13 +7530,91 @@ const BOUNTY_PET_RARITY = {
     '極少': [
         ['Lv2','烈風哥布林'],
         ['Lv3','殺手蠍'],['Lv3','蔓陀羅草'],['Lv3','幻歌妖'],['Lv3','烈風鳥人'],['Lv3','胖蝙蝠'],['Lv3','死亡蜂'],['Lv3','死亡樹精'],['Lv3','殺人蜂'],['Lv3','鐵剪螃蟹']
-    ],
+    ]
 };
-const BOUNTY_PETS = {
-    '全部': [...BOUNTY_PET_RARITY['經常'], ...BOUNTY_PET_RARITY['罕見'], ...BOUNTY_PET_RARITY['極少']],
-    ...BOUNTY_PET_RARITY
-};
-const BOUNTY_PET_NAMES = Object.values(BOUNTY_PET_RARITY).flat().map(([, name]) => name);
+function renderBountyDeliveryGroups() {
+    const sections = Object.entries(BOUNTY_PET_RARITY).map(([key, items]) => {
+        if (!items.length) return '';
+        return `<div class="bounty-cat">
+            <div class="bounty-cat-title">${escapeHtml(bountyCatLabel(key))}</div>
+            <div class="bounty-grid">${renderItems(items)}</div>
+        </div>`;
+    }).join('');
+    return sections || bountyEmptyHtml();
+}
+const BOUNTY_PET_CARD_FILTERS = [
+    { tier: 'all', labelKey: 'price.bountyPetCardAll' },
+    { tier: '普', labelKey: 'price.bountyPetCardNormal' },
+    { tier: '銀', labelKey: 'price.bountyPetCardSilver' },
+    { tier: '金', labelKey: 'price.bountyPetCardGold' }
+];
+let bountyPetCardFilter = 'all';
+let bountyPetActiveSubCat = BOUNTY_PET_DELIVERY_KEY;
+let allPetCatalogCache = null;
+
+function invalidateAllPetCatalogCache() {
+    allPetCatalogCache = null;
+    if (typeof renderBounty === 'function') renderBounty();
+    if (typeof initProcurementUi === 'function') initProcurementUi(true);
+}
+
+function getAllPetCatalogEntries() {
+    if (allPetCatalogCache) return allPetCatalogCache;
+    let entries = [];
+    if (Object.keys(PET_PROFILES).length) {
+        entries = Object.entries(PET_PROFILES).map(([name, p]) => ({
+            name,
+            race: p.race,
+            cardTier: p.rarity
+        }));
+    } else if (Array.isArray(globalThis.PETS_DATA)) {
+        entries = globalThis.PETS_DATA.map(p => ({
+            name: String(p?.name ?? '').trim(),
+            race: normalizePetRace(p?.race),
+            cardTier: p?.cardTier
+        })).filter(p => p.name);
+    }
+    allPetCatalogCache = entries.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'));
+    return allPetCatalogCache;
+}
+
+function buildAllPetGroups(cardTier = bountyPetCardFilter) {
+    const groups = { [BOUNTY_PET_DELIVERY_KEY]: [] };
+    const entries = getAllPetCatalogEntries().filter(p =>
+        cardTier === 'all' || p.cardTier === cardTier
+    );
+    groups['全部'] = entries.map(p => toMarketPetName(p.name));
+    PET_RACE_KEYS.forEach(([race]) => {
+        const names = entries.filter(p => p.race === race).map(p => toMarketPetName(p.name));
+        if (names.length) groups[race] = names;
+    });
+    return groups;
+}
+
+function isKnownPetName(name) {
+    if (!name) return false;
+    return !!getPetProfile(name);
+}
+
+function getPetCatalogTabIdx() {
+    return COMMON_TABS.findIndex(t => t.petCatalog);
+}
+
+function renderBountyPetCardChips() {
+    const el = document.getElementById('bountyPetCardChips');
+    if (!el) return;
+    el.innerHTML = BOUNTY_PET_CARD_FILTERS.map(f =>
+        `<button type="button" class="bounty-pet-card-chip${f.tier === bountyPetCardFilter ? ' active' : ''}" data-tier="${escapeAttr(f.tier)}">${escapeHtml(T(f.labelKey))}</button>`
+    ).join('');
+}
+
+function updateBountyPetToolbarVisibility() {
+    const toolbar = document.getElementById('bountyPetToolbar');
+    if (!toolbar) return;
+    const petIdx = getPetCatalogTabIdx();
+    const activeIdx = Number(document.querySelector('#commonTabs .bounty-tab.active')?.dataset.idx ?? 0);
+    toolbar.hidden = petIdx < 0 || activeIdx !== petIdx;
+}
 
 // 飾品 / 藥水 / 料理（待補，格式：{ 子分類: [[等級或null, 名稱], ...] }）
 const COMMON_ACCESSORIES = {
@@ -7430,12 +7666,12 @@ const MATERIAL_WOOD = [
     ['Lv2','樅'],['Lv2','檸檬草'],
     ['Lv3','黃月木'],['Lv3','蝴蝶花'],
     ['Lv4','鐵杉'],['Lv4','果梨'],
-    ['Lv5','琵琶木'],['Lv5','茉莫木'],['Lv5','桃木'],
+    ['Lv5','琵琶木'],['Lv5','茱萸木'],['Lv5','桃木'],
     ['Lv6','赤松'],['Lv6','番紅花'],
     ['Lv7','樸'],['Lv7','百里香'],
-    ['Lv8','杉'],['Lv8','單木'],['Lv8','香草'],['Lv8','罌粟'],['Lv8','魔法紅蘿卜'],
-    ['Lv9','絲柏'],['Lv9','苗香'],
-    ['Lv10','樺'],['Lv10','七葉樹']
+    ['Lv8','杉'],['Lv8','單木'],['Lv8','香草'],['Lv8','瞿麥'],['Lv8','魔法紅蘿卜'],
+    ['Lv9','絲柏'],['Lv9','茴香'],
+    ['Lv10','梣'],['Lv10','七葉樹']
 ];
 const MATERIAL_NO_BAG = new Set([]);
 const materialBag = items => items
@@ -7488,7 +7724,7 @@ const COMMON_TABS = [
     { labelKey: 'price.bountyTab.armor', groups: pickGroups(['盔', '帽', '鎧', '衣', '袍', '靴', '鞋', '盾']) },
     { labelKey: 'price.bountyTab.series', groups: pickGroups(['弗旦系列', '弗旦+系列', '水龍系列']) },
     { labelKey: 'price.bountyTab.supplies', groups: { ...COMMON_POTIONS, ...COMMON_FOODS } },
-    { labelKey: 'price.bountyTab.pets', groups: BOUNTY_PETS },
+    { labelKey: 'price.bountyTab.allPets', groups: null, petCatalog: true },
     { labelKey: 'price.bountyTab.materials', groups: COMMON_MATERIALS },
     { labelKey: 'price.bountyTab.gems', groups: COMMON_GEMS },
     { labelKey: 'price.bountyTab.enchants', groups: COMMON_ENCHANTS },
@@ -7505,6 +7741,9 @@ const BOUNTY_CAT_I18N = {
     '鞋': 'price.bountyCat.shoes', '盾': 'price.bountyCat.shield',
     '弗旦系列': 'price.bountyCat.fudan', '弗旦+系列': 'price.bountyCat.fudanPlus', '水龍系列': 'price.bountyCat.waterDragon',
     '全部': 'price.bountyCat.all', '經常': 'price.bountyCat.common', '罕見': 'price.bountyCat.rare', '極少': 'price.bountyCat.veryRare',
+    '懸賞': 'price.bountyCat.bountyQuest',
+    '人形': 'price.race.humanoid', '昆蟲': 'price.race.insect', '植物': 'price.race.plant', '特殊': 'price.race.special',
+    '龍': 'price.race.dragon', '野獸': 'price.race.beast', '飛行': 'price.race.flying', '不死': 'price.race.undead', '金屬': 'price.race.metal',
     '藥水(一包)': 'price.bountyCat.potionBag', '料理(一箱)': 'price.bountyCat.foodBox',
     '藥水(單個)': 'price.bountyCat.potionSingle', '料理(單個)': 'price.bountyCat.foodSingle',
     '狩獵(一袋)': 'price.bountyCat.huntBag', '挖掘(一袋)': 'price.bountyCat.mineBag', '伐木(一袋)': 'price.bountyCat.woodBag',
@@ -7535,11 +7774,18 @@ function renderItems(arr) {
         const [lv, name] = Array.isArray(it)
             ? (it.length === 1 ? [null, it[0]] : it)
             : [null, it];
-        return `<span class="bounty-item" data-name="${escapeHtml(name)}">${lv ? `<span class="lv">${lv}</span>` : ''}${escapeHtml(gn(name))}</span>`;
+        const displayName = isKnownPetName(name) ? toMarketPetName(name) : name;
+        return `<span class="bounty-item" data-name="${escapeHtml(displayName)}">${lv ? `<span class="lv">${lv}</span>` : ''}${escapeHtml(displaySearchItemName(name))}</span>`;
     }).join('');
 }
 
-function renderGroups(groups) {
+function resolveActiveSubCat(cats, preferred) {
+    if (preferred && cats.includes(preferred)) return preferred;
+    if (cats.includes('全部')) return '全部';
+    return cats[0] || preferred;
+}
+
+function renderGroups(groups, activeCat) {
     const cats = Object.keys(groups);
     if (cats.length === 0) {
         return bountyEmptyHtml();
@@ -7550,14 +7796,21 @@ function renderGroups(groups) {
             ? `<div class="bounty-grid">${renderItems(groups[''])}</div>`
             : bountyEmptyHtml();
     }
+    const active = resolveActiveSubCat(cats, activeCat);
+    const activeIdx = Math.max(0, cats.indexOf(active));
     const subTabs = cats.map((c, i) =>
-        `<div class="sub-tab${i === 0 ? ' active' : ''}" data-sub="${i}" data-cat="${escapeAttr(c)}">${escapeHtml(bountyCatLabel(c))}</div>`
+        `<div class="sub-tab${i === activeIdx ? ' active' : ''}" data-sub="${i}" data-cat="${escapeAttr(c)}">${escapeHtml(bountyCatLabel(c))}</div>`
     ).join('');
     const subPanels = cats.map((c, i) => {
-        const body = groups[c]?.length
-            ? `<div class="bounty-grid">${renderItems(groups[c])}</div>`
-            : bountyEmptyHtml();
-        return `<div class="sub-panel" data-sub="${i}" style="display:${i === 0 ? 'block' : 'none'}">${body}</div>`;
+        let body;
+        if (c === BOUNTY_PET_DELIVERY_KEY) {
+            body = renderBountyDeliveryGroups();
+        } else if (groups[c]?.length) {
+            body = `<div class="bounty-grid">${renderItems(groups[c])}</div>`;
+        } else {
+            body = bountyEmptyHtml();
+        }
+        return `<div class="sub-panel" data-sub="${i}" style="display:${i === activeIdx ? 'block' : 'none'}">${body}</div>`;
     }).join('');
     return `<div class="sub-layout"><div class="sub-tabs">${subTabs}</div><div class="sub-content">${subPanels}</div></div>`;
 }
@@ -7570,9 +7823,13 @@ function renderBounty() {
     tabsEl.innerHTML = COMMON_TABS.map((t, i) =>
         `<div class="bounty-tab${String(i) === prevActive ? ' active' : ''}" data-idx="${i}">${escapeHtml(T(t.labelKey))}</div>`
     ).join('');
-    bodyEl.innerHTML = COMMON_TABS.map((t, i) =>
-        `<div class="common-panel" data-idx="${i}" style="display:${String(i) === prevActive ? 'block' : 'none'}">${renderGroups(t.groups)}</div>`
-    ).join('');
+    bodyEl.innerHTML = COMMON_TABS.map((t, i) => {
+        const groups = t.petCatalog ? buildAllPetGroups() : t.groups;
+        const subCat = t.petCatalog ? bountyPetActiveSubCat : undefined;
+        return `<div class="common-panel" data-idx="${i}" style="display:${String(i) === prevActive ? 'block' : 'none'}">${renderGroups(groups, subCat)}</div>`;
+    }).join('');
+    renderBountyPetCardChips();
+    updateBountyPetToolbarVisibility();
 }
 
 function openBountyModal() {
@@ -7602,6 +7859,18 @@ function initBounty() {
         document.querySelectorAll('#commonBody .common-panel').forEach(p => {
             p.style.display = p.dataset.idx === idx ? 'block' : 'none';
         });
+        updateBountyPetToolbarVisibility();
+    });
+    document.getElementById('bountyPetCardChips')?.addEventListener('click', e => {
+        const chip = e.target.closest('.bounty-pet-card-chip');
+        if (!chip) return;
+        bountyPetCardFilter = chip.dataset.tier || 'all';
+        const petIdx = getPetCatalogTabIdx();
+        const panel = document.querySelector(`#commonBody .common-panel[data-idx="${petIdx}"]`);
+        const groups = buildAllPetGroups();
+        bountyPetActiveSubCat = resolveActiveSubCat(Object.keys(groups), bountyPetActiveSubCat);
+        if (panel) panel.innerHTML = renderGroups(groups, bountyPetActiveSubCat);
+        renderBountyPetCardChips();
     });
     // 左側子分頁切換
     document.getElementById('commonBody').addEventListener('click', e => {
@@ -7609,6 +7878,10 @@ function initBounty() {
         if (!sub) return;
         const layout = sub.closest('.sub-layout');
         const idx = sub.dataset.sub;
+        const panel = layout?.closest('.common-panel');
+        if (panel && panel.dataset.idx === String(getPetCatalogTabIdx()) && sub.dataset.cat) {
+            bountyPetActiveSubCat = sub.dataset.cat;
+        }
         layout.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
         sub.classList.add('active');
         layout.querySelectorAll('.sub-panel').forEach(p => {
