@@ -3776,11 +3776,11 @@ function saveTags() {
 }
 
 function tagHtml(tag, pinned) {
-    const t = escapeHtml(tag);
+    const label = escapeHtml(displaySearchItemName(tag));
     return `
-        <div class="quick-tag${pinned ? ' pinned' : ''}" data-tag="${t}" data-pinned="${pinned ? 1 : 0}">
+        <div class="quick-tag${pinned ? ' pinned' : ''}" data-tag="${escapeAttr(tag)}" data-pinned="${pinned ? 1 : 0}">
             <span class="pin" data-act="pin" title="${escapeAttr(pinned ? T('price.unpin') : T('price.pin'))}">${pinned ? '📌' : '📍'}</span>
-            <span class="label" data-act="search">${t}</span>
+            <span class="label" data-act="search">${label}</span>
             <span class="remove" data-act="remove" title="${escapeAttr(T('price.removeTag'))}">✕</span>
         </div>`;
 }
