@@ -382,10 +382,10 @@
 
 <script src="starcg_i18n.js"></script>
 <script src="starcg_game_names.js"></script>
-<script src="starcg_i18n_char_pet.js"></script>
+<script src="starcg_i18n_char_pet.js?v=20260730"></script>
 <script src="starcg_i18n_messages.js"></script>
 <script src="gems_data.js"></script>
-<script src="equipment_catalog.js" async id="equipCatalogScript"></script>
+<script src="equipment_catalog.js?v=20260730" async id="equipCatalogScript"></script>
 <script>
 const REPO_RAW = 'https://raw.githubusercontent.com/wodenchen/StarCG/main/';
 const GUIDE_EQUIP_URL = 'https://guide.starcg.net/equipment/';
@@ -396,10 +396,13 @@ function t(key, params) { return StarCG_I18N.t(key, params); }
 function statLabel(k) { return StarCG_I18N.stat(k); }
 function gn(name) { return StarCG_I18N.displayGameName(name); }
 
+const CATEGORY_LABEL_OVERRIDES = { 'princess-legend': '公主傳說' };
+
 function getCategoryLabel(k) {
   const key = 'char.cat.' + k;
   const text = t(key);
-  return text === key ? k : text;
+  if (text !== key) return text;
+  return CATEGORY_LABEL_OVERRIDES[k] || k;
 }
 
 const SLOT_CATEGORY_ORDER = {
