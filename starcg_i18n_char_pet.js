@@ -154,6 +154,7 @@
     'char.cat.headband': tr('頭帶', 'Headband', '머리띠'),
     'char.cat.fudan': tr('弗旦', 'Fudan', 'フダン'),
     'char.cat.water-dragon': tr('水龍', 'Water Dragon', '수룡'),
+    'char.cat.princess-legend': tr('公主傳說', 'Princess Legend', '공주전설'),
     'char.cat.headwear': tr('頭飾', 'Headwear', '머리 장식'),
     'char.cat.instrument': tr('樂器', 'Instrument', '악기'),
     'char.cat.super-artifact': tr('超神器', 'Super Artifact', '초신기'),
