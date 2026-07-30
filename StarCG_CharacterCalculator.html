@@ -405,7 +405,7 @@ function getCategoryLabel(k) {
 const SLOT_CATEGORY_ORDER = {
   weapon: ['sword','axe','spear','bow','staff','dagger','boomerang','super-artifact','forest','water-dragon'],
   hat: ['helmet','hat','headwear','fudan','water-dragon'],
-  body: ['armor','clothes','robe','fudan','water-dragon'],
+  body: ['armor','clothes','robe','princess-legend','fudan','water-dragon'],
   shoes: ['boots','shoes','fudan','water-dragon'],
   shield: ['shield','fudan','water-dragon'],
   acc: ['ring','necklace','earring','bracelet','amulet','headband','instrument'],
@@ -414,6 +414,11 @@ const SLOT_CATEGORY_ORDER = {
 const WATER_DRAGON_NAMES = new Set([
   '水龍之劍','水龍之斧','水龍之槍','水龍之弓','水龍之杖','水龍的小刀','冰龍',
   '水龍之盔','水龍之帽','水龍鎧甲','水龍之服','水龍法袍','水龍之靴','水龍之鞋','水龍之盾',
+]);
+
+const PRINCESS_LEGEND_NAMES = new Set([
+  '血盟之衣','禍害之裳','無情之裳','凜冽之裳','炙熱之裳',
+  '大地之裳','海洋之裳','火焰之裳','雲群之裳','結界之裳','城堡之裳','魔消之裳','兵消之裳','魔靈之裳','戰靈之裳','氤氳之裳',
 ]);
 
 const PICKER_NAME_ORDER = (() => {
@@ -435,6 +440,7 @@ const PICKER_NAME_ORDER = (() => {
   reg('shoes', ['運動鞋','馬車鞋','皮鞋','安全鞋','光之鞋','戰鞋','薄板鞋','鎖鏈鞋','蜥蜴鞋','維京鞋','特製舞鞋','戰鬥鞋','騎士鞋','妖精鞋','紫水晶鞋','白金鞋','精緻高根鞋','妖精鞋+','神秘之鞋','力量之鞋','黃金鞋','龍之鞋','守護之鞋','大木屐']);
   reg('shield', ['小圓盾','小型盾','板盾','鳶盾','漩渦重盾','哥特盾','士兵盾','重盾','蜥蜴盾','反光之盾','聖者之盾','風之盾','獅子盾','防守之盾','黃金之盾','鏡之盾','力量之盾','防禦之盾+','漆黑之盾','火龍之盾','黑暗之盾','勇者之盾','突猛盾','重型防御盾']);
   reg('water-dragon', [...WATER_DRAGON_NAMES]);
+  reg('princess-legend', [...PRINCESS_LEGEND_NAMES]);
   return map;
 })();
 
@@ -445,6 +451,7 @@ function formatItemDisplayName(item) {
 
 function getPickerCategory(it) {
   if (it.categorySlug === 'water-dragon' || WATER_DRAGON_NAMES.has(it.name)) return 'water-dragon';
+  if (it.categorySlug === 'princess-legend' || PRINCESS_LEGEND_NAMES.has(it.name)) return 'princess-legend';
   return it.categorySlug;
 }
 
@@ -593,7 +600,7 @@ function renderCrystalRefTable() {
 
 const RESIST_KEYS = ['poison','sleep','stone','drunk','chaos','forget'];
 const CORRECT_KEYS = ['crit','counter','hit','dodge'];
-const PICKER_FLAT_CATEGORIES = new Set(['fudan', 'water-dragon', ...SLOT_CATEGORY_ORDER.acc]);
+const PICKER_FLAT_CATEGORIES = new Set(['fudan', 'water-dragon', 'princess-legend', ...SLOT_CATEGORY_ORDER.acc]);
 const PICKER_STAT_GROUP_LABELS = { basic: 'char.picker.basic', extra: 'char.picker.extra' };
 const STAT_MODE_OPTIONS = [
   { value: 'max', labelKey: 'char.mode.max', ratio: 1 },

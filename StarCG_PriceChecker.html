@@ -3244,7 +3244,7 @@
 <script src="starcg_game_names.js"></script>
 <script src="starcg_i18n_char_pet.js"></script>
 <script src="starcg_i18n_messages.js"></script>
-<script src="equipment_max_stats.js?v=20260703"></script>
+<script src="equipment_max_stats.js?v=20260730"></script>
 <script src="pets-data.js"></script>
 <script>
 function T(k, p) { return StarCG_I18N.t(k, p); }
@@ -7578,15 +7578,23 @@ const BOUNTY_EQUIPMENT = {
     '盾': [['1A','小圓盾'],['1B','小型盾'],['2A','板盾'],['2B','鳶盾'],['3A','漩渦重盾'],['3B','哥特盾'],['4A','士兵盾'],['4B','重盾'],['5A','蜥蜴盾'],['5B','反光之盾'],['5C','聖者之盾'],['6A','風之盾'],['6B','獅子盾'],['7A','防守之盾'],['7B','黃金之盾'],['8A','鏡之盾'],['8B','力量之盾'],['8C','防御之盾+'],['9A','漆黑之盾'],['9B','火龍之盾'],['10A','黑暗之盾'],['10B','勇者之盾'],['11A','突猛盾'],['11B','重型防御盾']],
 
     // ---- 系列裝 ----
-    '弗旦系列': ['弗旦頭盔','弗旦帽','弗旦鎧','弗旦衣','弗旦之袍','弗旦靴','弗旦鞋','弗旦之盾','弗旦之戒'],
-    '弗旦+系列': ['弗旦頭盔+','弗旦帽+','弗旦鎧+','弗旦衣+','弗旦之袍+','弗旦靴+','弗旦鞋+','弗旦之盾+','弗旦之戒+'],
+    '弗旦系列': [],
     '水龍系列': ['水龍之劍','水龍之斧','水龍之槍','水龍之弓','水龍之杖','水龍的小刀','冰龍','水龍之盔','水龍之帽','水龍鎧甲','水龍之衣','水龍法袍','水龍之靴','水龍之鞋','水龍之盾'],
     '公主傳說系列': []
+};
+const FUDAN_SERIES_KEY = '弗旦系列';
+const FUDAN_SERIES_GROUPS = {
+    '弗旦系列': ['弗旦頭盔','弗旦帽','弗旦鎧','弗旦衣','弗旦之袍','弗旦靴','弗旦鞋','弗旦之盾','弗旦之戒'],
+    '弗旦+系列': ['弗旦頭盔+','弗旦帽+','弗旦鎧+','弗旦衣+','弗旦之袍+','弗旦靴+','弗旦鞋+','弗旦之盾+','弗旦之戒+']
 };
 const PRINCESS_LEGEND_SERIES_KEY = '公主傳說系列';
 const PRINCESS_LEGEND_GROUPS = {
     '公主傳說五': ['血盟之衣', '禍害之裳', '無情之裳', '凜冽之裳', '炙熱之裳'],
     '公主傳說七': ['大地之裳', '海洋之裳', '火焰之裳', '雲群之裳', '結界之裳', '城堡之裳', '魔消之裳', '兵消之裳', '魔靈之裳', '戰靈之裳', '氤氳之裳']
+};
+const BOUNTY_NESTED_SERIES = {
+    [FUDAN_SERIES_KEY]: FUDAN_SERIES_GROUPS,
+    [PRINCESS_LEGEND_SERIES_KEY]: PRINCESS_LEGEND_GROUPS
 };
 const BOUNTY_PET_DELIVERY_KEY = '懸賞';
 const BOUNTY_PET_RARITY = {
@@ -7615,10 +7623,6 @@ function renderGroupedBountySections(groupMap) {
 
 function renderBountyDeliveryGroups() {
     return renderGroupedBountySections(BOUNTY_PET_RARITY);
-}
-
-function renderPrincessLegendGroups() {
-    return renderGroupedBountySections(PRINCESS_LEGEND_GROUPS);
 }
 const BOUNTY_PET_CARD_FILTERS = [
     { tier: 'all', labelKey: 'price.bountyPetCardAll' },
@@ -7800,7 +7804,7 @@ function pickGroups(cats) {
 const COMMON_TABS = [
     { labelKey: 'price.bountyTab.weapon', groups: pickGroups(['劍', '斧', '槍', '弓', '杖', '小刀', '回力鏢']) },
     { labelKey: 'price.bountyTab.armor', groups: pickGroups(['盔', '帽', '鎧', '衣', '袍', '靴', '鞋', '盾']) },
-    { labelKey: 'price.bountyTab.series', groups: pickGroups(['弗旦系列', '弗旦+系列', '水龍系列', '公主傳說系列']) },
+    { labelKey: 'price.bountyTab.series', groups: pickGroups(['弗旦系列', '水龍系列', '公主傳說系列']) },
     { labelKey: 'price.bountyTab.supplies', groups: { ...COMMON_POTIONS, ...COMMON_FOODS } },
     { labelKey: 'price.bountyTab.allPets', groups: null, petCatalog: true },
     { labelKey: 'price.bountyTab.materials', groups: COMMON_MATERIALS },
@@ -7884,8 +7888,8 @@ function renderGroups(groups, activeCat) {
         let body;
         if (c === BOUNTY_PET_DELIVERY_KEY) {
             body = renderBountyDeliveryGroups();
-        } else if (c === PRINCESS_LEGEND_SERIES_KEY) {
-            body = renderPrincessLegendGroups();
+        } else if (BOUNTY_NESTED_SERIES[c]) {
+            body = renderGroupedBountySections(BOUNTY_NESTED_SERIES[c]);
         } else if (groups[c]?.length) {
             body = `<div class="bounty-grid">${renderItems(groups[c])}</div>`;
         } else {
