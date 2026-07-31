@@ -3317,7 +3317,7 @@
 <script src="starcg_i18n_char_pet.js"></script>
 <script src="starcg_i18n_messages.js"></script>
 <script src="equipment_max_stats.js?v=20260730"></script>
-<script src="pets-data.js"></script>
+<script src="pets-data.js?v=20260731b"></script>
 <script>
 function T(k, p) { return StarCG_I18N.t(k, p); }
 function gn(name) { return StarCG_I18N.displayGameName(name); }
@@ -3443,8 +3443,13 @@ const FETCH_TIMEOUT_MS = 22000;
 async function fetchWithTimeout(resource, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const headers = {
+        Accept: 'application/json, text/plain, */*',
+        'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
+        ...(options.headers || {})
+    };
     try {
-        return await fetch(resource, { ...options, signal: controller.signal });
+        return await fetch(resource, { ...options, headers, signal: controller.signal });
     } catch (err) {
         if (err.name === 'AbortError') {
             throw new Error(T('price.fetchTimeout', { sec: Math.round(timeoutMs / 1000) }));
@@ -4003,8 +4008,12 @@ function countPetScanStats(items) {
 
 function formatPetScanProgress(items, page, totalPages) {
     const s = countPetScanStats(items);
+    const profiles = Object.keys(PET_PROFILES).length;
+    starcgDiag.petCatalogCount = profiles;
+    starcgDiag.petScanStats = { ...s, profiles };
     return T('price.loading.petScanPage', {
-        page, total: totalPages, pets: s.pets, full: s.full, star: s.maxStar, skill: s.fullSkill
+        page, total: totalPages, pets: s.pets, full: s.full, star: s.maxStar, skill: s.fullSkill,
+        profiles, alloc: s.withAlloc, matched: s.withProfile
     });
 }
 
@@ -4053,7 +4062,6 @@ function finalizePetScanResults() {
 
 async function loadPetProfilesWithTimeout(timeoutMs = PET_GUIDE_LOAD_TIMEOUT_MS) {
     bootstrapPetProfilesFromEmbedded();
-    if (Object.keys(PET_PROFILES).length > 0) return Object.keys(PET_PROFILES).length;
     await Promise.race([
         loadPetProfilesFromGuide(),
         new Promise((_, reject) => {
@@ -4166,8 +4174,12 @@ async function scanPetMarket() {
             console.warn('[寵物圖鑑] 掃描時載入略過', err);
         });
         const profileCount = Object.keys(PET_PROFILES).length;
+        starcgDiag.petCatalogCount = profileCount;
         if (profileCount === 0) {
             console.warn('[寵掃] 寵物圖鑑未載入，滿檔/滿星/滿技判定不可用（請確認 pets-data.js / pets.json 已部署）');
+        } else if (profileCount < 400) {
+            console.warn(`[寵掃] 寵物圖鑑偏少（${profileCount} 隻），滿檔判定可能不準 — 請 Ctrl+F5 並確認 pets-data.js 已部署`);
+            diagLog('圖鑑偏少', { profileCount });
         } else {
             console.info(`[寵掃] 圖鑑就緒 ${profileCount} 隻`);
         }
@@ -4494,6 +4506,8 @@ const PET_RACE_KEYS = [
 ];
 const PET_RACE_OPTIONS = PET_RACE_KEYS.map(([race]) => race);
 const PET_GUIDE_JSON_URL = 'https://guide.starcg.net/data/pets.json';
+/** 官方圖鑑預期隻數（sync-pets-from-guide.ps1 同步後更新） */
+const PET_CATALOG_EXPECTED = 516;
 const PET_REPO_RAW = 'https://raw.githubusercontent.com/wodenchen/StarCG/main/';
 const PET_JSON_URLS = [
     'pets-local.json',
@@ -4607,11 +4621,32 @@ function mergePetNameAliases(aliases, sourceLabel) {
 }
 
 async function fetchPetJson(url, useProxy = false) {
-    const viaProxy = useProxy && !String(url).includes('raw.githubusercontent.com');
-    const text = viaProxy
-        ? await fetchWithProxy(url)
-        : await (await fetchWithTimeout(url, { cache: 'no-store' })).text();
-    return JSON.parse(text);
+    const isRemote = String(url).startsWith('http');
+    const errors = [];
+    if (isRemote) {
+        try {
+            const resp = await fetchWithTimeout(url, { cache: 'no-store' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const text = await resp.text();
+            return JSON.parse(text);
+        } catch (err) {
+            errors.push(`direct: ${err.message}`);
+        }
+    }
+    const viaProxy = useProxy && isRemote && !String(url).includes('raw.githubusercontent.com');
+    if (viaProxy) {
+        try {
+            return JSON.parse(await fetchWithProxy(url));
+        } catch (err) {
+            errors.push(`proxy: ${err.message}`);
+        }
+    }
+    if (!isRemote) {
+        const resolved = new URL(url, location.href).href;
+        const text = await (await fetchWithTimeout(resolved, { cache: 'no-store' })).text();
+        return JSON.parse(text);
+    }
+    throw new Error(errors.join(' · ') || 'fetch failed');
 }
 
 function mergePetGuideEntriesFillOnly(pets, sourceLabel) {
@@ -4670,15 +4705,27 @@ async function loadPetProfilesFromGuide() {
                 }
             } else {
                 try {
-                    total += mergePetGuideEntriesFillOnly(
+                    const embeddedCount = Object.keys(PET_PROFILES).length;
+                    const merged = mergePetGuideEntries(
                         await fetchPetJson(PET_GUIDE_JSON_URL, true),
                         'guide.starcg.net'
                     );
-                } catch (_) { /* 遠端補漏失敗不影響本地 */ }
+                    total += merged;
+                    starcgDiag.petCatalogEmbedded = embeddedCount;
+                    starcgDiag.petCatalogRemote = merged;
+                } catch (err) {
+                    console.warn('[寵物圖鑑] 遠端同步失敗，使用本地嵌入/快照', err.message);
+                    starcgDiag.petCatalogRemoteError = err.message;
+                }
             }
             mergePetProfileOverrides(PET_PROFILE_OVERRIDES, '官方勘誤');
             const count = Object.keys(PET_PROFILES).length;
-            console.info(`[寵物圖鑑] 合計 ${count} 隻（有效合併 ${total} 筆）`);
+            starcgDiag.petCatalogCount = count;
+            starcgDiag.petCatalogExpected = PET_CATALOG_EXPECTED;
+            console.info(`[寵物圖鑑] 合計 ${count} 隻（預期 ${PET_CATALOG_EXPECTED} · 嵌入 ${starcgDiag.petCatalogEmbedded ?? '?'} · 遠端合併 ${starcgDiag.petCatalogRemote ?? '?'} 筆）`);
+            if (count > 0 && count < PET_CATALOG_EXPECTED - 4) {
+                console.warn(`[寵物圖鑑] 偏少 ${count}/${PET_CATALOG_EXPECTED} — 請部署最新 pets-data.js（516）並 Ctrl+F5；遠端同步失敗時也需更新該檔`);
+            }
             if (count === 0) petProfilesLoadPromise = null;
             invalidateAllPetCatalogCache();
             if (count > 0 && allMarketItems.length > 0) {
