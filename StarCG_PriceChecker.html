@@ -4623,7 +4623,9 @@ function mergePetNameAliases(aliases, sourceLabel) {
 async function fetchPetJson(url, useProxy = false) {
     const isRemote = String(url).startsWith('http');
     const errors = [];
-    if (isRemote) {
+    // guide.starcg.net 無 CORS 標頭，GitHub Pages 直連必失敗（僅洗版 Console）
+    const skipDirect = isRemote && String(url).includes('guide.starcg.net');
+    if (isRemote && !skipDirect) {
         try {
             const resp = await fetchWithTimeout(url, { cache: 'no-store' });
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -4704,18 +4706,23 @@ async function loadPetProfilesFromGuide() {
                     console.warn('[寵物圖鑑] 本地與遠端皆載入失敗', e);
                 }
             } else {
-                try {
-                    const embeddedCount = Object.keys(PET_PROFILES).length;
-                    const merged = mergePetGuideEntries(
-                        await fetchPetJson(PET_GUIDE_JSON_URL, true),
-                        'guide.starcg.net'
-                    );
-                    total += merged;
-                    starcgDiag.petCatalogEmbedded = embeddedCount;
-                    starcgDiag.petCatalogRemote = merged;
-                } catch (err) {
-                    console.warn('[寵物圖鑑] 遠端同步失敗，使用本地嵌入/快照', err.message);
-                    starcgDiag.petCatalogRemoteError = err.message;
+                const embeddedCount = Object.keys(PET_PROFILES).length;
+                starcgDiag.petCatalogEmbedded = embeddedCount;
+                if (embeddedCount >= PET_CATALOG_EXPECTED) {
+                    starcgDiag.petCatalogRemote = 'skipped';
+                    console.info(`[寵物圖鑑] 嵌入已 ${embeddedCount} 隻，略過遠端同步（減少代理請求）`);
+                } else {
+                    try {
+                        const merged = mergePetGuideEntries(
+                            await fetchPetJson(PET_GUIDE_JSON_URL, true),
+                            'guide.starcg.net'
+                        );
+                        total += merged;
+                        starcgDiag.petCatalogRemote = merged;
+                    } catch (err) {
+                        console.warn('[寵物圖鑑] 遠端同步失敗，使用本地嵌入/快照', err.message);
+                        starcgDiag.petCatalogRemoteError = err.message;
+                    }
                 }
             }
             mergePetProfileOverrides(PET_PROFILE_OVERRIDES, '官方勘誤');
