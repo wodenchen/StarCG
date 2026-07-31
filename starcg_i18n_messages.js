@@ -17,9 +17,19 @@
       '⚠️ <code>file://</code>로 열렸습니다 — 브라우저가 API를 차단합니다. 폴더에서 <code>python proxy.py</code> 실행 후 <a href="http://localhost:8000/StarCG_PriceChecker.html">http://localhost:8000/StarCG_PriceChecker.html</a>로 여세요. GitHub Pages 배포도 가능합니다.'
     ),
     'price.petScanTip': tr(
-      '掃描全場寵物攤位（可勾選滿檔/滿星/滿技篩選；搜尋框可填名稱縮小範圍）',
-      'Scan all pet stalls (filter by full grade / max star / full skills; optional name in search box)',
-      '전체 펫 노점 스캔 (만땅/만별/만기 필터; 검색창에 이름 입력 가능)'
+      '掃描全場寵物攤位；操作細節見下方「全場寵掃描操作說明」',
+      'Scan all pet stalls — see “Pet scan guide” below for steps',
+      '전체 펫 노점 스캔 — 아래 「펫 스캔 안내」 참고'
+    ),
+    'price.petScanGuideTitle': tr(
+      '🐾 全場寵掃描操作說明',
+      '🐾 Pet scan guide',
+      '🐾 펫 스캔 안내'
+    ),
+    'price.petScanGuideBody': tr(
+      '<ol><li>至少勾一項檔次篩選：🧬滿檔 / ⭐滿星 / 🎯滿技（建議勾任一項，之後再篩選）</li><li>清空搜尋欄，並取消 🎯精確搜尋（避免搜尋衝突）</li><li>道具類篩選恢復預設：改造圖、英靈之誓、重來種子 → 全部</li><li>寵物篩選（展開寵物區）：卡等／種族／改造／等級（取消 🍼1等、清空 Lv≥）→ 全部（搜尋完再篩選）</li><li>按 🐾全場寵掃描，不是 🔍搜尋市場</li><li>🐾全場寵掃描完，若要 🔍搜尋市場，請關閉 🧬滿檔 / ⭐滿星 / 🎯滿技篩選，避免搜尋衝突</li></ol><p class="pet-scan-guide-ps">P.S. 搜尋需使用市場 API 的中文名稱；找特定寵物請善用「快捷清單」，儘量不要使用全場寵掃描。進度列的滿檔/滿星/滿技為全場統計，不含 🍼1等 等後續篩選。</p>',
+      '<ol><li>Check at least one alloc filter: 🧬 full grade / ⭐ max star / 🎯 full skills (pick one first; refine later)</li><li>Clear the search box and turn off 🎯 exact search (avoids conflicts)</li><li>Reset item filters: mod scroll, soul oath, reroll seeds → All</li><li>Pet filters: card tier / race / mod / level (off 🍼 Lv1, clear Lv≥) → All (filter after scan)</li><li>Use 🐾 Pet scan, not 🔍 Search market</li><li>After 🐾 pet scan, to 🔍 search market again, turn off 🧬/⭐/🎯 alloc filters to avoid conflicts</li></ol><p class="pet-scan-guide-ps">P.S. Market API uses Chinese pet names — use Quick list for specific pets. Progress full/star/skill counts are market-wide, before 🍼 Lv1 and other filters.</p>',
+      '<ol><li>만땅/만별/만기 중 최소 1개 선택 (하나만 켜고 스캔 후 추가 필터)</li><li>검색창 비우고 🎯 정확 검색 해제 (충돌 방지)</li><li>아이템 필터 기본값: 개조도·영령의 맹세·재시작 씨앗 → 전체</li><li>펫 필터: 카드등급/종족/개조/레벨(🍼 Lv1 해제, Lv≥ 비움) → 전체 (스캔 후 필터)</li><li>🔍 시장 검색이 아니라 🐾 전체 펫 스캔</li><li>🐾 스캔 후 🔍 시장 검색 시 🧬/⭐/🎯 필터 끄기 (충돌 방지)</li></ol><p class="pet-scan-guide-ps">P.S. 시장 API는 중국어 펫 이름 사용 — 특정 펫은 「빠른 목록」 권장. 진행률의 만땅/만별/만기는 🍼 Lv1 등 추가 필터 적용 전 전체 통계입니다.</p>'
     ),
     'price.gradeFilterTip': tr('改造圖', 'Mod scroll filter', '개조도 필터'),
     'price.gradeNormal': tr('普通', 'Normal', '일반'),
@@ -351,6 +361,14 @@
     'price.emptyPetCatalogMissing': tr('⚠️ 寵物圖鑑未載入，無法判定滿檔/滿星。請確認同目錄已部署 <code>pets-data.js</code> 或 <code>pets.json</code>，並 Ctrl+F5 強刷。', '⚠️ Pet catalog not loaded. Deploy <code>pets-data.js</code> or <code>pets.json</code> beside this page, then hard-refresh.', '⚠️ 펫 도감 미로드. <code>pets-data.js</code> 또는 <code>pets.json</code> 배포 후 새로고침.'),
     'price.emptyPetAllocMissing': tr('⚠️ 市場資料缺少 AllocPoint，無法計算檔次。可能是代理回應異常，請稍後重試或換時段掃描。', '⚠️ Market data has no AllocPoint; grade stats unavailable. Proxy issue — retry later.', '⚠️ AllocPoint 없음. 프록시/응답 문제 — 나중에 재시도.'),
     'price.emptyPetScanNoMatchHint': tr('圖鑑 {profiles} 隻 · 有檔次資料 {alloc} 隻 · 圖鑑對上 {matched} 隻。若已勾滿檔/滿星，可能本場確實沒有；可先取消篩選確認。', 'Catalog {profiles} · with alloc {alloc} · name matched {matched}. If filters are on, try clearing them.', '도감 {profiles} · 배분 {alloc} · 이름 일치 {matched}. 필터 해제 후 확인.'),
+    'price.emptyPetScanBlockersTitle': tr('可能原因（與進度統計無關的額外篩選）：', 'Extra filters hiding results (progress counts ignore these):', '진행률 통계와 별개 — 다음 필터 확인:'),
+    'price.emptyPetScanTryOtherAlloc': tr('全場確有符合檔次的寵物，但與目前篩選組合不符。可改勾 ⭐滿星 / 🎯滿技，或取消 🍼1等、交易單位等篩選。', 'Pets matching alloc stats exist, but not with current filters. Try ⭐/🎯 filters or clear 🍼 Lv1 / price unit.', '해당 배분 펫은 있으나 현재 필터와 불일치. ⭐/🎯 필터 또는 🍼 Lv1·거래 단위 해제.'),
+    'price.hint.petScanBabyOn': tr('已勾 🍼1等 — 進度「滿檔」含所有等級，列表只顯示 Lv1', '🍼 Lv1 on — progress counts all levels, table shows Lv1 only', '🍼 Lv1 ON — 진행률은 전 레벨, 목록은 Lv1만'),
+    'price.hint.petScanMinLvOn': tr('已設 Lv≥{lv} — 低於此等級的滿檔/滿星寵不會顯示', 'Lv≥{lv} set — lower-level matches hidden', 'Lv≥{lv} 설정 — 더 낮은 레벨 펫 제외'),
+    'price.hint.petScanExactOn': tr('已勾 🎯精確搜尋 — 可能過濾掉結果', '🎯 Exact search may hide results', '🎯 정확 검색 ON'),
+    'price.hint.petScanKeywordOn': tr('搜尋欄仍有「{kw}」— 市場 API 需中文名', 'Search box still has “{kw}” — API needs Chinese names', '검색창 「{kw}」 — API는 중국어 이름'),
+    'price.hint.petScanPriceUnitOn': tr('交易單位限 {unit} — 改選「全部」可看另一幣別', 'Price unit: {unit} only — pick All for both', '거래 단위 {unit} — 「전체」로 변경'),
+    'price.hint.petScanItemTypeOn': tr('商品類型為「僅道具」— 寵物不會顯示', 'Item type: items only — pets hidden', '상품 유형: 아이템만 — 펫 숨김'),
     'price.emptyNoTableMatch': tr('無符合條件的物品', 'No items match filters', '조건에 맞는 항목 없음'),
     'price.petScanPlaceholder': tr('【全場寵物】', '[All pets]', '[전체 펫]'),
 

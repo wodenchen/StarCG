@@ -125,6 +125,74 @@
             font-weight: 600;
         }
 
+        .pet-scan-guide {
+            position: relative;
+            padding: 0;
+            background: #f0f7ff;
+            border: 1px solid #c5ddf5;
+            border-radius: var(--radius);
+            font-size: 0.82rem;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+        .pet-scan-guide summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #2c5282;
+            user-select: none;
+            list-style: none;
+            height: var(--ctrl-h);
+            display: flex;
+            align-items: center;
+            padding: 0 calc(var(--ctrl-px) + 2px);
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+        .pet-scan-guide > div {
+            display: none;
+        }
+        .pet-scan-guide[open] > div {
+            display: block;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            z-index: 30;
+            min-width: min(380px, 85vw);
+            max-width: min(420px, 92vw);
+            max-height: min(70vh, 480px);
+            overflow-y: auto;
+            padding: 10px 12px;
+            background: #f0f7ff;
+            border: 1px solid #c5ddf5;
+            border-radius: var(--radius);
+            box-shadow: 0 6px 20px rgba(44, 82, 130, 0.15);
+        }
+        .pet-scan-guide summary::-webkit-details-marker { display: none; }
+        .pet-scan-guide summary::before {
+            content: '▸ ';
+            display: inline-block;
+            transition: transform 0.15s;
+        }
+        .pet-scan-guide[open] summary::before {
+            transform: rotate(90deg);
+        }
+        .pet-scan-guide[open] summary {
+            margin-bottom: 0;
+        }
+        .pet-scan-guide ol {
+            margin: 0;
+            padding-left: 1.35em;
+        }
+        .pet-scan-guide li + li {
+            margin-top: 6px;
+        }
+        .pet-scan-guide-ps {
+            margin: 10px 0 0;
+            padding-top: 8px;
+            border-top: 1px dashed #c5ddf5;
+            font-size: 0.86rem;
+        }
+
         .search-panel > .search-row .form-group {
             gap: 6px;
         }
@@ -2816,6 +2884,10 @@
                 <div class="search-actions">
                     <button id="searchBtn" data-i18n="price.searchBtn">🔍 搜尋市場</button>
                     <button id="petScanBtn" type="button" class="secondary" data-i18n-title="price.petScanTip" data-i18n="price.petScan">🐾 全場寵掃描</button>
+                    <details class="pet-scan-guide">
+                        <summary data-i18n="price.petScanGuideTitle">🐾 全場寵掃描操作說明</summary>
+                        <div data-i18n-html="price.petScanGuideBody"></div>
+                    </details>
                 </div>
             </div>
         </div>
@@ -3852,6 +3924,70 @@ function resetMarketSearchSession() {
     }
 }
 
+/** 全場寵掃描前：依操作說明重置會衝突的篩選（保留滿檔/滿星/滿技） */
+function resetPetScanCompanionFilters() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+    const exactEl = document.getElementById('exactSearchFilter');
+    if (exactEl) exactEl.checked = false;
+    const gradeEl = document.getElementById('gradeFilter');
+    if (gradeEl) gradeEl.value = 'all';
+    const soulEl = document.getElementById('soulColorFilter');
+    if (soulEl) soulEl.value = 'all';
+    const seedPlusEl = document.getElementById('seedPlusFilter');
+    if (seedPlusEl) seedPlusEl.value = 'all';
+    const seedMinusEl = document.getElementById('seedMinusFilter');
+    if (seedMinusEl) seedMinusEl.value = 'all';
+    const babyEl = document.getElementById('babyOnlyFilter');
+    if (babyEl) babyEl.checked = false;
+    const minLvEl = document.getElementById('petMinLvFilter');
+    if (minLvEl) minLvEl.value = '';
+    syncPetLevelBabyFilters('baby');
+    const cardEl = document.getElementById('petCardFilter');
+    if (cardEl) cardEl.value = 'all';
+    const raceEl = document.getElementById('petRaceFilter');
+    if (raceEl) raceEl.value = 'all';
+    const transEl = document.getElementById('petTransFilter');
+    if (transEl) transEl.value = 'all';
+}
+
+function getPetScanFilterBlockerHints() {
+    const hints = [];
+    if (document.getElementById('babyOnlyFilter')?.checked) {
+        hints.push(T('price.hint.petScanBabyOn'));
+    }
+    const minLv = getPetMinLvFilter();
+    if (minLv > 0) {
+        hints.push(T('price.hint.petScanMinLvOn', { lv: minLv }));
+    }
+    if (document.getElementById('exactSearchFilter')?.checked) {
+        hints.push(T('price.hint.petScanExactOn'));
+    }
+    const kw = document.getElementById('searchInput')?.value.trim();
+    if (kw) {
+        hints.push(T('price.hint.petScanKeywordOn', { kw: escapeHtml(kw) }));
+    }
+    if (marketPriceUnit !== 'all') {
+        hints.push(T('price.hint.petScanPriceUnitOn', { unit: marketPriceUnit === '0' ? T('price.segCoin') : T('price.segCrystal') }));
+    }
+    if (marketItemType === 'item') {
+        hints.push(T('price.hint.petScanItemTypeOn'));
+    }
+    return hints;
+}
+
+function appendPetScanEmptyHints(emptyMsg, stats) {
+    let msg = emptyMsg;
+    const blockers = getPetScanFilterBlockerHints();
+    if (blockers.length) {
+        msg += '<br><br><strong>' + T('price.emptyPetScanBlockersTitle') + '</strong><ul style="margin:8px 0 0 1.2em;text-align:left;display:inline-block">'
+            + blockers.map(h => `<li>${h}</li>`).join('') + '</ul>';
+    } else if (stats && (stats.full > 0 || stats.maxStar > 0 || stats.fullSkill > 0)) {
+        msg += '<br><br>' + T('price.emptyPetScanTryOtherAlloc');
+    }
+    return msg;
+}
+
 function countPetScanStats(items) {
     const pets = (items || []).filter(i => i.isPet);
     return {
@@ -3911,7 +4047,7 @@ function finalizePetScanResults() {
         } else if (stats.withAlloc === 0) {
             emptyMsg += '<br><br>' + T('price.emptyPetAllocMissing');
         }
-        showEmpty(emptyMsg);
+        showEmpty(appendPetScanEmptyHints(emptyMsg, stats));
     }
 }
 
@@ -3996,7 +4132,6 @@ async function searchMarket() {
 }
 
 async function scanPetMarket() {
-    const keyword = document.getElementById('searchInput').value.trim();
     const fullOnly = document.getElementById('petFullOnlyFilter')?.checked;
     const maxStarOnly = document.getElementById('petMaxStarOnlyFilter')?.checked;
     const fullSkillOnly = document.getElementById('petFullSkillOnlyFilter')?.checked;
@@ -4004,6 +4139,9 @@ async function scanPetMarket() {
         const ok = confirm(T('price.confirm.petScanNoFilter'));
         if (!ok) return;
     }
+
+    resetPetScanCompanionFilters();
+    const keyword = document.getElementById('searchInput').value.trim();
 
     diagLog('寵掃開始', { keyword: keyword || '(全場)', fullOnly, maxStarOnly, fullSkillOnly });
     const token = ++marketSearchToken;
@@ -4090,7 +4228,7 @@ async function scanPetMarket() {
                 });
             }
             console.info('[寵掃] 統計', { ...stats, profiles: profileCount });
-            showEmpty(emptyMsg);
+            showEmpty(appendPetScanEmptyHints(emptyMsg, stats));
         } else {
             showEmpty(T('price.emptyNoMarketPets'));
         }
@@ -6552,7 +6690,19 @@ function renderMarketTable(items) {
     const tbody = document.getElementById('marketBody');
     
     if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary);">${T('price.emptyNoTableMatch')}</td></tr>`;
+        let emptyMsg = T('price.emptyNoTableMatch');
+        if (lastMarketScanMode === 'petScan' && allMarketItems.some(i => i.isPet)) {
+            const stats = countPetScanStats(allMarketItems);
+            const blockers = getPetScanFilterBlockerHints();
+            if (blockers.length) {
+                emptyMsg += '<br><br><span style="font-size:0.88rem;line-height:1.5">'
+                    + T('price.emptyNoFilterPets', { n: stats.pets, full: stats.full, star: stats.maxStar, skill: stats.fullSkill })
+                    + '<br>' + blockers.join('<br>') + '</span>';
+            } else if (stats.full > 0 || stats.maxStar > 0 || stats.fullSkill > 0) {
+                emptyMsg += '<br><br><span style="font-size:0.88rem">' + T('price.emptyPetScanTryOtherAlloc') + '</span>';
+            }
+        }
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary);">${emptyMsg}</td></tr>`;
         document.getElementById('marketSection').style.display = 'block';
         return;
     }
