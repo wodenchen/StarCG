@@ -15588,7 +15588,7 @@ window.EQUIPMENT_CATALOG = {
                       "calcSlot":  "weapon",
                       "level":  11,
                       "stats":  {
-                                    "hit":  10,
+                                    "hit":  0,
                                     "rec":  0,
                                     "hp":  0,
                                     "dodge":  0,

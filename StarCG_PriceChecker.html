@@ -678,6 +678,17 @@
         .market-results-head {
             margin-bottom: 16px;
         }
+        .pet-scan-alloc-warning {
+            display: none;
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: var(--radius);
+            color: #664d03;
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
 
         /* Stats Cards */
         .stats-grid {
@@ -3010,6 +3021,7 @@
 
     <!-- 結果區頭部：Stats + 類型/單位 pill -->
     <div class="market-results-head" id="marketResultsHead">
+        <div id="petScanAllocWarning" class="pet-scan-alloc-warning" style="display: none;"></div>
         <div class="stats-grid" id="statsGrid" style="display: none;">
             <div class="stat-card">
                 <div class="label" data-i18n="price.statOnSale">📦 在售數量</div>
@@ -3316,7 +3328,7 @@
 <script src="starcg_game_names.js"></script>
 <script src="starcg_i18n_char_pet.js"></script>
 <script src="starcg_i18n_messages.js"></script>
-<script src="equipment_max_stats.js?v=20260730"></script>
+<script src="equipment_max_stats.js?v=20260802"></script>
 <script src="pets-data.js?v=20260731b"></script>
 <script>
 function T(k, p) { return StarCG_I18N.t(k, p); }
@@ -4212,9 +4224,13 @@ async function scanPetMarket() {
         refreshPetAllocTagsOnItems(allMarketItems);
 
         const stats = countPetScanStats(allMarketItems);
+        starcgDiag.petScanStats = stats;
+        starcgDiag.petScanAllocRatio = stats.pets ? stats.withAlloc / stats.pets : 0;
         const displayed = filterByMarketPriceUnit(
             filterByMarketItemType(getMarketPanelFiltered())
         ).filter(i => i.isPet).length;
+
+        updatePetScanAllocWarning(stats);
 
         if (displayed > 0) {
             document.getElementById('tabsContainer').style.display = 'flex';
@@ -4224,7 +4240,10 @@ async function scanPetMarket() {
             const partialHint = scanTotalPages >= PET_SCAN_MAX_PAGES
                 ? ` · 已達 ${PET_SCAN_MAX_PAGES} 頁上限`
                 : '';
-            console.info(`[寵掃] 寵物 ${stats.pets} · 滿檔 ${stats.full} · 滿星 ${stats.maxStar} · 滿技 ${stats.fullSkill} · 顯示 ${displayed}${partialHint}`);
+            console.info(`[寵掃] 寵物 ${stats.pets} · 滿檔 ${stats.full} · 滿星 ${stats.maxStar} · 滿技 ${stats.fullSkill} · 有檔次 ${stats.withAlloc} · 圖鑑對上 ${stats.withProfile} · 顯示 ${displayed}${partialHint}`);
+            if (shouldWarnLowPetAlloc(stats)) {
+                console.warn(`[寵掃] 有檔次比例偏低 ${stats.withAlloc}/${stats.pets} — 代理/網路可能截斷 AllocPoint，滿檔/滿星不可信；可試日本 VPN 或換網路`);
+            }
         } else if (stats.pets > 0) {
             let emptyMsg = T('price.emptyNoFilterPets', { n: stats.pets, full: stats.full, star: stats.maxStar, skill: stats.fullSkill });
             const profileCount = Object.keys(PET_PROFILES).length;
@@ -4458,12 +4477,46 @@ function marketNameMatches(normalizedName, normalizedKeyword, exact) {
 const PET_ALLOC_POWERS = [64 ** 4, 64 ** 3, 64 ** 2, 64, 1];
 
 function decodePetAllocPoint(point) {
-    let remain = Math.max(0, Math.floor(Number(point) || 0));
+    const n = parseAllocPointNumber(point);
+    if (n <= 0) return PET_ALLOC_POWERS.map(() => 0);
+    let remain = n;
     return PET_ALLOC_POWERS.map(power => {
         const stat = Math.floor(remain / power);
         remain -= stat * power;
         return stat;
     });
+}
+
+/** 解析市場 API 的 AllocPoint（容忍字串、千分位） */
+function parseAllocPointNumber(point) {
+    if (point == null || point === '') return 0;
+    const s = String(point).replace(/,/g, '').trim();
+    if (!s || s === '0') return 0;
+    const n = Number(s);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+}
+
+function shouldWarnLowPetAlloc(stats) {
+    return stats.pets >= 100 && stats.withAlloc / stats.pets < 0.3;
+}
+
+function updatePetScanAllocWarning(stats) {
+    const el = document.getElementById('petScanAllocWarning');
+    if (!el) return;
+    if (lastMarketScanMode !== 'petScan' || !shouldWarnLowPetAlloc(stats)) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+        return;
+    }
+    const pct = Math.round(100 * stats.withAlloc / stats.pets);
+    el.innerHTML = T('price.warn.lowPetAlloc', {
+        pets: stats.pets,
+        alloc: stats.withAlloc,
+        pct,
+        full: stats.full,
+        star: stats.maxStar
+    });
+    el.style.display = 'block';
 }
 
 function pickPetField(pet, ...keys) {
@@ -5138,8 +5191,9 @@ function processMarketPageData(data, normalizedKeyword, exact = false) {
                     let petAllocBase = null;
                     let petAllocStar = null;
                     let petAllocTotal = null;
-                    if (allocPoint != null && Number(allocPoint) > 0) {
-                        petAllocBase = decodePetAllocPoint(allocPoint);
+                    const allocNum = parseAllocPointNumber(allocPoint);
+                    if (allocNum > 0) {
+                        petAllocBase = decodePetAllocPoint(allocNum);
                         petAllocStar = decodePetAllocPoint(petAllocPoint);
                         petAllocTotal = petAllocBase.map((v, i) => v + petAllocStar[i]);
                     }
@@ -7078,6 +7132,8 @@ function hideAll() {
     document.getElementById('statsGrid').style.display = 'none';
     const bar = document.getElementById('marketSegmentBar');
     if (bar) bar.style.display = 'none';
+    const allocWarn = document.getElementById('petScanAllocWarning');
+    if (allocWarn) allocWarn.style.display = 'none';
 }
 
 function showEmpty(msg) {
