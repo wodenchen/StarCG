@@ -27,9 +27,9 @@
       '🐾 펫 스캔 안내'
     ),
     'price.petScanGuideBody': tr(
-      '<ol><li>至少勾一項檔次篩選：🧬滿檔 / ⭐滿星 / 🎯滿技（建議勾任一項，之後再篩選）</li><li>清空搜尋欄，並取消 🎯精確搜尋（避免搜尋衝突）</li><li>道具類篩選恢復預設：改造圖、英靈之誓、重來種子 → 全部</li><li>寵物篩選（展開寵物區）：卡等／種族／改造／等級（取消 🍼1等、清空 Lv≥）→ 全部（搜尋完再篩選）</li><li>按 🐾全場寵掃描，不是 🔍搜尋市場</li><li>🐾全場寵掃描完，若要 🔍搜尋市場，請關閉 🧬滿檔 / ⭐滿星 / 🎯滿技篩選，避免搜尋衝突</li></ol><p class="pet-scan-guide-ps">P.S. 全場掃描查的是<strong>同一個</strong>台服/韓服共用市場（API <code>server=all</code>），<strong>沒有</strong>依國家篩選。進度列「滿檔/滿星/滿技」為全場統計；若數字異常偏少，請看「圖鑑」「有檔次」是否接近 500 / 寵物總數 — 偏低代表圖鑑未載入，請 Ctrl+F5 並確認 <code>pets-data.js</code> 已部署。找特定寵物請用「快捷清單」（中文名）。</p>',
-      '<ol><li>Check at least one alloc filter: 🧬 full grade / ⭐ max star / 🎯 full skills (pick one first; refine later)</li><li>Clear the search box and turn off 🎯 exact search (avoids conflicts)</li><li>Reset item filters: mod scroll, soul oath, reroll seeds → All</li><li>Pet filters: card tier / race / mod / level (off 🍼 Lv1, clear Lv≥) → All (filter after scan)</li><li>Use 🐾 Pet scan, not 🔍 Search market</li><li>After 🐾 pet scan, to 🔍 search market again, turn off 🧬/⭐/🎯 alloc filters to avoid conflicts</li></ol><p class="pet-scan-guide-ps">P.S. One shared market for all regions (<code>server=all</code>) — no country filter. If full/star/skill counts look too low, check catalog (~500) and alloc counts in progress; deploy <code>pets-data.js</code> and hard-refresh. Use Quick list (Chinese names) for specific pets.</p>',
-      '<ol><li>만땅/만별/만기 중 최소 1개 선택 (하나만 켜고 스캔 후 추가 필터)</li><li>검색창 비우고 🎯 정확 검색 해제 (충돌 방지)</li><li>아이템 필터 기본값: 개조도·영령의 맹세·재시작 씨앗 → 전체</li><li>펫 필터: 카드등급/종족/개조/레벨(🍼 Lv1 해제, Lv≥ 비움) → 전체 (스캔 후 필터)</li><li>🔍 시장 검색이 아니라 🐾 전체 펫 스캔</li><li>🐾 스캔 후 🔍 시장 검색 시 🧬/⭐/🎯 필터 끄기 (충돌 방지)</li></ol><p class="pet-scan-guide-ps">P.S. 국가별 필터 없음 — TW/KR 동일 시장(<code>server=all</code>). 진행률의 만땅/만별/만기가 너무 적으면 「도감」「배분」 확인(도감 약 500). <code>pets-data.js</code> 배포 후 Ctrl+F5. 특정 펫은 「빠른 목록」(중국어 이름).</p>'
+      '<ol><li>至少勾一項檔次篩選：🧬滿檔 / ⭐滿星 / 🎯滿技（建議勾任一項，之後再篩選）</li><li>清空搜尋欄，並取消 🎯精確搜尋（避免搜尋衝突）</li><li>道具類篩選恢復預設：改造圖、英靈之誓、重來種子 → 全部</li><li>寵物篩選（展開寵物區）：卡等／種族／改造／等級（取消 🍼1等、清空 Lv≥）→ 全部（搜尋完再篩選）</li><li>按 🐾全場寵掃描，不是 🔍搜尋市場</li><li>🐾全場寵掃描完，若要 🔍搜尋市場，請關閉 🧬滿檔 / ⭐滿星 / 🎯滿技篩選，避免搜尋衝突</li></ol><p class="pet-scan-guide-ps">P.S. 搜尋需使用市場 API 的中文名稱；找特定寵物請善用「快捷清單」，儘量不要使用全場寵掃描。進度列的滿檔/滿星/滿技為全場統計，不含 🍼1等 等後續篩選。</p>',
+      '<ol><li>Check at least one alloc filter: 🧬 full grade / ⭐ max star / 🎯 full skills (pick one first; refine later)</li><li>Clear the search box and turn off 🎯 exact search (avoids conflicts)</li><li>Reset item filters: mod scroll, soul oath, reroll seeds → All</li><li>Pet filters: card tier / race / mod / level (off 🍼 Lv1, clear Lv≥) → All (filter after scan)</li><li>Use 🐾 Pet scan, not 🔍 Search market</li><li>After 🐾 pet scan, to 🔍 search market again, turn off 🧬/⭐/🎯 alloc filters to avoid conflicts</li></ol><p class="pet-scan-guide-ps">P.S. Market API uses Chinese pet names — use Quick list for specific pets. Progress full/star/skill counts are market-wide, before 🍼 Lv1 and other filters.</p>',
+      '<ol><li>만땅/만별/만기 중 최소 1개 선택 (하나만 켜고 스캔 후 추가 필터)</li><li>검색창 비우고 🎯 정확 검색 해제 (충돌 방지)</li><li>아이템 필터 기본값: 개조도·영령의 맹세·재시작 씨앗 → 전체</li><li>펫 필터: 카드등급/종족/개조/레벨(🍼 Lv1 해제, Lv≥ 비움) → 전체 (스캔 후 필터)</li><li>🔍 시장 검색이 아니라 🐾 전체 펫 스캔</li><li>🐾 스캔 후 🔍 시장 검색 시 🧬/⭐/🎯 필터 끄기 (충돌 방지)</li></ol><p class="pet-scan-guide-ps">P.S. 시장 API는 중국어 펫 이름 사용 — 특정 펫은 「빠른 목록」 권장. 진행률의 만땅/만별/만기는 🍼 Lv1 등 추가 필터 적용 전 전체 통계입니다.</p>'
     ),
     'price.gradeFilterTip': tr('改造圖', 'Mod scroll filter', '개조도 필터'),
     'price.gradeNormal': tr('普通', 'Normal', '일반'),
@@ -368,7 +368,11 @@
     'price.hint.petScanExactOn': tr('已勾 🎯精確搜尋 — 可能過濾掉結果', '🎯 Exact search may hide results', '🎯 정확 검색 ON'),
     'price.hint.petScanKeywordOn': tr('搜尋欄仍有「{kw}」— 市場 API 需中文名', 'Search box still has “{kw}” — API needs Chinese names', '검색창 「{kw}」 — API는 중국어 이름'),
     'price.hint.petScanPriceUnitOn': tr('交易單位限 {unit} — 改選「全部」可看另一幣別', 'Price unit: {unit} only — pick All for both', '거래 단위 {unit} — 「전체」로 변경'),
-    'price.hint.petScanItemTypeOn': tr('商品類型為「僅道具」— 寵物不會顯示', 'Item type: items only — pets hidden', '상품 유형: 아이템만 — 펫 숨김'),
+    'price.warn.lowPetAlloc': tr(
+      '⚠️ 掃描 {pets} 隻寵物，僅 {alloc} 隻（{pct}%）含檔次資料（AllocPoint）。滿檔/滿星判定不可信（本次：滿檔 {full} · 滿星 {star}）。常見原因：韓國/手機網路或代理截斷市場 API 回應；可試日本 VPN、Wi‑Fi，或稍後重掃。此工具<strong>沒有</strong>依國家篩選攤位。',
+      '⚠️ {pets} pets scanned but only {alloc} ({pct}%) include AllocPoint — full/star stats unreliable (full {full}, star {star}). Try Japan VPN or Wi‑Fi; not country-filtered.',
+      '⚠️ 펫 {pets}마리 중 {alloc}마리({pct}%)만 AllocPoint 있음 — 만땅/만별 부정확(만땅 {full}·만별 {star}). 일본 VPN/Wi‑Fi 시도. 국가별 필터 없음.'
+    ),
     'price.emptyNoTableMatch': tr('無符合條件的物品', 'No items match filters', '조건에 맞는 항목 없음'),
     'price.petScanPlaceholder': tr('【全場寵物】', '[All pets]', '[전체 펫]'),
 
