@@ -12,18 +12,33 @@
       --text-primary: #443c34; --text-secondary: #7a7268;
       --accent: #8b7355; --accent-soft: #ebe6de; --accent-gold: #b8956a;
       --accent-green: #6a9468; --accent-red: #b86868; --radius: 10px;
-      --crystal-battle: #2d8a8a; --crystal-vital: #b8860b; --crystal-mod: #6a9468;
+      --crystal-battle: #2d8a8a; --crystal-vital: #b8860b; --crystal-mod: #6a9468; --title-move: #9b7bb8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
-    .wrap { max-width: 1320px; margin: 0 auto; padding: 16px; }
+    .wrap { max-width: 1380px; margin: 0 auto; padding: 16px; }
     header { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
     header h1 { font-size: clamp(1.2rem, 4vw, 1.6rem); color: #6b5a45; }
     .header-nav { margin-left: auto; display: flex; flex-wrap: wrap; gap: 10px; }
     .header-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
     .header-nav a:hover { color: var(--text-primary); text-decoration: underline; }
-    .grid { display: grid; gap: 16px; grid-template-columns: 380px 1fr; }
-    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+    /* 三欄：配點 | 加成系統 | 裝備+能力 */
+    .grid {
+      display: grid; gap: 14px; align-items: start;
+      grid-template-columns: minmax(210px, 240px) minmax(280px, 320px) minmax(0, 1fr);
+    }
+    .card-points .field-row.level-row { grid-template-columns: 1fr; }
+    .card-points .field-row.points-stat-fields { grid-template-columns: 1fr; gap: 8px; }
+    .card-points .status-item { padding: 8px; }
+    .card-points .status-item .v { font-size: 1.1rem; }
+    @media (max-width: 1200px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .grid > .card-equip { grid-column: 1 / -1; }
+    }
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: 1fr; }
+      .grid > .card-equip { grid-column: auto; }
+    }
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 10px rgba(68,60,52,.06); }
     .card h2 { font-size: 1rem; margin-bottom: 12px; color: #6b5a45; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
     .hint { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; }
@@ -41,6 +56,7 @@
       background: var(--accent-soft); color: var(--accent); cursor: pointer; font-weight: 700; line-height: 1.4;
     }
     .stat-shortcut-btn:hover { background: var(--accent); color: #fff; }
+    .stat-shortcut-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     .stat-clear-all { margin-bottom: 10px; }
     .stat-clear-all .stat-shortcut-btn { padding: 4px 12px; font-size: 0.78rem; }
     .equip-extra-options {
@@ -50,7 +66,7 @@
     .equip-extra-options label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary); }
     .equip-extra-options input { accent-color: var(--accent); }
     .equip-extra-options .stat-shortcut-btn { padding: 4px 12px; font-size: 0.78rem; }
-    .slot-cluster { display: flex; align-items: center; gap: 6px; width: max-content; max-width: 46%; }
+    .slot-cluster { display: flex; align-items: center; gap: 6px; width: max-content; max-width: none; }
     .cluster-top { flex-direction: column; align-items: center; }
     .cluster-left { flex-direction: row; }
     .cluster-right { flex-direction: row; }
@@ -88,23 +104,32 @@
     .custom-stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 6px; }
     .custom-stat-grid label { font-size: 0.75rem; color: var(--text-secondary); display: block; }
     .custom-stat-grid input { width: 100%; margin-top: 2px; padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
-    .equip-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
-    @media (max-width: 768px) { .equip-layout { grid-template-columns: 1fr; } }
-    .results-column { display: flex; flex-direction: column; min-height: 100%; }
+    /* 裝備區略縮寬、略加高；能力結果接近配點欄寬 */
+    .equip-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 480px) minmax(220px, 240px);
+      gap: 14px;
+      align-items: stretch;
+      justify-content: start;
+    }
+    @media (max-width: 900px) { .equip-layout { grid-template-columns: 1fr; } }
+    .results-column { display: flex; flex-direction: column; min-height: 100%; max-width: 240px; width: 100%; }
+    @media (max-width: 900px) { .results-column { max-width: none; } }
     .equip-stage {
-      position: relative; height: 430px; border: 1px solid var(--border); border-radius: 12px;
+      position: relative; height: 480px; width: 100%; max-width: 480px;
+      border: 1px solid var(--border); border-radius: 12px;
       background: radial-gradient(closest-side, #f5e8da 40%, #faf4ec 100%);
       overflow: hidden;
     }
-    .equip-stage .slot { position: absolute; width: max-content; max-width: 44%; z-index: 1; }
-    .equip-stage .slot-cluster { z-index: 2; }
-    .slot.tl { left: 3%; top: 10%; }
-    .slot.tc { left: 50%; top: 1%; transform: translateX(-50%); }
-    .slot.tr { right: 3%; top: 10%; }
-    .slot.ml { left: 12%; top: 48%; transform: translateY(-50%); }
-    .slot.mr { right: 12%; top: 48%; transform: translateY(-50%); }
-    .slot.bl { left: 14%; bottom: 2%; }
-    .slot.br { right: 14%; bottom: 2%; }
+    .equip-stage .slot { position: absolute; width: max-content; max-width: none; z-index: 1; }
+    .equip-stage .slot-cluster { z-index: 2; max-width: none; }
+    .slot.tl { left: 3%; top: 11%; }
+    .slot.tc { left: 50%; top: 2%; transform: translateX(-50%); }
+    .slot.tr { right: 3%; top: 11%; }
+    .slot.ml { left: 5%; top: 48%; transform: translateY(-50%); }
+    .slot.mr { right: 5%; top: 48%; transform: translateY(-50%); }
+    .slot.bl { left: 12%; bottom: 3%; }
+    .slot.br { right: 12%; bottom: 3%; }
     .equip-btn {
       width: 96px; min-width: 96px; max-width: 96px; flex-shrink: 0;
       padding: 10px 8px; border: 1px solid var(--border); border-radius: 10px;
@@ -118,9 +143,22 @@
     .equip-btn .equip-thumb { width: 28px; height: 28px; object-fit: contain; image-rendering: pixelated; display: block; margin: 0 auto 4px; }
     .result-block { background: var(--accent-soft); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .result-block h3 { font-size: 0.92rem; margin-bottom: 8px; }
-    .result-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 0.92rem; }
-    .result-list.mod { grid-template-columns: repeat(3, 1fr); }
-    .result-item { display: flex; justify-content: space-between; gap: 8px; }
+    .result-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; font-size: 0.88rem; }
+    .result-mod-stack {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 10px;
+      align-items: start;
+    }
+    .result-list.mod-correct,
+    .result-list.mod-resist {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      font-size: 0.88rem;
+    }
+    .result-item { display: flex; justify-content: space-between; gap: 6px; min-width: 0; }
+    .result-item.spacer { visibility: hidden; pointer-events: none; }
+    .result-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .load-bar { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 14px; font-size: 0.9rem; color: var(--text-secondary); }
     .load-bar.ok { background: #f2f6f2; border-color: #c4d4c4; color: #4a684a; }
     .load-bar.err { background: #f8f4f0; border-color: #d4c8b8; color: #6b5a45; }
@@ -185,14 +223,65 @@
     table.compare th, table.compare td { border-bottom: 1px solid var(--border); padding: 8px; text-align: center; }
     table.compare th { background: var(--accent-soft); }
     .compare-wrap { overflow-x: auto; margin-top: 10px; }
-    .crystal-panel { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
-    .crystal-title { font-size: 0.92rem; margin-bottom: 6px; color: #6b5a45; }
-    .crystal-enable { display: block; font-size: 0.85rem; margin-bottom: 10px; cursor: pointer; color: var(--text-secondary); }
-    .crystal-enable input { accent-color: var(--accent); margin-right: 6px; }
+    .bonus-card .crystal-panel,
+    .bonus-card .title-ach-panel,
+    .bonus-card .train-panel { margin-top: 0; padding-top: 0; border-top: none; }
+    .bonus-card .title-ach-panel,
+    .bonus-card .train-panel { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); }
+    .crystal-title, .title-ach-title, .train-title { font-size: 0.92rem; margin-bottom: 6px; color: #6b5a45; }
+    .train-preview { margin-top: 8px; min-height: 2em; }
+    .train-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .train-stat-blocks { display: flex; flex-direction: column; gap: 10px; }
+    .train-stat-blocks.hidden { display: none; }
+    .train-stat-block-label {
+      font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;
+    }
+    .train-stat-grid {
+      display: grid;
+      gap: 8px;
+    }
+    .train-stat-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .train-stat-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .train-stat-grid label {
+      display: flex; flex-direction: column; gap: 4px;
+      font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);
+    }
+    .train-stat-grid input {
+      width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px;
+      background: #fff; font-size: 0.95rem; box-sizing: border-box;
+    }
+    @media (max-width: 520px) {
+      .train-stat-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .train-stat-grid.cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .title-ach-preview { margin-top: 8px; min-height: 2em; }
+    .title-ach-preview.active { color: var(--text-primary); }
+    .title-ach-ref-wrap { margin-top: 10px; }
+    .title-ach-ref-wrap details { border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+    .title-ach-ref-wrap summary {
+      cursor: pointer; padding: 8px 10px; font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);
+      list-style: none; user-select: none;
+    }
+    .title-ach-ref-wrap summary::-webkit-details-marker { display: none; }
+    .title-ach-ref-wrap summary::before { content: '▸ '; color: var(--accent); }
+    .title-ach-ref-wrap details[open] summary::before { content: '▾ '; }
+    .title-ach-ref-table-wrap { overflow-x: auto; max-height: 260px; overflow-y: auto; border-top: 1px solid var(--border); }
+    table.title-ach-ref-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    table.title-ach-ref-table th, table.title-ach-ref-table td {
+      border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; line-height: 1.4;
+    }
+    table.title-ach-ref-table thead th { background: var(--accent-soft); font-weight: 700; white-space: nowrap; color: #6b5a45; }
+    table.title-ach-ref-table tr:last-child th, table.title-ach-ref-table tr:last-child td { border-bottom: none; }
+    table.title-ach-ref-table tr.active-tier { background: #eef8ee; }
+    table.title-ach-ref-table .tier-on { color: #2e7d32; font-weight: 700; }
+    table.title-ach-ref-table .tier-off { color: var(--text-secondary); opacity: 0.55; }
+    table.title-ach-ref-table .bonus-cell { font-weight: 600; }
+    table.title-ach-ref-table .crystal-grp { display: inline; font-weight: 600; }
+    table.title-ach-ref-table .bonus-sep { color: var(--text-secondary); font-weight: 500; }
+    .bonus-quick-label { font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); margin: 0 0 6px; }
+    .title-ach-quick, .crystal-level-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .crystal-fields { margin-top: 0; grid-template-columns: 1fr; }
     .crystal-roll-actions { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
-    .crystal-panel.disabled .crystal-fields,
-    .crystal-panel.disabled .crystal-roll-actions,
-    .crystal-panel.disabled .crystal-custom-panel { opacity: 0.45; pointer-events: none; }
     #crystalStatPreview { margin-top: 8px; min-height: 2em; }
     .crystal-custom-panel { margin-top: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
     .crystal-custom-panel.hidden { display: none; }
@@ -228,10 +317,19 @@
     .crystal-grp-battle, .crystal-ref-grp.crystal-grp-battle { color: var(--crystal-battle); }
     .crystal-grp-vital, .crystal-ref-grp.crystal-grp-vital { color: var(--crystal-vital); }
     .crystal-grp-mod, .crystal-ref-grp.crystal-grp-mod { color: var(--crystal-mod); }
-    #crystalStatPreview .crystal-preview-label { display: block; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
-    #crystalStatPreview .crystal-preview-stats { display: block; }
-    #crystalStatPreview .crystal-grp { display: block; font-weight: 600; }
-    #crystalStatPreview .crystal-grp + .crystal-grp { margin-top: 2px; }
+    .crystal-grp-move { color: var(--title-move); }
+    #crystalStatPreview .crystal-preview-label,
+    #titleAchPreview .crystal-preview-label,
+    #trainPreview .crystal-preview-label { display: block; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+    #crystalStatPreview .crystal-preview-stats,
+    #titleAchPreview .crystal-preview-stats,
+    #trainPreview .crystal-preview-stats { display: block; }
+    #crystalStatPreview .crystal-grp,
+    #titleAchPreview .crystal-grp,
+    #trainPreview .crystal-grp { display: block; font-weight: 600; }
+    #crystalStatPreview .crystal-grp + .crystal-grp,
+    #titleAchPreview .crystal-grp + .crystal-grp,
+    #trainPreview .crystal-grp + .crystal-grp { margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -250,8 +348,8 @@
   <input type="file" id="equipFileInput" accept=".json,application/json" hidden>
 
   <div class="grid">
-    <section class="card">
-      <h2 data-i18n="char.params">參數設定</h2>
+    <section class="card card-points">
+      <h2 data-i18n="char.params">配點設定</h2>
       <p class="hint" data-i18n="char.paramsHint">單項上限為可配點數的一半。</p>
       <div class="status">
         <div class="status-item"><div class="k" data-i18n="char.pointsAvail">可配點數</div><div class="v" id="pointsAvail">0</div></div>
@@ -262,21 +360,25 @@
       <div class="stat-clear-all">
         <button type="button" class="stat-shortcut-btn" id="clearAllStatsBtn" data-i18n="char.clearStats">清空全配點</button>
       </div>
-      <div class="field-row">
+      <div class="field-row level-row">
         <div class="field"><label data-i18n="char.level">預測等級</label><input type="number" id="level" value="120" min="1" max="200"></div>
       </div>
-      <div class="field-row">
+      <div class="field-row points-stat-fields">
         <div class="field"><div class="field-head"><label for="vit" data-i18n="char.vit">體力</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="vit" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="vit" value="0" min="0"></div>
         <div class="field"><div class="field-head"><label for="str" data-i18n="char.str">力量</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="str" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="str" value="0" min="0"></div>
         <div class="field"><div class="field-head"><label for="def" data-i18n="char.defStat">強度</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="def" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="def" value="0" min="0"></div>
         <div class="field"><div class="field-head"><label for="agi" data-i18n="char.agiStat">速度</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="agi" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="agi" value="0" min="0"></div>
         <div class="field"><div class="field-head"><label for="mag" data-i18n="char.mag">魔法</label><div class="stat-shortcuts"><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="100">100</button><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="max" data-i18n="common.max">滿</button><button type="button" class="stat-shortcut-btn" data-stat="mag" data-mode="remain" data-i18n="common.remain">剩餘</button></div></div><input type="number" id="mag" value="0" min="0"></div>
       </div>
+    </section>
+
+    <section class="card bonus-card">
+      <h2 data-i18n="char.bonusSystems">加成系統</h2>
       <div class="crystal-panel" id="crystalPanel">
         <h3 class="crystal-title" data-i18n="char.crystal">水晶改造</h3>
-        <label class="crystal-enable"><input type="checkbox" id="crystalEnabled"> <span data-i18n="char.crystalEnable">計入水晶能力</span></label>
+        <div class="bonus-quick-label" data-i18n="char.crystalLevel">水晶等級</div>
+        <div class="crystal-level-quick" id="crystalLevelQuick"></div>
         <div class="field-row crystal-fields">
-          <div class="field"><label for="crystalLevel" data-i18n="char.crystalLevel">水晶等級</label><input type="number" id="crystalLevel" value="1" min="1" max="10"></div>
           <div class="field"><label for="crystalRollMode" data-i18n="char.crystalRollMode">區間取値</label><select id="crystalRollMode">
             <option value="random" data-i18n-opt="common.random">隨機</option>
             <option value="min" data-i18n-opt="common.min">最低</option>
@@ -293,7 +395,7 @@
           <div class="crystal-custom-title" data-i18n="char.crystalCustomTitle">自選詞條（每級擇一，區間取平均）</div>
           <div id="crystalCustomRows"></div>
         </div>
-        <div id="crystalStatPreview" class="equip-stat-preview" data-i18n="char.crystalNoRoll">未計入水晶能力</div>
+        <div id="crystalStatPreview" class="equip-stat-preview"></div>
         <div class="crystal-ref-wrap">
           <details id="crystalRefDetails">
             <summary data-i18n="char.crystalRefSummary">升級詞條表（每級隨機擇一）</summary>
@@ -301,9 +403,27 @@
           </details>
         </div>
       </div>
+      <div class="title-ach-panel" id="titleAchPanel">
+        <h3 class="title-ach-title" data-i18n="char.titleAch">稱號成就</h3>
+        <div class="bonus-quick-label" data-i18n="char.titleAchTier">成就門檻</div>
+        <div class="title-ach-quick" id="titleAchQuick"></div>
+        <div id="titleAchPreview" class="equip-stat-preview title-ach-preview" data-i18n="char.titleAchNone">尚未達到任何成就門檻</div>
+        <div class="title-ach-ref-wrap">
+          <details id="titleAchRefDetails">
+            <summary data-i18n="char.titleAchRefSummary">成就加成一覽（疊加）</summary>
+            <div id="titleAchRefTable" class="title-ach-ref-table-wrap"></div>
+          </details>
+        </div>
+      </div>
+      <div class="train-panel" id="trainPanel">
+        <h3 class="train-title" data-i18n="char.train">修練</h3>
+        <div class="train-actions" id="trainQuick"></div>
+        <div class="train-fields train-stat-blocks hidden" id="trainStatGrid"></div>
+        <div id="trainPreview" class="equip-stat-preview train-preview" data-i18n="char.trainNone">各項皆 Lv0，無加成</div>
+      </div>
     </section>
 
-    <section class="card">
+    <section class="card card-equip">
       <div class="equip-layout">
         <div>
           <h2 data-i18n="char.equip">裝備模擬</h2>
@@ -320,7 +440,7 @@
             </div>
             <div class="equip-extra-options">
               <button type="button" class="stat-shortcut-btn" id="clearAllEquipsBtn" data-i18n="char.clearEquips">清空全裝備</button>
-              <label><input type="checkbox" id="hyorikiToggle"> <span data-i18n="char.hyoriki">百靈耐（玩家製作／水龍系列 攻防敏回精 +5%）</span></label>
+              <label><input type="checkbox" id="hyorikiToggle"> <span data-i18n="char.hyoriki">百靈耐（玩家製作／水龍：武器攻、防具防、敏回精 +5%）</span></label>
             </div>
           </div>
           <div id="equipStatPreview" class="equip-stat-preview" data-i18n="char.equipPreviewHint">游標指向已裝備欄位或寶石／附魔石可預覽效果</div>
@@ -333,7 +453,10 @@
           </div>
           <div class="result-block">
             <h3 data-i18n="char.modResults">修正與抗值</h3>
-            <div class="result-list mod" id="modResults"></div>
+            <div class="result-mod-stack">
+              <div class="result-list mod-correct" id="correctResults"></div>
+              <div class="result-list mod-resist" id="resistResults"></div>
+            </div>
           </div>
           <div id="customStatPanel" class="custom-stat-panel hidden"></div>
         </div>
@@ -382,7 +505,7 @@
 
 <script src="starcg_i18n.js"></script>
 <script src="starcg_game_names.js"></script>
-<script src="starcg_i18n_char_pet.js?v=20260730"></script>
+<script src="starcg_i18n_char_pet.js?v=20260804l"></script>
 <script src="starcg_i18n_messages.js"></script>
 <script src="gems_data.js"></script>
 <script src="equipment_catalog.js?v=20260730" async id="equipCatalogScript"></script>
@@ -467,11 +590,13 @@ const STAT_LABELS = new Proxy({}, { get: (_, k) => statLabel(k) });
 
 const COMPARE_KEYS = ['hp','mp','atk','def','agi','rec','spt','matk','amres','crit','hit','counter','dodge','poison','stone','drunk','sleep','chaos','forget'];
 const COMPARE_FROM_SUM = new Set(['hp','mp','atk','def','agi','rec','spt','matk','amres']);
-const RESULT_BASIC_KEYS = COMPARE_KEYS.filter(k => COMPARE_FROM_SUM.has(k));
-const RESULT_MOD_KEYS = COMPARE_KEYS.filter(k => !COMPARE_FROM_SUM.has(k));
+/** 能力結果基本值排版：生命魔力／攻擊回復／防禦精神／敏捷魔攻／魔抗 */
+const RESULT_BASIC_KEYS = ['hp', 'mp', 'atk', 'rec', 'def', 'spt', 'agi', 'matk', 'amres'];
+const RESULT_MOD_CORRECT_KEYS = ['crit', 'counter', 'hit', 'dodge'];
+const RESULT_MOD_RESIST_KEYS = ['poison', 'sleep', 'stone', 'drunk', 'chaos', 'forget'];
+const RESULT_MOD_KEYS = [...RESULT_MOD_CORRECT_KEYS, ...RESULT_MOD_RESIST_KEYS];
 const BASIC_KEYS = [...RESULT_BASIC_KEYS, 'charm'];
 const MOD_KEYS = [...RESULT_MOD_KEYS];
-const GENERAL_CORE_KEYS = ['atk', 'def', 'agi', 'rec', 'spt'];
 const HYORIKI_RATE = 1.05;
 
 const CRYSTAL_BASE = { hp: 10, mp: 10, atk: 1, def: 1, agi: 1 };
@@ -603,6 +728,31 @@ function renderCrystalRefTable() {
 
 const RESIST_KEYS = ['poison','sleep','stone','drunk','chaos','forget'];
 const CORRECT_KEYS = ['crit','counter','hit','dodge'];
+
+/** 稱號成就加成（疊加；need = 稱號數量門檻） */
+const TITLE_ACHIEVEMENT_TIERS = [
+  { need: 5, bonuses: { atk: 5, def: 5, agi: 5 } },
+  { need: 10, bonuses: { spt: 4, mp: 40 } },
+  { need: 15, bonuses: { rec: 4, hp: 40 } },
+  { need: 20, bonuses: Object.fromEntries(RESIST_KEYS.map(k => [k, 1])), allResist: true },
+  { need: 25, bonuses: { agi: 10, spt: 4 } },
+  { need: 30, bonuses: { def: 10, rec: 4 } },
+  { need: 35, bonuses: { atk: 10, spt: 4 } },
+  { need: 40, bonuses: { dodge: 1, hit: 1, crit: 1, counter: 1 } },
+  { need: 45, bonuses: {}, moveSpeedPct: 5 },
+  { need: 50, bonuses: { dodge: 1, hit: 1, crit: 1, counter: 1 } },
+  { need: 55, bonuses: { spt: 6, mp: 60 } },
+  { need: 60, bonuses: { rec: 6, hp: 60 } },
+  { need: 65, bonuses: { atk: 10, def: 10, agi: 10 } },
+  { need: 70, bonuses: { dodge: 1, hit: 1, crit: 1, counter: 1 } },
+];
+const TITLE_ACH_QUICK = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70];
+const CRYSTAL_LEVEL_QUICK = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+let crystalLevel = 1;
+let titleCount = 0;
+const TRAIN_KEYS = [...CORRECT_KEYS, ...RESIST_KEYS];
+let trainLevels = Object.fromEntries(TRAIN_KEYS.map(k => [k, 0]));
+let trainCustomOpen = false;
 const PICKER_FLAT_CATEGORIES = new Set(['fudan', 'water-dragon', 'princess-legend', ...SLOT_CATEGORY_ORDER.acc]);
 const PICKER_STAT_GROUP_LABELS = { basic: 'char.picker.basic', extra: 'char.picker.extra' };
 const STAT_MODE_OPTIONS = [
@@ -613,6 +763,15 @@ const STAT_MODE_OPTIONS = [
   { value: 'custom', labelKey: 'char.mode.custom', ratio: null },
 ];
 const STAT_MODE_RATIOS = Object.fromEntries(STAT_MODE_OPTIONS.filter(o => o.ratio != null).map(o => [o.value, o.ratio]));
+
+/** 標籤語意：頂值 × 比例（近頂 90% / 中上 80% / 平均 50%），不是 min~max 線性插值 */
+function resolveScaledByMode(min, max, mode) {
+  if (min === max) return min;
+  const ratio = STAT_MODE_RATIOS[mode];
+  if (ratio == null || ratio >= 1) return max;
+  return Math.round(max * ratio);
+}
+
 const CATEGORY_MOD_IGNORE = {
   dagger: ['crit'], axe: ['crit'],
   spear: ['counter', 'hit'],
@@ -712,9 +871,9 @@ function scaleGem(n, ratio) {
 function resolveGemEffectValue(val, mode) {
   if (!Array.isArray(val)) return val;
   const [min, max] = val;
-  if (min === max) return min;
-  const r = STAT_MODE_RATIOS[mode] ?? 1;
-  return Math.round(min + (max - min) * r);
+  // 寶石「最低」取區間下限；其餘與裝備相同：頂值 × 模式比例，再乘打洞倍率
+  if (mode === 'min') return min;
+  return resolveScaledByMode(min, max, mode);
 }
 
 function applyGemEffectObject(out, baseStats, eff, mode, ratio) {
@@ -767,9 +926,7 @@ function resolveEnchantValue(type, level, mode) {
   const range = gd().ENCHANT_RANGES[type]?.[level - 1];
   if (!range) return 0;
   const [min, max] = range;
-  if (min === max) return min;
-  const ratio = STAT_MODE_RATIOS[mode] ?? 1;
-  return Math.round(min + (max - min) * ratio);
+  return resolveScaledByMode(min, max, mode);
 }
 
 function applyEnchantBonus(decor, slotId) {
@@ -782,7 +939,7 @@ function applyEnchantBonus(decor, slotId) {
 
 function resolveSlotStats(item, slotId) {
   const { general, mod } = getStatModes();
-  const base = resolveEquipStats(item, general, mod, equipCustomStats[slotId]);
+  const base = resolveEquipStats(item, general, mod, equipCustomStats[slotId], slotId);
   const decor = effectiveDecor(slotId);
   const gem = applyGemBonus(base, decor, slotId);
   const out = { ...base };
@@ -829,7 +986,7 @@ function formatDecorEffectPreview(slotId, kind) {
   const name = getDecorDisplayName(slotId, kind);
   if (!item || !name) return null;
   const { general, mod } = getStatModes();
-  const base = resolveEquipStats(item, general, mod, equipCustomStats[slotId]);
+  const base = resolveEquipStats(item, general, mod, equipCustomStats[slotId], slotId);
   const stats = kind === 'gem'
     ? applyGemBonus(base, decor, slotId)
     : applyEnchantBonus(decor, slotId);
@@ -942,7 +1099,7 @@ function formatDecorPickerPreview(item, slotId) {
   if (!item) return '—';
   const { general, mod } = getStatModes();
   const base = equips[slotId]
-    ? resolveEquipStats(equips[slotId], general, mod, equipCustomStats[slotId])
+    ? resolveEquipStats(equips[slotId], general, mod, equipCustomStats[slotId], slotId)
     : emptyEquipStats();
   if (item.pickerKind === 'gem') {
     const fakeDecor = { ...effectiveDecor(slotId), gemType: item.gemType, gemLevel: item.gemLevel };
@@ -1020,12 +1177,11 @@ function resolveStatValue(item, key, mode, customMap) {
     }
     mode = 'max';
   }
-  const ratio = STAT_MODE_RATIOS[mode] ?? 1;
   if (item.ranges?.[key]) {
     const [min, max] = item.ranges[key];
-    if (min === max) return min;
-    return Math.round(min + (max - min) * ratio);
+    return resolveScaledByMode(min, max, mode);
   }
+  // 無區間 = 固定值，不套比例
   return item.stats?.[key] ?? 0;
 }
 
@@ -1047,18 +1203,33 @@ function isPlayerMadeEquip(item) {
   return item.categorySlug === 'water-dragon' || WATER_DRAGON_NAMES.has(item.name);
 }
 
-function applyHyorikiBonus(stats, item, generalMode) {
+function resolveHyorikiSlot(item, slotId) {
+  if (slotId) return slotId;
+  return item?.calcSlot || null;
+}
+
+/** 百靈耐：武器只加攻、防具只加防；敏／回／精各部位有值都加 */
+function hyorikiBonusKeys(slotId) {
+  const keys = ['agi', 'rec', 'spt'];
+  if (slotId === 'weapon') keys.unshift('atk');
+  else if (slotId === 'hat' || slotId === 'body' || slotId === 'shoes' || slotId === 'shield') keys.unshift('def');
+  return keys;
+}
+
+function applyHyorikiBonus(stats, item, generalMode, slotId) {
   if (!isHyorikiEnabled() || generalMode === 'custom' || !isPlayerMadeEquip(item)) return stats;
+  const slot = resolveHyorikiSlot(item, slotId);
+  if (!slot) return stats;
   const out = { ...stats };
-  for (const k of GENERAL_CORE_KEYS) {
+  for (const k of hyorikiBonusKeys(slot)) {
     const val = out[k] || 0;
     if (val) out[k] = Math.floor(val * HYORIKI_RATE);
   }
   return out;
 }
 
-function resolveEquipStats(item, generalMode, modMode, customMap) {
-  return applyHyorikiBonus(resolveStats(item, generalMode, modMode, customMap), item, generalMode);
+function resolveEquipStats(item, generalMode, modMode, customMap, slotId = null) {
+  return applyHyorikiBonus(resolveStats(item, generalMode, modMode, customMap), item, generalMode, slotId);
 }
 
 function initCustomStatsForSlot(slotId, generalMode, modMode) {
@@ -1161,7 +1332,9 @@ function formatStatLine(stats) {
 function formatItemStatPreview(item, slotId = null) {
   if (!item) return '';
   const { general, mod } = getStatModes();
-  const stats = slotId != null ? resolveSlotStats(item, slotId) : resolveEquipStats(item, general, mod, null);
+  const stats = slotId != null
+    ? resolveSlotStats(item, slotId)
+    : resolveEquipStats(item, general, mod, null, item?.calcSlot || null);
   const basic = BASIC_KEYS.filter(k => stats[k]).map(k => `${STAT_LABELS[k]}${stats[k] > 0 ? '+' : ''}${stats[k]}`);
   const modLine = MOD_KEYS.filter(k => stats[k]).map(k => `${STAT_LABELS[k]}${stats[k] > 0 ? '+' : ''}${stats[k]}`);
   const detail = [basic.join(' · '), modLine.join(' · ')].filter(Boolean).join(' ｜ ') || '—';
@@ -1264,9 +1437,16 @@ function rollCrystalTier(t, mode) {
   return { idx, val: resolveCrystalRollValue(opt, mode) };
 }
 
+function getCrystalLevel() {
+  return Math.max(1, Math.min(10, crystalLevel || 1));
+}
+
+function setCrystalLevel(lv) {
+  crystalLevel = Math.max(1, Math.min(10, Math.round(Number(lv)) || 1));
+}
+
 function ensureCrystalRolls({ rerollAll = false } = {}) {
-  if (!document.getElementById('crystalEnabled')?.checked) return;
-  const lvl = Math.min(10, Math.max(1, getNum('crystalLevel') || 1));
+  const lvl = getCrystalLevel();
   const mode = getCrystalRollMode();
   for (let t = 0; t < 9; t++) {
     if (t >= lvl - 1) {
@@ -1296,8 +1476,8 @@ function refreshCrystalRollValues() {
   }
 }
 
-function buildCrystalTierSelectHtml(t, selectedIdx) {
-  const tier = CRYSTAL_UPGRADE_TIERS[t];
+function buildCrystalTierSelectHtml(tierIdx, selectedIdx) {
+  const tier = CRYSTAL_UPGRADE_TIERS[tierIdx];
   return CRYSTAL_STAT_GROUPS.map(g => {
     const items = tier.map((o, idx) => ({ o, idx })).filter(({ o }) => g.keys.includes(o.key));
     if (!items.length) return '';
@@ -1313,11 +1493,10 @@ function renderCrystalCustomPanel() {
   const rows = document.getElementById('crystalCustomRows');
   if (!panel || !rows) return;
   const mode = getCrystalRollMode();
-  const enabled = document.getElementById('crystalEnabled')?.checked;
-  panel.classList.toggle('hidden', mode !== 'custom' || !enabled);
-  if (mode !== 'custom' || !enabled) return;
+  const lvl = getCrystalLevel();
+  panel.classList.toggle('hidden', mode !== 'custom');
+  if (mode !== 'custom') return;
 
-  const lvl = Math.min(10, Math.max(1, getNum('crystalLevel') || 1));
   if (lvl <= 1) {
     rows.innerHTML = `<p class="hint" style="margin:0">${t('char.crystalNoTier')}</p>`;
     return;
@@ -1345,10 +1524,9 @@ function formatCrystalOption(opt) {
 }
 
 function getCrystalStats() {
-  if (!document.getElementById('crystalEnabled')?.checked) return emptyEquipStats();
   const out = emptyEquipStats();
+  const lvl = getCrystalLevel();
   for (const [k, v] of Object.entries(CRYSTAL_BASE)) out[k] = v;
-  const lvl = Math.min(10, Math.max(1, getNum('crystalLevel') || 1));
   for (let t = 0; t < lvl - 1; t++) {
     const roll = crystalRolls[t];
     if (!roll) continue;
@@ -1359,8 +1537,249 @@ function getCrystalStats() {
   return out;
 }
 
+function getTitleCount() {
+  return Math.max(0, Math.min(200, titleCount || 0));
+}
+
+function setTitleCount(n) {
+  titleCount = Math.max(0, Math.min(200, Math.round(Number(n)) || 0));
+}
+
+function titleBonusColorClass(key) {
+  if (key === 'moveSpeedPct') return 'crystal-grp-move';
+  if (['atk', 'def', 'agi'].includes(key)) return 'crystal-grp-battle';
+  if (['hp', 'mp', 'spt', 'rec'].includes(key)) return 'crystal-grp-vital';
+  if (['crit', 'counter', 'hit', 'dodge', ...RESIST_KEYS].includes(key) || key === 'allResist') {
+    return 'crystal-grp-mod';
+  }
+  return 'crystal-grp-mod';
+}
+
+function formatTitleTierBonusHtml(tier) {
+  const chunks = [];
+  if (tier.allResist) {
+    const txt = `${t('char.titleAchAllResist')}+${tier.bonuses.poison || 1}`;
+    chunks.push(`<span class="crystal-grp ${titleBonusColorClass('allResist')}">${escapeHtml(txt)}</span>`);
+  } else {
+    for (const [k, v] of Object.entries(tier.bonuses || {})) {
+      if (!v) continue;
+      const txt = `${STAT_LABELS[k] || k}${v > 0 ? '+' : ''}${v}`;
+      chunks.push(`<span class="crystal-grp ${titleBonusColorClass(k)}">${escapeHtml(txt)}</span>`);
+    }
+  }
+  if (tier.moveSpeedPct) {
+    const txt = `${t('char.titleAchMoveSpeed')}+${tier.moveSpeedPct}%`;
+    chunks.push(`<span class="crystal-grp ${titleBonusColorClass('moveSpeedPct')}">${escapeHtml(txt)}</span>`);
+  }
+  if (!chunks.length) return '—';
+  return chunks.join('<span class="bonus-sep"> · </span>');
+}
+
+function getTitleAchievementStats() {
+  const out = emptyEquipStats();
+  out.moveSpeedPct = 0;
+  const n = getTitleCount();
+  for (const tier of TITLE_ACHIEVEMENT_TIERS) {
+    if (n < tier.need) continue;
+    for (const [k, v] of Object.entries(tier.bonuses || {})) {
+      out[k] = (out[k] || 0) + v;
+    }
+    if (tier.moveSpeedPct) out.moveSpeedPct += tier.moveSpeedPct;
+  }
+  return out;
+}
+
+function clampTrainLv(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(5, Math.round(n)));
+}
+
+function syncTrainLevelsFromInputs() {
+  document.querySelectorAll('#trainStatGrid input[data-train-stat]').forEach(inp => {
+    const k = inp.dataset.trainStat;
+    const lv = clampTrainLv(inp.value);
+    trainLevels[k] = lv;
+    if (String(inp.value) !== String(lv)) inp.value = lv;
+  });
+}
+
+function getTrainStats() {
+  const out = emptyEquipStats();
+  for (const k of TRAIN_KEYS) {
+    const lv = clampTrainLv(trainLevels[k]);
+    if (lv) out[k] = lv;
+  }
+  return out;
+}
+
 function getCombinedBonusStats() {
-  return mergeStatMaps(getEquipTotals(), getCrystalStats());
+  return mergeStatMaps(
+    mergeStatMaps(mergeStatMaps(getEquipTotals(), getCrystalStats()), getTitleAchievementStats()),
+    getTrainStats()
+  );
+}
+
+function setAllTrainLevels(lv) {
+  const v = clampTrainLv(lv);
+  for (const k of TRAIN_KEYS) trainLevels[k] = v;
+  document.querySelectorAll('#trainStatGrid input[data-train-stat]').forEach(inp => {
+    inp.value = v;
+  });
+}
+
+function getUniformTrainLevel() {
+  const first = clampTrainLv(trainLevels[TRAIN_KEYS[0]]);
+  return TRAIN_KEYS.every(k => clampTrainLv(trainLevels[k]) === first) ? first : null;
+}
+
+function setTrainCustomOpen(open) {
+  trainCustomOpen = !!open;
+  const grid = document.getElementById('trainStatGrid');
+  grid?.classList.toggle('hidden', !trainCustomOpen);
+  if (trainCustomOpen) {
+    document.querySelectorAll('#trainStatGrid input[data-train-stat]').forEach(inp => {
+      inp.value = clampTrainLv(trainLevels[inp.dataset.trainStat]);
+    });
+  }
+}
+
+function renderTrainQuick() {
+  const el = document.getElementById('trainQuick');
+  if (!el) return;
+  const uniform = getUniformTrainLevel();
+  const nums = [0, 1, 2, 3, 4, 5].map(n =>
+    `<button type="button" class="stat-shortcut-btn${!trainCustomOpen && uniform === n ? ' active' : ''}" data-train-all="${n}">${n}</button>`
+  ).join('');
+  const customBtn = `<button type="button" class="stat-shortcut-btn${trainCustomOpen ? ' active' : ''}" data-train-custom="1">${t('common.custom')}</button>`;
+  el.innerHTML = nums + customBtn;
+  el.querySelectorAll('button[data-train-all]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setAllTrainLevels(+btn.dataset.trainAll);
+      setTrainCustomOpen(false);
+      updateTrainPreview();
+      recalc(false);
+    });
+  });
+  el.querySelector('button[data-train-custom]')?.addEventListener('click', () => {
+    setTrainCustomOpen(true);
+    updateTrainPreview();
+    recalc(false);
+  });
+}
+
+function renderTrainStatInputs(keys) {
+  return keys.map(k => {
+    const lv = clampTrainLv(trainLevels[k]);
+    return `<label>${STAT_LABELS[k]}
+      <input type="number" min="0" max="5" step="1" value="${lv}" data-train-stat="${k}">
+    </label>`;
+  }).join('');
+}
+
+function renderTrainStatGrid() {
+  const el = document.getElementById('trainStatGrid');
+  if (!el) return;
+  el.innerHTML = `
+    <div>
+      <div class="train-stat-block-label">${escapeHtml(t('char.trainGroupMod'))}</div>
+      <div class="train-stat-grid cols-4">${renderTrainStatInputs(CORRECT_KEYS)}</div>
+    </div>
+    <div>
+      <div class="train-stat-block-label">${escapeHtml(t('char.trainGroupResist'))}</div>
+      <div class="train-stat-grid cols-3">${renderTrainStatInputs(RESIST_KEYS)}</div>
+    </div>`;
+}
+
+function updateTrainPreview() {
+  syncTrainLevelsFromInputs();
+  renderTrainQuick();
+  const el = document.getElementById('trainPreview');
+  if (!el) return;
+  const stats = getTrainStats();
+  const items = TRAIN_KEYS.filter(k => stats[k]).map(k =>
+    `${STAT_LABELS[k]}${stats[k] > 0 ? '+' : ''}${stats[k]}`
+  );
+  if (!items.length) {
+    el.classList.remove('active');
+    el.textContent = t('char.trainNone');
+    return;
+  }
+  el.classList.add('active');
+  el.innerHTML = `<span class="crystal-preview-label">${t('char.trainPreview')}</span>`
+    + `<span class="crystal-preview-stats"><span class="crystal-grp crystal-grp-mod">${escapeHtml(items.join(' · '))}</span></span>`;
+}
+
+function renderTitleAchQuick() {
+  const el = document.getElementById('titleAchQuick');
+  if (!el) return;
+  const cur = getTitleCount();
+  el.innerHTML = TITLE_ACH_QUICK.map(n =>
+    `<button type="button" class="stat-shortcut-btn${n === cur ? ' active' : ''}" data-title-n="${n}">${n}</button>`
+  ).join('');
+  el.querySelectorAll('button[data-title-n]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setTitleCount(btn.dataset.titleN);
+      updateTitleAchPreview();
+      recalc(false);
+    });
+  });
+}
+
+function renderTitleAchRefTable() {
+  const el = document.getElementById('titleAchRefTable');
+  if (!el) return;
+  const n = getTitleCount();
+  const rows = TITLE_ACHIEVEMENT_TIERS.map(tier => {
+    const on = n >= tier.need;
+    return `<tr class="${on ? 'active-tier' : ''}">
+      <td class="${on ? 'tier-on' : 'tier-off'}">${on ? '✓' : '—'}</td>
+      <td>${tier.need}</td>
+      <td class="bonus-cell">${formatTitleTierBonusHtml(tier)}</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table class="title-ach-ref-table"><thead><tr>
+    <th>${t('char.titleAchActive')}</th>
+    <th>${t('char.titleAchTier')}</th>
+    <th>${t('char.titleAchBonus')}</th>
+  </tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function updateTitleAchPreview() {
+  renderTitleAchQuick();
+  renderTitleAchRefTable();
+  const el = document.getElementById('titleAchPreview');
+  if (!el) return;
+  const stats = getTitleAchievementStats();
+  const n = getTitleCount();
+  const activeTiers = TITLE_ACHIEVEMENT_TIERS.filter(tier => n >= tier.need).length;
+  if (!activeTiers) {
+    el.classList.remove('active');
+    el.textContent = t('char.titleAchNone');
+    return;
+  }
+  el.classList.add('active');
+  el.innerHTML = `<span class="crystal-preview-label">${t('char.titleAchPreview', { n, tiers: activeTiers })}</span>`
+    + `<span class="crystal-preview-stats">${formatTitleAchStatLine(stats)}</span>`;
+}
+
+function formatTitleAchStatLine(stats) {
+  const groups = [
+    { cls: 'crystal-grp-battle', keys: ['atk', 'def', 'agi'] },
+    { cls: 'crystal-grp-vital', keys: ['hp', 'mp', 'spt', 'rec'] },
+    { cls: 'crystal-grp-mod', keys: ['crit', 'counter', 'hit', 'dodge', ...RESIST_KEYS] },
+  ];
+  const lines = groups.map(g => {
+    const items = g.keys.filter(k => stats[k]).map(k =>
+      `${STAT_LABELS[k] || k}${stats[k] > 0 ? '+' : ''}${stats[k]}`
+    );
+    if (!items.length) return '';
+    return `<span class="crystal-grp ${g.cls}">${escapeHtml(items.join(' · '))}</span>`;
+  }).filter(Boolean);
+  if (stats.moveSpeedPct) {
+    lines.push(`<span class="crystal-grp crystal-grp-move">${escapeHtml(`${t('char.titleAchMoveSpeed')}+${stats.moveSpeedPct}%`)}</span>`);
+  }
+  return lines.join('') || '—';
 }
 
 function formatCrystalStatLine(stats) {
@@ -1375,9 +1794,23 @@ function formatCrystalStatLine(stats) {
   return groups.join('') || '—';
 }
 
+function renderCrystalLevelQuick() {
+  const el = document.getElementById('crystalLevelQuick');
+  if (!el) return;
+  const cur = getCrystalLevel();
+  el.innerHTML = CRYSTAL_LEVEL_QUICK.map(n =>
+    `<button type="button" class="stat-shortcut-btn${n === cur ? ' active' : ''}" data-crystal-lv="${n}">${n}</button>`
+  ).join('');
+  el.querySelectorAll('button[data-crystal-lv]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setCrystalLevel(btn.dataset.crystalLv);
+      ensureCrystalRolls();
+      recalc();
+    });
+  });
+}
+
 function updateCrystalPanelState() {
-  const enabled = document.getElementById('crystalEnabled')?.checked;
-  document.getElementById('crystalPanel')?.classList.toggle('disabled', !enabled);
   const mode = getCrystalRollMode();
   document.getElementById('crystalRerollBtn')?.classList.toggle('hidden', mode === 'custom');
   const hint = document.getElementById('crystalRollHint');
@@ -1389,13 +1822,9 @@ function updateCrystalPanelState() {
 
 function updateCrystalPreview() {
   updateCrystalPanelState();
+  renderCrystalLevelQuick();
   const el = document.getElementById('crystalStatPreview');
   if (!el) return;
-  if (!document.getElementById('crystalEnabled')?.checked) {
-    el.classList.remove('active');
-    el.textContent = t('char.crystalNoRoll');
-    return;
-  }
   const c = getCrystalStats();
   el.classList.add('active');
   const line = formatCrystalStatLine(c);
@@ -1433,15 +1862,20 @@ function recalc(refreshCustomPanel = true) {
     amres: eq.amres || 0,
   };
 
-  document.getElementById('basicResults').innerHTML = RESULT_BASIC_KEYS.map(k =>
-    `<div class="result-item"><span>${STAT_LABELS[k]}</span><strong>${display[k]}</strong></div>`
-  ).join('');
+  document.getElementById('basicResults').innerHTML = RESULT_BASIC_KEYS.flatMap(k => {
+    const item = `<div class="result-item"><span>${STAT_LABELS[k]}</span><strong>${display[k]}</strong></div>`;
+    // 魔抗單獨一列時靠右
+    return k === 'amres' ? ['<div class="result-item spacer" aria-hidden="true"></div>', item] : [item];
+  }).join('');
 
-  document.getElementById('modResults').innerHTML = RESULT_MOD_KEYS.map(k =>
-    `<div class="result-item"><span>${STAT_LABELS[k]}</span><strong>${eq[k] || 0}</strong></div>`
-  ).join('');
+  const modItem = k =>
+    `<div class="result-item"><span>${STAT_LABELS[k]}</span><strong>${eq[k] || 0}</strong></div>`;
+  document.getElementById('correctResults').innerHTML = RESULT_MOD_CORRECT_KEYS.map(modItem).join('');
+  document.getElementById('resistResults').innerHTML = RESULT_MOD_RESIST_KEYS.map(modItem).join('');
 
   updateCrystalPreview();
+  updateTitleAchPreview();
+  updateTrainPreview();
   renderEquipStage();
   if (refreshCustomPanel) renderCustomStatPanelIfNeeded();
 }
@@ -1637,7 +2071,7 @@ function renderPickerGridItems(items, { badgeGroup = null } = {}) {
   const badgeItems = badgeGroup ? sortPickerItems(badgeGroup) : sorted;
   return sorted.map(it => {
     const { general, mod } = getStatModes();
-    const stats = formatStatLine(resolveEquipStats(it, general, mod, null));
+    const stats = formatStatLine(resolveEquipStats(it, general, mod, null, it?.calcSlot || null));
     const lv = getLevelBadge(it, badgeItems) ? `<span class="lv">${getLevelBadge(it, badgeItems)}</span>` : '';
     return `<button type="button" class="picker-item" data-id="${escapeHtml(it.id)}" title="${escapeHtml(stats)}">
       ${renderPickerIcon(it)}
@@ -1950,15 +2384,24 @@ document.querySelectorAll('#level,#vit,#str,#def,#agi,#mag,#statModeGeneral,#sta
   });
 });
 document.getElementById('hyorikiToggle').addEventListener('change', () => recalc());
-document.getElementById('crystalEnabled').addEventListener('change', () => {
-  ensureCrystalRolls();
-  recalc();
+document.getElementById('trainStatGrid').addEventListener('input', e => {
+  const inp = e.target.closest('input[data-train-stat]');
+  if (!inp) return;
+  trainLevels[inp.dataset.trainStat] = clampTrainLv(inp.value);
+  recalc(false);
 });
-document.getElementById('crystalLevel').addEventListener('input', () => {
-  ensureCrystalRolls();
-  recalc();
+document.getElementById('trainStatGrid').addEventListener('change', e => {
+  const inp = e.target.closest('input[data-train-stat]');
+  if (!inp) return;
+  trainLevels[inp.dataset.trainStat] = clampTrainLv(inp.value);
+  inp.value = trainLevels[inp.dataset.trainStat];
+  recalc(false);
 });
 document.getElementById('crystalRollMode').addEventListener('change', () => {
+  // 自選需要至少 2 等才有升級詞條可選
+  if (getCrystalRollMode() === 'custom' && getCrystalLevel() <= 1) {
+    setCrystalLevel(2);
+  }
   ensureCrystalRolls();
   refreshCrystalRollValues();
   recalc();
@@ -2035,6 +2478,9 @@ function applyCharLang() {
   renderEquipStage();
   renderCrystalRefTable();
   updateCrystalPanelState();
+  updateTitleAchPreview();
+  renderTrainStatGrid();
+  updateTrainPreview();
   customPanelSignature = '';
   renderCustomStatPanelIfNeeded();
   renderCompare();
@@ -2046,6 +2492,9 @@ function boot() {
   initStatModeSelects();
   renderCrystalRefTable();
   updateCrystalPanelState();
+  updateTitleAchPreview();
+  renderTrainStatGrid();
+  updateTrainPreview();
   renderEquipStage();
   recalc();
   loadCatalog()
