@@ -18,6 +18,7 @@
     'nav.pet': { 'zh-TW': '🐾 寵物成長模擬', en: '🐾 Pet Growth', ko: '🐾 펫 성장' },
     'nav.char': { 'zh-TW': '⚔️ 角色能力計算', en: '⚔️ Character Stats', ko: '⚔️ 캐릭터 스탯' },
     'nav.site': { 'zh-TW': '🌐 官網', en: '🌐 Official Site', ko: '🌐 공식 사이트' },
+    'nav.market': { 'zh-TW': '🏪 官方市場', en: '🏪 Official Market', ko: '🏪 공식 시장' },
     'nav.guide': { 'zh-TW': '📖 官方攻略網', en: '📖 Official Guide', ko: '📖 공식 가이드' },
     'nav.aria': { 'zh-TW': '相關連結', en: 'Related links', ko: '관련 링크' },
     'lang.label': { 'zh-TW': '語言', en: 'Language', ko: '언어' },

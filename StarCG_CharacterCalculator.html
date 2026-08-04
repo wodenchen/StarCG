@@ -60,12 +60,16 @@
     .stat-clear-all { margin-bottom: 10px; }
     .stat-clear-all .stat-shortcut-btn { padding: 4px 12px; font-size: 0.78rem; }
     .equip-extra-options {
-      display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 4px;
+      display: flex; flex-wrap: nowrap; gap: 10px 12px; align-items: center; margin-top: 4px;
       font-size: 0.85rem;
     }
-    .equip-extra-options label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary); }
-    .equip-extra-options input { accent-color: var(--accent); }
-    .equip-extra-options .stat-shortcut-btn { padding: 4px 12px; font-size: 0.78rem; }
+    .equip-extra-options label {
+      display: inline-flex; align-items: flex-start; gap: 6px; cursor: pointer;
+      color: var(--text-secondary); min-width: 0; flex: 1; line-height: 1.35;
+    }
+    .equip-extra-options label span { min-width: 0; }
+    .equip-extra-options input { accent-color: var(--accent); margin-top: 0.2em; flex-shrink: 0; }
+    .equip-extra-options .stat-shortcut-btn { padding: 4px 12px; font-size: 0.78rem; flex-shrink: 0; }
     .slot-cluster { display: flex; align-items: center; gap: 6px; width: max-content; max-width: none; }
     .cluster-top { flex-direction: column; align-items: center; }
     .cluster-left { flex-direction: row; }
